@@ -35,6 +35,18 @@ vim.api.nvim_create_user_command("MasonInstallAll", function()
   vim.cmd("MasonInstall " .. table.concat(ensure_installed, " "))
 end, { desc = "Install All Mason Packages" })
 
+-- File detect
+-- Terraform
+vim.cmd [[silent! autocmd! filetype detect BufRead,BufNewFile *.tf]]
+vim.cmd [[autocmd BufRead,BufNewFile *.hcl set filetype=hcl]]
+vim.cmd [[autocmd BufRead,BufNewFile .terraformrc,terraform.rc set filetype=hcl]]
+vim.cmd [[autocmd BufRead,BufNewFile *.tf,*.tfvars set filetype=terraform]]
+vim.cmd [[autocmd BufRead,BufNewFile *.tfstate,*.tfstate.backup set filetype=json]]
+
+-- Ansible
+vim.cmd [[silent! autocmd! filetype detect BufRead,BufNewFile *.yaml.ansible]]
+vim.cmd [[autocmd BufRead,BufNewFile *.yaml.ansible set filetype=yaml.ansible]]
+
 return {
   {
     "neovim/nvim-lspconfig",
@@ -158,36 +170,67 @@ return {
     dependencies = {
       "rafamadriz/friendly-snippets",
       "petertriho/cmp-git",
-      "zbirenbaum/copilot-cmp",
+      "giuxtaposition/blink-cmp-copilot",
       "rcarriga/cmp-dap",
     },
     event = "LspAttach",
     version = "*",
-    completion = {
-      accept = { auto_brackets = { enabled = true } },
-      list = {
-        selection = function(ctx)
-          return ctx.mode == "cmdline" and "manual" or "preselect"
-        end,
-      },
-    },
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
     opts = {
       keymap = {
         ["<CR>"] = {},
         ["<Tab>"] = {},
       },
-    },
-    sources = {
-      -- TODO: Adjust this with actual functions
-      -- default = { 'lsp', 'path', 'snippets', 'buffer', 'git', 'copilot' },
-      default = function()
-        local defaults = { "lsp", "path", "snippets", "buffer" }
-        local git_filetypes = { gitcommit = true, octo = true }
-      end,
-      providers = {
-        git = { name = "git", module = "blink.compat.source" },
-        copilot = { name = "copilot", module = "blink.compat.source" },
-        dap = { name = "dap", module = "blink.compat.source" },
+      completion = {
+        accept = { auto_brackets = { enabled = true } },
+        menu = {
+          draw = { treesitter = "lsp" },
+        },
+      },
+      sources = {
+        cmdline = {},
+        default = function()
+          local success, node = pcall(vim.treesitter.get_node)
+          if vim.bo.filetype == "lua" then
+            return { "lsp", "path", "copilot", "lazydev" }
+          elseif
+            success
+            and node
+            and vim.tbl_contains(
+              { "comment", "line_comment", "block_comment" },
+              node:type()
+            )
+          then
+            return { "buffer" }
+          elseif vim.bo.filetype == "codecompanion" then
+            return { "buffer", "codecompanion" }
+          elseif vim.tbl_contains({ "gitcommit", "octo" }, vim.bo.filetype) then
+            return { "buffer", "git", "path" }
+          elseif require("cmp_dap").is_dap_buffer() then
+            return { "dap", "snippets", "buffer" }
+          else
+            return { "lsp", "path", "buffer", "copilot" }
+          end
+        end,
+        providers = {
+          git = { name = "git", module = "blink.compat.source" },
+          dap = { name = "dap", module = "blink.compat.source" },
+          copilot = {
+            name = "copilot",
+            module = "blink-cmp-copilot",
+            async = true,
+          },
+          codecompanion = {
+            name = "CodeCompanion",
+            module = "codecompanion.providers.completion.blink",
+          },
+          lazydev = {
+            name = "LazyDev",
+            module = "lazydev.integrations.blink",
+            score_offset = 100,
+          },
+        },
       },
     },
   },

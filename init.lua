@@ -1,4 +1,4 @@
-require("config.lazy")
+require "config.lazy"
 
 vim.opt.wrap = false
 vim.opt.cmdheight = 0
@@ -18,7 +18,6 @@ vim.diagnostic.config {
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 vim.opt.termguicolors = true
-
 
 -- Adjust padding on enter and load
 vim.api.nvim_create_autocmd({ "UIEnter", "ColorScheme" }, {
