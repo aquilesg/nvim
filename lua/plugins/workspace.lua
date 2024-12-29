@@ -1,18 +1,23 @@
 vim.api.nvim_create_user_command("Format", function(args)
   local range = nil
   if args.count ~= -1 then
-    local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+    local end_line =
+      vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
     range = {
       start = { args.line1, 0 },
       ["end"] = { args.line2, end_line:len() },
     }
   end
-  require("conform").format { async = true, lsp_format = "fallback", range = range }
+  require("conform").format {
+    async = true,
+    lsp_format = "fallback",
+    range = range,
+  }
 end, { range = true })
 
 vim.api.nvim_create_autocmd("BufWritePre", {
   callback = function()
-    require("conform").format({ async = true, lsp_fallback = true })
+    require("conform").format { async = true, lsp_fallback = true }
   end,
 })
 
@@ -27,29 +32,70 @@ local slow_format_filetypes = {
 
 local map = vim.keymap.set
 local custom = require "custom_functions"
-map("n", "<leader>fm", function() require("conform").format({ async = true }) end,
-  { desc = "Format document" })
+map("n", "<leader>fm", function()
+  require("conform").format { async = true }
+end, { desc = "Format document" })
 
-map("n", "<leader>ot", "<cmd> ObsidianToday <CR>", { desc = "Open today's note" })
-map("n", "<leader>ou", "<cmd> ObsidianTomorrow <CR>", { desc = "Open tomorrow's note" })
-map("n", "<leader>oy", "<cmd> ObsidianYesterday <CR>", { desc = "Open yesterday's note" })
-map("n", "<leader>osn", "<cmd> ObsidianSearch <CR>", { desc = "Obsidian search notes" })
+map(
+  "n",
+  "<leader>ot",
+  "<cmd> ObsidianToday <CR>",
+  { desc = "Open today's note" }
+)
+map(
+  "n",
+  "<leader>ou",
+  "<cmd> ObsidianTomorrow <CR>",
+  { desc = "Open tomorrow's note" }
+)
+map(
+  "n",
+  "<leader>oy",
+  "<cmd> ObsidianYesterday <CR>",
+  { desc = "Open yesterday's note" }
+)
+map(
+  "n",
+  "<leader>osn",
+  "<cmd> ObsidianSearch <CR>",
+  { desc = "Obsidian search notes" }
+)
 map("n", "<leader>ost", "<cmd> ObsidianTags <CR>", { desc = "Search for tags" })
-map("n", "<leader>oq", "<cmd> ObsidianQuickSwitch <CR>", { desc = "Quick switch to different note" })
-map("n", "<leader>oo", "<cmd> ObsidianOpen <CR>", { desc = "Open current file in Obsidian" })
-map("n", "<leader>op", "<cmd> ObsidianPasteImg <CR>", { desc = "Paste image into Obsidian note" })
-map("n", "<leader>on", "<cmd> ObsidianNewFromTemplate <CR>", { desc = "Paste image into Obsidian note" })
+map(
+  "n",
+  "<leader>oq",
+  "<cmd> ObsidianQuickSwitch <CR>",
+  { desc = "Quick switch to different note" }
+)
+map(
+  "n",
+  "<leader>oo",
+  "<cmd> ObsidianOpen <CR>",
+  { desc = "Open current file in Obsidian" }
+)
+map(
+  "n",
+  "<leader>op",
+  "<cmd> ObsidianPasteImg <CR>",
+  { desc = "Paste image into Obsidian note" }
+)
+map(
+  "n",
+  "<leader>on",
+  "<cmd> ObsidianNewFromTemplate <CR>",
+  { desc = "Paste image into Obsidian note" }
+)
 
 map("n", "<leader>fr", "<cmd> GrugFar <CR>", { desc = "Find and Replace" })
 
-map( "n" , "<leader>ff", custom.find_files, { desc = "File Search" })
-map( "n" , "<leader>fw", custom.livegrep, { desc = "Word Search" })
+map("n", "<leader>ff", custom.find_files, { desc = "File Search" })
+map("n", "<leader>fw", custom.livegrep, { desc = "Word Search" })
 
 return {
   {
     "stevearc/conform.nvim",
     event = "VeryLazy",
-    opt = {
+    opts = {
       format_on_save = function(bufnr)
         if slow_format_filetypes[vim.bo[bufnr].filetype] then
           return
@@ -158,5 +204,9 @@ return {
     dependencies = {
       "nvim-telescope/telescope-live-grep-args.nvim",
     },
+  },
+  {
+    "numToStr/Comment.nvim",
+    opts = {},
   },
 }

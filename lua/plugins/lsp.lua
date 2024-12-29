@@ -31,7 +31,6 @@ local ensure_installed = {
   "yaml-language-server",
 }
 
-
 vim.api.nvim_create_user_command("MasonInstallAll", function()
   vim.cmd("MasonInstall " .. table.concat(ensure_installed, " "))
 end, { desc = "Install All Mason Packages" })
@@ -53,17 +52,52 @@ return {
     config = function()
       local on_attach = function()
         local map = vim.keymap.set
-        map("n", "K", "<cmd> Lspsaga hover_doc <CR>", { desc = "Show hover doc" })
-        map("n", "gr", "<cmd> Lspsaga finder <CR>", { desc = "Find references" })
-        map("n", "gd", "<cmd> Lspsaga goto_definition <CR>", { desc = "Go to definition" })
-        map("n", "<leader>pd", "<cmd> Lspsaga peek_definition <CR>", { desc = "Peek definition" })
-        map("n", "<leader>pD", "<cmd> Lspsaga peek_type_definition <CR>", { desc = "Peek type definition" })
-        map("n", "<leader>ra", "<cmd> Lspsaga rename <CR>", { desc = "Lsp outline" })
-        map("n", "ca", require("actions-preview").code_actions, { desc = "Show code actions" })
+        map(
+          "n",
+          "K",
+          "<cmd> Lspsaga hover_doc <CR>",
+          { desc = "Show hover doc" }
+        )
+        map(
+          "n",
+          "gr",
+          "<cmd> Lspsaga finder <CR>",
+          { desc = "Find references" }
+        )
+        map(
+          "n",
+          "gd",
+          "<cmd> Lspsaga goto_definition <CR>",
+          { desc = "Go to definition" }
+        )
+        map(
+          "n",
+          "<leader>pd",
+          "<cmd> Lspsaga peek_definition <CR>",
+          { desc = "Peek definition" }
+        )
+        map(
+          "n",
+          "<leader>pD",
+          "<cmd> Lspsaga peek_type_definition <CR>",
+          { desc = "Peek type definition" }
+        )
+        map(
+          "n",
+          "<leader>ra",
+          "<cmd> Lspsaga rename <CR>",
+          { desc = "Lsp outline" }
+        )
+        map(
+          "n",
+          "ca",
+          require("actions-preview").code_actions,
+          { desc = "Show code actions" }
+        )
       end
 
       local opts = {
-        on_attach = on_attach
+        on_attach = on_attach,
       }
       require("mason-lspconfig").setup_handlers {
         function(server_name)
@@ -114,20 +148,29 @@ return {
     },
   },
   {
-    'saghen/blink.compat',
-    version = '*',
+    "saghen/blink.compat",
+    version = "*",
     lazy = true,
     opts = {},
   },
   {
-    'saghen/blink.cmp',
+    "saghen/blink.cmp",
     dependencies = {
-      { 'rafamadriz/friendly-snippets' },
-      { 'petertriho/cmp-git' },
-      { 'zbirenbaum/copilot-cmp' },
+      "rafamadriz/friendly-snippets",
+      "petertriho/cmp-git",
+      "zbirenbaum/copilot-cmp",
+      "rcarriga/cmp-dap",
     },
     event = "LspAttach",
     version = "*",
+    completion = {
+      accept = { auto_brackets = { enabled = true } },
+      list = {
+        selection = function(ctx)
+          return ctx.mode == "cmdline" and "manual" or "preselect"
+        end,
+      },
+    },
     opts = {
       keymap = {
         ["<CR>"] = {},
@@ -135,16 +178,16 @@ return {
       },
     },
     sources = {
-      default = { 'lsp', 'path', 'snippets', 'buffer', 'git', 'copilot' },
+      -- TODO: Adjust this with actual functions
+      -- default = { 'lsp', 'path', 'snippets', 'buffer', 'git', 'copilot' },
+      default = function()
+        local defaults = { "lsp", "path", "snippets", "buffer" }
+        local git_filetypes = { gitcommit = true, octo = true }
+      end,
       providers = {
-        git = {
-          name = 'git',
-          module = 'blink.compat.source',
-        },
-        copilot = {
-          name = 'copilot',
-          module = 'blink.compat.source',
-        },
+        git = { name = "git", module = "blink.compat.source" },
+        copilot = { name = "copilot", module = "blink.compat.source" },
+        dap = { name = "dap", module = "blink.compat.source" },
       },
     },
   },

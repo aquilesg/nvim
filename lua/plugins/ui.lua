@@ -1,16 +1,47 @@
 --  Nvim Tree Mappings
 local map = vim.keymap.set
 
-map("n", "<leader>jj", "<cmd> Noice dismiss <CR>", { desc = "Dismiss Noice notification" })
+map(
+  "n",
+  "<leader>jj",
+  "<cmd> Noice dismiss <CR>",
+  { desc = "Dismiss Noice notification" }
+)
 map("n", "<leader>x", "<cmd> bd <CR>", { desc = "Close current buffer" })
+map(
+  "n",
+  "<leader>/",
+  ":nohlsearch<CR>",
+  { silent = true, desc = "Clear search highlight" }
+)
 
 -- Nvim Tree
-map({ "n", "i" }, "<c-n>", "<cmd> NvimTreeToggle <cr>", { desc = "Open Nvim Tree" })
-map({ "n", "i" }, "<leader>e", "<cmd> NvimTreeFocus <cr>", { desc = "Focus Nvim Tree" })
+map(
+  { "n", "i" },
+  "<c-n>",
+  "<cmd> NvimTreeToggle <cr>",
+  { desc = "Open Nvim Tree" }
+)
+map(
+  { "n", "i" },
+  "<leader>e",
+  "<cmd> NvimTreeFocus <cr>",
+  { desc = "Focus Nvim Tree" }
+)
 
 -- Trouble Diagnostics
-map("n", "<leader>qt", "<cmd> Trouble diagnostics toggle <CR>", { desc = "Toggle Trouble over workspace" })
-map("n", "<leader>qb", "<cmd> Trouble diagnostics toggle filter.buf=0 <CR>", { desc = "Toggle buffer diagnostics" })
+map(
+  "n",
+  "<leader>qt",
+  "<cmd> Trouble diagnostics toggle <CR>",
+  { desc = "Toggle Trouble over workspace" }
+)
+map(
+  "n",
+  "<leader>qb",
+  "<cmd> Trouble diagnostics toggle filter.buf=0 <CR>",
+  { desc = "Toggle buffer diagnostics" }
+)
 map("n", "<leader>qa", "<cmd> TodoTrouble <CR>", { desc = "Toggle TODO list" })
 
 -- Document symbols
@@ -26,8 +57,8 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
     config = function()
-      vim.cmd("colorscheme rose-pine")
-    end
+      vim.cmd "colorscheme rose-pine"
+    end,
   },
   {
     "folke/noice.nvim",
@@ -93,20 +124,51 @@ return {
   {
     "MeanderingProgrammer/markdown.nvim",
     ft = "markdown",
-    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons",
+    },
     opts = {
       preset = "obsidian",
       callout = {
-        done = { raw = "[!Done]", rendered = "󰄬 Done", highlight = "RenderMarkdownSuccess" },
-        info = { raw = "[!info]", rendered = "󰋽 Info", highlight = "RenderMarkdownInfo" },
-        time = { raw = "[!timestamp]", rendered = " Timestamp", highlight = "RenderMarkdownInfo" },
+        done = {
+          raw = "[!Done]",
+          rendered = "󰄬 Done",
+          highlight = "RenderMarkdownSuccess",
+        },
+        info = {
+          raw = "[!info]",
+          rendered = "󰋽 Info",
+          highlight = "RenderMarkdownInfo",
+        },
+        time = {
+          raw = "[!timestamp]",
+          rendered = " Timestamp",
+          highlight = "RenderMarkdownInfo",
+        },
       },
       checkbox = {
         custom = {
-          todo = { raw = "[-]", rendered = "󰥔 ", highlight = "RenderMarkdownTodo" },
-          follow_up = { raw = "[>]", rendered = " ", highlight = "RenderMarkdownTodo" },
-          canceled = { raw = "[~]", rendered = "󰰱 ", highlight = "RenderMarkdownTodo" },
-          important = { raw = "[!]", rendered = " ", highlight = "RenderMarkdownTodo" },
+          todo = {
+            raw = "[-]",
+            rendered = "󰥔 ",
+            highlight = "RenderMarkdownTodo",
+          },
+          follow_up = {
+            raw = "[>]",
+            rendered = " ",
+            highlight = "RenderMarkdownTodo",
+          },
+          canceled = {
+            raw = "[~]",
+            rendered = "󰰱 ",
+            highlight = "RenderMarkdownTodo",
+          },
+          important = {
+            raw = "[!]",
+            rendered = " ",
+            highlight = "RenderMarkdownTodo",
+          },
         },
       },
       pipe_table = { preset = "heavy" },
@@ -149,7 +211,7 @@ return {
         enabled = true,
         sections = {
           { section = "header" },
-          { section = "keys",  gap = 1, padding = 1 },
+          { section = "keys", gap = 1, padding = 1 },
           function()
             local Snacks = require "snacks"
             Snacks.scroll.enable()
@@ -218,14 +280,14 @@ return {
       highlight = {
         enable = true,
       },
-    }
+    },
   },
   {
-    'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    "nvim-lualine/lualine.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
-      disabled_filetypes = {
-        statusline = { 'NvimTree' }
+      options = {
+        globalstatus = true,
       },
       sections = {
         lualine_x = {
@@ -244,6 +306,20 @@ return {
             color = { fg = "#ff9e64" },
           },
         },
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = {},
+    keys = {
+      {
+        "<leader>?",
+        function()
+          require("which-key").show { global = true }
+        end,
+        desc = "Buffer Local Keymaps (which-key)",
       },
     },
   },

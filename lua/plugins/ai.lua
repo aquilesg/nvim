@@ -15,7 +15,11 @@ map(
   "v",
   "ga",
   "<cmd>CodeCompanionChat Add<cr>",
-  { noremap = true, silent = true, desc = "Add selected visual section to chat" }
+  {
+    noremap = true,
+    silent = true,
+    desc = "Add selected visual section to chat",
+  }
 )
 
 vim.treesitter.language.register("markdown", "codecompanion")
@@ -29,7 +33,7 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "hrsh7th/nvim-cmp",
       "nvim-telescope/telescope.nvim",
-      { "echasnovski/mini.nvim",  version = false },
+      { "echasnovski/mini.nvim", version = false },
       { "stevearc/dressing.nvim", opts = {} },
     },
     opts = {
