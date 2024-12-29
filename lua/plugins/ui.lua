@@ -16,14 +16,9 @@ map(
 )
 
 -- Nvim Tree
+map({ "n" }, "<c-n>", "<cmd> NvimTreeToggle <cr>", { desc = "Open Nvim Tree" })
 map(
-  { "n", "i" },
-  "<c-n>",
-  "<cmd> NvimTreeToggle <cr>",
-  { desc = "Open Nvim Tree" }
-)
-map(
-  { "n", "i" },
+  { "n" },
   "<leader>e",
   "<cmd> NvimTreeFocus <cr>",
   { desc = "Focus Nvim Tree" }

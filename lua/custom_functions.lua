@@ -7,14 +7,6 @@ function M.insert_timestamp()
   vim.api.nvim_buf_set_text(0, row, 0, row, 0, { timestamp })
 end
 
-function M.debug_nearest_test()
-  require("neotest").run.run { strategy = "dap" }
-end
-
-function M.open_test()
-  require("neotest").output.open { enter = true }
-end
-
 function Close_unnamed_buffers()
   -- Get a list of all buffers
   local buffers = vim.api.nvim_list_bufs()
