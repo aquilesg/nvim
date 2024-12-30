@@ -78,7 +78,24 @@ return {
     "nvim-tree/nvim-tree.lua",
     version = "*",
     event = "UIEnter",
-    opts = {},
+    opts = {
+      hijack_cursor = true,
+      sync_root_with_cwd = true,
+      update_focused_file = {
+        enable = true,
+        update_root = false,
+      },
+      renderer = {
+        root_folder_label = false,
+        highlight_git = true,
+        indent_markers = { enable = true },
+        icons = {
+          glyphs = {
+            git = { unmerged = "" },
+          },
+        },
+      },
+    },
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
@@ -128,6 +145,10 @@ return {
       "nvim-tree/nvim-web-devicons",
     },
     opts = {
+      heading = {
+        width = { "full", "block", "full", "block" },
+        min_width = 30,
+      },
       preset = "obsidian",
       callout = {
         done = {

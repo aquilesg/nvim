@@ -71,8 +71,10 @@ local autocmd = vim.api.nvim_create_autocmd
 local augroup = vim.api.nvim_create_augroup
 
 -- Create augroups
-local terraform_group = augroup("TerraformDetect", { clear = true })
-local ansible_group = augroup("AnsibleDetect", { clear = true })
+local terraform_group =
+  vim.api.nvim_create_augroup("TerraformDetect", { clear = true })
+local ansible_group =
+  vim.api.nvim_create_augroup("AnsibleDetect", { clear = true })
 
 -- Terraform related files
 autocmd({ "BufRead", "BufNewFile" }, {
@@ -263,6 +265,42 @@ return {
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
+      appearance = {
+        kind_icons = {
+          Copilot = "",
+          Tag = "󰓹",
+          Text = "󰉿",
+          Method = "󰊕",
+          Function = "󰊕",
+          Constructor = "󰒓",
+
+          Field = "󰜢",
+          Variable = "󰆦",
+          Property = "󰖷",
+
+          Class = "󱡠",
+          Interface = "󱡠",
+          Struct = "󱡠",
+          Module = "󰅩",
+
+          Unit = "󰪚",
+          Value = "󰦨",
+          Enum = "󰦨",
+          EnumMember = "󰦨",
+
+          Keyword = "󰻾",
+          Constant = "",
+
+          Snippet = "󱄽",
+          Color = "󰏘",
+          File = "󰈔",
+          Reference = "󰬲",
+          Folder = "󰉋",
+          Event = "󱐋",
+          Operator = "󰪚",
+          TypeParameter = "󰬛",
+        },
+      },
       keymap = {
         ["<CR>"] = {},
         ["<Tab>"] = {},
