@@ -201,12 +201,14 @@ return {
   },
   {
     "nvim-telescope/telescope.nvim",
+    event = "VeryLazy",
     dependencies = {
       "nvim-telescope/telescope-live-grep-args.nvim",
     },
   },
   {
     "numToStr/Comment.nvim",
+    event = "VeryLazy",
     opts = {},
   },
 }

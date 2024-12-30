@@ -61,7 +61,7 @@ return {
   },
   {
     "folke/noice.nvim",
-    event = "VeryLazy",
+    event = "UIEnter",
     opts = {
       presets = {
         command_palette = true,
@@ -77,7 +77,7 @@ return {
   {
     "nvim-tree/nvim-tree.lua",
     version = "*",
-    lazy = false,
+    event = "UIEnter",
     opts = {},
     dependencies = {
       "nvim-tree/nvim-web-devicons",
@@ -111,7 +111,7 @@ return {
   },
   {
     "sphamba/smear-cursor.nvim",
-    event = "VeryLazy",
+    event = "UIEnter",
     opts = {
       stiffness = 0.8,
       trailing_stiffness = 0.6,
@@ -195,7 +195,7 @@ return {
   },
   {
     "folke/drop.nvim",
-    event = "VeryLazy",
+    event = "UIEnter",
     opts = {},
   },
   {
@@ -283,34 +283,47 @@ return {
   },
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons", "folke/noice.nvim"},
+    dependencies = { "nvim-tree/nvim-web-devicons", "folke/noice.nvim" },
+    event = "UIEnter",
     opts = {
       options = {
         globalstatus = true,
       },
-    sections = {
-      lualine_x = {
-        {
-          function() return require("noice").api.status.message.get_hl() end,
-          cond = function() return require("noice").api.status.message.has() end,
-        },
-        {
-          function() return require("noice").api.status.mode.get() end,
-          cond = function() return require("noice").api.status.mode.has() end,
-          color = { fg = "#ff9e64" },
-        },
-        {
-          function() return require("noice").api.status.search.get() end,
-          cond = function() return require("noice").api.status.search.has() end,
-          color = { fg = "#ff9e64" },
+      sections = {
+        lualine_x = {
+          {
+            function()
+              return require("noice").api.status.message.get_hl()
+            end,
+            cond = function()
+              return require("noice").api.status.message.has()
+            end,
+          },
+          {
+            function()
+              return require("noice").api.status.mode.get()
+            end,
+            cond = function()
+              return require("noice").api.status.mode.has()
+            end,
+            color = { fg = "#ff9e64" },
+          },
+          {
+            function()
+              return require("noice").api.status.search.get()
+            end,
+            cond = function()
+              return require("noice").api.status.search.has()
+            end,
+            color = { fg = "#ff9e64" },
+          },
         },
       },
     },
   },
-  },
   {
     "folke/which-key.nvim",
-    event = "VeryLazy",
+    event = "UIEnter",
     opts = {},
     keys = {
       {
