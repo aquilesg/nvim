@@ -94,7 +94,7 @@ return {
         map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>")
       end,
     },
-    event = "VeryLazy",
+    event = "UIEnter",
   },
   {
     "pwntester/octo.nvim",
@@ -132,7 +132,7 @@ return {
     {
       "Rawnly/gist.nvim",
       cmd = { "GistCreate", "GistCreateFromFile", "GistsList" },
-      config = true,
+      opts = {},
     },
   },
   {

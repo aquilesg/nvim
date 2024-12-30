@@ -1,3 +1,9 @@
+local custom = require "custom_functions"
+vim.api.nvim_create_user_command(
+  "LoadTestSuite",
+  custom.load_test_suite,
+  { desc = "Load test suite" }
+)
 return {
   {
     "rcarriga/nvim-dap-ui",
@@ -34,5 +40,8 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "jbyuki/one-small-step-for-vimkind",
     },
+    config = function()
+      require "config.neotest"
+    end,
   },
 }

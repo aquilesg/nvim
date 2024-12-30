@@ -68,7 +68,6 @@ end, { desc = "Install All Treesitter Parsers" })
 
 -- Infrastructure as Code file detection
 local autocmd = vim.api.nvim_create_autocmd
-local augroup = vim.api.nvim_create_augroup
 
 -- Create augroups
 local terraform_group =
@@ -130,6 +129,7 @@ autocmd({ "BufRead", "BufNewFile" }, {
 return {
   {
     "nvim-treesitter/nvim-treesitter",
+    event = "UIEnter",
     opts = {
       highlight = {
         enable = true,
@@ -138,16 +138,14 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
-    event = "VeryLazy",
-  },
-  {
-    "williamboman/mason.nvim",
-    cmd = "Mason",
-    opts = {},
+    event = "UIEnter",
   },
   {
     "williamboman/mason-lspconfig.nvim",
-    event = "VeryLazy",
+    dependencies = {
+      "williamboman/mason.nvim",
+    },
+    event = "UIEnter",
     opts = {},
     config = function()
       local on_attach = function()
@@ -198,8 +196,11 @@ return {
 
       local opts = {
         on_attach = on_attach,
-        capabilities = require("blink.cmp").get_lsp_capabilities(),
+        capabilities = require("blink.cmp").get_lsp_capabilities({}, true),
       }
+
+      require("mason").setup()
+      require("mason-lspconfig").setup()
       require("mason-lspconfig").setup_handlers {
         function(server_name)
           require("lspconfig")[server_name].setup(opts)
@@ -331,7 +332,7 @@ return {
           elseif require("cmp_dap").is_dap_buffer() then
             return { "dap", "snippets", "buffer" }
           else
-            return { "lsp", "path", "buffer", "copilot" }
+            return { "lsp", "path", "copilot" }
           end
         end,
         providers = {

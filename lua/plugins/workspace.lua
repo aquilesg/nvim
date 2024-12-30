@@ -94,7 +94,7 @@ map("n", "<leader>fw", custom.livegrep, { desc = "Word Search" })
 return {
   {
     "stevearc/conform.nvim",
-    event = "VeryLazy",
+    event = "LspAttach",
     opts = {
       format_on_save = function(bufnr)
         if slow_format_filetypes[vim.bo[bufnr].filetype] then
@@ -135,12 +135,11 @@ return {
   {
     "kylechui/nvim-surround",
     version = "*",
-    event = "VeryLazy",
+    event = "UIEnter",
     opts = {},
   },
   {
     "epwalsh/obsidian.nvim",
-    event = "VeryLazy",
     cmd = {
       "ObsidianOpen",
       "ObsidianNew",
@@ -201,14 +200,14 @@ return {
   },
   {
     "nvim-telescope/telescope.nvim",
-    event = "VeryLazy",
+    event = "UIEnter",
     dependencies = {
       "nvim-telescope/telescope-live-grep-args.nvim",
     },
   },
   {
     "numToStr/Comment.nvim",
-    event = "VeryLazy",
+    event = "UIEnter",
     opts = {},
   },
 }
