@@ -51,6 +51,10 @@ return {
   {
     "rose-pine/neovim",
     name = "rose-pine",
+    opts = {
+      dark_variant = "moon",
+      dim_inactive_windows = true,
+    },
     config = function()
       vim.cmd "colorscheme rose-pine"
     end,
@@ -279,30 +283,30 @@ return {
   },
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = { "nvim-tree/nvim-web-devicons", "folke/noice.nvim"},
     opts = {
       options = {
         globalstatus = true,
       },
-      sections = {
-        lualine_x = {
-          {
-            require("noice").api.status.message.get_hl,
-            cond = require("noice").api.status.message.has,
-          },
-          {
-            require("noice").api.status.mode.get,
-            cond = require("noice").api.status.mode.has,
-            color = { fg = "#ff9e64" },
-          },
-          {
-            require("noice").api.status.search.get,
-            cond = require("noice").api.status.search.has,
-            color = { fg = "#ff9e64" },
-          },
+    sections = {
+      lualine_x = {
+        {
+          function() return require("noice").api.status.message.get_hl() end,
+          cond = function() return require("noice").api.status.message.has() end,
+        },
+        {
+          function() return require("noice").api.status.mode.get() end,
+          cond = function() return require("noice").api.status.mode.has() end,
+          color = { fg = "#ff9e64" },
+        },
+        {
+          function() return require("noice").api.status.search.get() end,
+          cond = function() return require("noice").api.status.search.has() end,
+          color = { fg = "#ff9e64" },
         },
       },
     },
+  },
   },
   {
     "folke/which-key.nvim",
