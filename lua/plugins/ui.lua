@@ -337,11 +337,17 @@ return {
         lualine_x = {
           {
             function()
-              return require("noice").api.status.message.get_hl()
+              local buf_clients = vim.lsp.get_active_clients { bufnr = 0 }
+              if #buf_clients == 0 then
+                return "No LSP "
+              end
+              local buf_client_names = {}
+              for _, client in pairs(buf_clients) do
+                table.insert(buf_client_names, " " .. client.name)
+              end
+              return table.concat(buf_client_names, ", ")
             end,
-            cond = function()
-              return require("noice").api.status.message.has()
-            end,
+            icon = "LSP(s):",
           },
           {
             function()
@@ -349,15 +355,6 @@ return {
             end,
             cond = function()
               return require("noice").api.status.mode.has()
-            end,
-            color = { fg = "#ff9e64" },
-          },
-          {
-            function()
-              return require("noice").api.status.search.get()
-            end,
-            cond = function()
-              return require("noice").api.status.search.has()
             end,
             color = { fg = "#ff9e64" },
           },

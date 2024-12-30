@@ -90,6 +90,8 @@ map("n", "<leader>fr", "<cmd> GrugFar <CR>", { desc = "Find and Replace" })
 
 map("n", "<leader>ff", custom.find_files, { desc = "File Search" })
 map("n", "<leader>fw", custom.livegrep, { desc = "Word Search" })
+map("n", "<leader>fb", custom.list_open_buffers, { desc = "Word Search" })
+map("n", "<leader>fc", custom.list_git_changes, { desc = "Word Search" })
 
 return {
   {

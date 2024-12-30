@@ -123,4 +123,15 @@ function M.livegrep()
   local telescope = require "telescope"
   telescope.extensions.live_grep_args.live_grep_args()
 end
+
+function M.list_open_buffers()
+  local telescope_builtin = require "telescope.builtin"
+  telescope_builtin.buffers()
+end
+
+function M.list_git_changes()
+  local telescope_builtin = require "telescope.builtin"
+  telescope_builtin.git_status()
+end
+
 return M
