@@ -35,19 +35,105 @@ vim.api.nvim_create_user_command("MasonInstallAll", function()
   vim.cmd("MasonInstall " .. table.concat(ensure_installed, " "))
 end, { desc = "Install All Mason Packages" })
 
--- File detect
--- Terraform
-vim.cmd [[silent! autocmd! filetype detect BufRead,BufNewFile *.tf]]
-vim.cmd [[autocmd BufRead,BufNewFile *.hcl set filetype=hcl]]
-vim.cmd [[autocmd BufRead,BufNewFile .terraformrc,terraform.rc set filetype=hcl]]
-vim.cmd [[autocmd BufRead,BufNewFile *.tf,*.tfvars set filetype=terraform]]
-vim.cmd [[autocmd BufRead,BufNewFile *.tfstate,*.tfstate.backup set filetype=json]]
+local treesitter_parsers = {
+  "bash",
+  "c",
+  "cpp",
+  "dockerfile",
+  "go",
+  "hcl",
+  "html",
+  "graphql",
+  "java",
+  "javascript",
+  "json",
+  "lua",
+  "markdown",
+  "markdown_inline",
+  "mermaid",
+  "python",
+  "proto",
+  "ruby",
+  "scala",
+  "sql",
+  "terraform",
+  "vim",
+  "vimdoc",
+  "yaml",
+}
 
--- Ansible
-vim.cmd [[silent! autocmd! filetype detect BufRead,BufNewFile *.yaml.ansible]]
-vim.cmd [[autocmd BufRead,BufNewFile *.yaml.ansible set filetype=yaml.ansible]]
+vim.api.nvim_create_user_command("TSInstallAll", function()
+  vim.cmd("TSInstall! " .. table.concat(treesitter_parsers, " "))
+end, { desc = "Install All Treesitter Parsers" })
+
+-- Infrastructure as Code file detection
+local autocmd = vim.api.nvim_create_autocmd
+local augroup = vim.api.nvim_create_augroup
+
+-- Create augroups
+local terraform_group = augroup("TerraformDetect", { clear = true })
+local ansible_group = augroup("AnsibleDetect", { clear = true })
+
+-- Terraform related files
+autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = {
+    "*.tf",
+    "*.tfvars",
+    "*.tfvars.json",
+  },
+  group = terraform_group,
+  callback = function()
+    vim.bo.filetype = "terraform"
+  end,
+})
+
+autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = {
+    "*.hcl",
+    ".terraformrc",
+    "terraform.rc",
+  },
+  group = terraform_group,
+  callback = function()
+    vim.bo.filetype = "hcl"
+  end,
+})
+
+autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = {
+    "*.tfstate",
+    "*.tfstate.backup",
+    "*.tfplan",
+  },
+  group = terraform_group,
+  callback = function()
+    vim.bo.filetype = "json"
+  end,
+})
+
+-- Ansible related files
+autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = {
+    "*.yaml.ansible",
+    "*/playbooks/*.yml",
+    "*/roles/*.yml",
+    "*/inventory/*.yml",
+  },
+  group = ansible_group,
+  callback = function()
+    vim.bo.filetype = "yaml.ansible"
+  end,
+})
 
 return {
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      highlight = {
+        enable = true,
+      },
+    },
+  },
   {
     "neovim/nvim-lspconfig",
     event = "VeryLazy",
