@@ -7,37 +7,6 @@ function M.insert_timestamp()
   vim.api.nvim_buf_set_text(0, row, 0, row, 0, { timestamp })
 end
 
-function Close_unnamed_buffers()
-  -- Get a list of all buffers
-  local buffers = vim.api.nvim_list_bufs()
-
-  for _, buf in ipairs(buffers) do
-    if vim.api.nvim_buf_get_name(buf) == "" then
-      if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
-        vim.api.nvim_buf_delete(buf, { force = true })
-      end
-    end
-  end
-end
-
-function M.set_dark_theme()
-  Close_unnamed_buffers()
-  vim.g.background = "dark"
-  vim.cmd "Lazy reload tiny-inline-diagnostic.nvim"
-  vim.cmd "Lazy reload markdown.nvim"
-  vim.cmd "Lazy reload drop.nvim"
-  vim.cmd "bufdo e"
-end
-
-function M.set_light_theme()
-  Close_unnamed_buffers()
-  vim.g.background = "light"
-  vim.cmd "Lazy reload tiny-inline-diagnostic.nvim"
-  vim.cmd "Lazy reload markdown.nvim"
-  vim.cmd "Lazy reload drop.nvim"
-  vim.cmd "bufdo e"
-end
-
 function M.toggle_diffview()
   if next(require("diffview.lib").views) == nil then
     vim.cmd "DiffviewOpen"

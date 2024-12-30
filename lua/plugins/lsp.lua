@@ -198,6 +198,7 @@ return {
 
       local opts = {
         on_attach = on_attach,
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
       }
       require("mason-lspconfig").setup_handlers {
         function(server_name)

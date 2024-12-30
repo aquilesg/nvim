@@ -47,17 +47,62 @@ map(
   { desc = "Show outline" }
 )
 
+local set_plugin_theme = function(background_option)
+  vim.api.nvim_set_option_value("background", background_option, {})
+
+  -- Reload the color theme
+  vim.cmd "colorscheme rose-pine"
+
+  -- Close unnamed buffers
+  local buffers = vim.api.nvim_list_bufs()
+
+  for _, buf in ipairs(buffers) do
+    if vim.api.nvim_buf_get_name(buf) == "" then
+      if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
+        vim.api.nvim_buf_delete(buf, { force = true })
+      end
+    end
+  end
+
+  -- Reload UI Plugins
+  local lazy = require "lazy"
+  local ui_plugins = {
+    "tiny-inline-diagnostic.nvim",
+    "markdown.nvim",
+    "drop.nvim",
+  }
+
+  for _, plugin in ipairs(ui_plugins) do
+    local plugin_info = lazy.plugins()[plugin]
+    if plugin_info and plugin_info._.working then
+      vim.cmd("Lazy reload " .. plugin)
+    end
+  end
+
+  vim.cmd "bufdo e"
+end
+
 return {
+  {
+    "f-person/auto-dark-mode.nvim",
+    opts = {
+      update_interval = 1000,
+      set_dark_mode = function()
+        set_plugin_theme "dark"
+      end,
+      set_light_mode = function()
+        set_plugin_theme "light"
+      end,
+    },
+  },
   {
     "rose-pine/neovim",
     name = "rose-pine",
     opts = {
+      variant = "auto",
       dark_variant = "moon",
       dim_inactive_windows = true,
     },
-    config = function()
-      vim.cmd "colorscheme rose-pine"
-    end,
   },
   {
     "folke/noice.nvim",
@@ -229,24 +274,37 @@ return {
       quickfile = { enabled = true },
       dashboard = {
         enabled = true,
+
         sections = {
           { section = "header" },
           { section = "keys", gap = 1, padding = 1 },
+          {
+            pane = 2,
+            icon = " ",
+            desc = "Browse Repo",
+            padding = 1,
+            key = "b",
+            action = function()
+              Snacks.gitbrowse()
+            end,
+          },
           function()
-            local Snacks = require "snacks"
-            Snacks.scroll.enable()
             local in_git = Snacks.git.get_root() ~= nil
             local cmds = {
               {
                 icon = " ",
                 title = "Open PRs",
                 cmd = "gh pr list -L 3",
+                key = "p",
+                action = function()
+                  vim.fn.jobstart("gh pr list --web", { detach = true })
+                end,
                 height = 7,
               },
               {
                 icon = " ",
                 title = "Git Status",
-                cmd = "hub --no-pager diff --stat -B -M -C",
+                cmd = "git --no-pager diff --stat -B -M -C",
                 height = 10,
               },
             }

@@ -11,15 +11,16 @@ map(
   "<cmd>CodeCompanionChat Toggle<cr>",
   { noremap = true, silent = true, desc = "Toggle CodeCompanionChat" }
 )
+map("v", "ga", "<cmd>CodeCompanionChat Add<cr>", {
+  noremap = true,
+  silent = true,
+  desc = "Add selected visual section to chat",
+})
 map(
-  "v",
-  "ga",
-  "<cmd>CodeCompanionChat Add<cr>",
-  {
-    noremap = true,
-    silent = true,
-    desc = "Add selected visual section to chat",
-  }
+  "n",
+  "<leader>n",
+  "<cmd> CodeCompanionChat <CR>",
+  { desc = "New CodeCompanionChat" }
 )
 
 vim.treesitter.language.register("markdown", "codecompanion")
