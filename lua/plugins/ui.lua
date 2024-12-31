@@ -126,6 +126,13 @@ return {
     },
   },
   {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    opts = {
+      flavour = "mocha",
+    },
+  },
+  {
     "EdenEast/nightfox.nvim",
     opts = {
       dim_inactive = true,

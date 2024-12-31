@@ -16,6 +16,7 @@ local ensure_installed = {
   "jdtls",
   "json-lsp",
   "lua-language-server",
+  "markdownlint",
   "prettier",
   "pydocstyle",
   "pyright",
@@ -227,42 +228,6 @@ return {
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
-      appearance = {
-        kind_icons = {
-          Copilot = "",
-          Tag = "󰓹",
-          Text = "󰉿",
-          Method = "󰊕",
-          Function = "󰊕",
-          Constructor = "󰒓",
-
-          Field = "󰜢",
-          Variable = "󰆦",
-          Property = "󰖷",
-
-          Class = "󱡠",
-          Interface = "󱡠",
-          Struct = "󱡠",
-          Module = "󰅩",
-
-          Unit = "󰪚",
-          Value = "󰦨",
-          Enum = "󰦨",
-          EnumMember = "󰦨",
-
-          Keyword = "󰻾",
-          Constant = "",
-
-          Snippet = "󱄽",
-          Color = "󰏘",
-          File = "󰈔",
-          Reference = "󰬲",
-          Folder = "󰉋",
-          Event = "󱐋",
-          Operator = "󰪚",
-          TypeParameter = "󰬛",
-        },
-      },
       keymap = {
         ["<CR>"] = {},
         ["<Tab>"] = {},
@@ -277,12 +242,14 @@ return {
           if vim.bo.filetype == "lua" then
             return { "lsp", "path", "copilot", "lazydev" }
           elseif
-            success
-            and node
-            and vim.tbl_contains(
-              { "comment", "line_comment", "block_comment" },
-              node:type()
-            )
+            (
+              success
+              and node
+              and vim.tbl_contains(
+                { "comment", "line_comment", "block_comment" },
+                node:type()
+              )
+            ) or vim.bo.filetype == "markdown"
           then
             return { "buffer" }
           elseif vim.bo.filetype == "codecompanion" then
@@ -292,21 +259,21 @@ return {
           elseif require("cmp_dap").is_dap_buffer() then
             return { "dap", "snippets", "buffer" }
           else
-            return { "lsp", "path", "copilot" }
+            return { "lsp", "buffer", "path", "copilot" }
           end
         end,
         providers = {
-          git = { name = "git", module = "blink.compat.source" },
           dap = { name = "dap", module = "blink.compat.source" },
+          codecompanion = {
+            name = "CodeCompanion",
+            module = "codecompanion.providers.completion.blink",
+          },
           copilot = {
             name = "copilot",
             module = "blink-cmp-copilot",
             async = true,
           },
-          codecompanion = {
-            name = "CodeCompanion",
-            module = "codecompanion.providers.completion.blink",
-          },
+          git = { name = "git", module = "blink.compat.source" },
           lazydev = {
             name = "LazyDev",
             module = "lazydev.integrations.blink",

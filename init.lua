@@ -22,7 +22,16 @@ vim.opt.expandtab = true
 vim.bo.softtabstop = 2
 vim.opt.fillchars:append { eob = " " }
 
+-- Status column stuff
+vim.api.nvim_set_hl(0, "StatusColumnSign", { fg = "#FFB3BA" })
+vim.api.nvim_set_hl(0, "StatusColumnLineNr", { fg = "#BAFFC9" })
+vim.api.nvim_set_hl(0, "StatusColumnRelative", { fg = "#BAE1FF" })
+
+-- Set statuscolumn with highlight groups
 vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.statuscolumn = "%#SignColumn#%s %#LineNumber#%l %#RelativeNumber#%r "
+
 vim.api.nvim_set_option("clipboard", "unnamed")
 vim.diagnostic.config {
   virtual_text = false,

@@ -7,6 +7,17 @@ function M.insert_timestamp()
   vim.api.nvim_buf_set_text(0, row, 0, row, 0, { timestamp })
 end
 
+function M.create_disabled_markdown_lint_section()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local line = cursor[1] - 1 -- Convert to 0-based index
+
+  local disable = "<!-- markdownlint-disable -->"
+  local enable = "<!-- markdownlint-enable -->"
+
+  vim.api.nvim_buf_set_lines(0, line, line, false, { disable, "", "", enable })
+  vim.api.nvim_win_set_cursor(0, { line + 2, 0 })
+end
+
 function M.toggle_diffview()
   if next(require("diffview.lib").views) == nil then
     vim.cmd "DiffviewOpen"

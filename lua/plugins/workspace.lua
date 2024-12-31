@@ -83,7 +83,7 @@ map(
   "n",
   "<leader>on",
   "<cmd> ObsidianNewFromTemplate <CR>",
-  { desc = "Paste image into Obsidian note" }
+  { desc = "Create new note from template" }
 )
 
 map("n", "<leader>fr", "<cmd> GrugFar <CR>", { desc = "Find and Replace" })
@@ -151,6 +151,7 @@ return {
       "ObsidianWorkspace",
       "ObsidianTemplate",
       "ObsidianSearch",
+      "ObsidianNewFromTemplate",
     },
     dependencies = {
       "nvim-lua/plenary.nvim",
