@@ -35,37 +35,6 @@ vim.api.nvim_create_user_command("MasonInstallAll", function()
   vim.cmd("MasonInstall " .. table.concat(ensure_installed, " "))
 end, { desc = "Install All Mason Packages" })
 
-local treesitter_parsers = {
-  "bash",
-  "c",
-  "cpp",
-  "dockerfile",
-  "go",
-  "hcl",
-  "html",
-  "graphql",
-  "java",
-  "javascript",
-  "json",
-  "lua",
-  "markdown",
-  "markdown_inline",
-  "mermaid",
-  "python",
-  "proto",
-  "ruby",
-  "scala",
-  "sql",
-  "terraform",
-  "vim",
-  "vimdoc",
-  "yaml",
-}
-
-vim.api.nvim_create_user_command("TSInstallAll", function()
-  vim.cmd("TSInstall! " .. table.concat(treesitter_parsers, " "))
-end, { desc = "Install All Treesitter Parsers" })
-
 -- Infrastructure as Code file detection
 local autocmd = vim.api.nvim_create_autocmd
 
@@ -127,15 +96,6 @@ autocmd({ "BufRead", "BufNewFile" }, {
 })
 
 return {
-  {
-    "nvim-treesitter/nvim-treesitter",
-    event = "UIEnter",
-    opts = {
-      highlight = {
-        enable = true,
-      },
-    },
-  },
   {
     "neovim/nvim-lspconfig",
     event = "UIEnter",

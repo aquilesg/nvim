@@ -51,7 +51,11 @@ local set_plugin_theme = function(background_option)
   vim.api.nvim_set_option_value("background", background_option, {})
 
   -- Reload the color theme
-  vim.cmd "colorscheme rose-pine"
+  if background_option == "light" then
+    vim.cmd "colorscheme dawnfox"
+  else
+    vim.cmd "colorscheme duskfox"
+  end
 
   -- Close unnamed buffers
   local buffers = vim.api.nvim_list_bufs()
@@ -81,6 +85,32 @@ local set_plugin_theme = function(background_option)
 
   vim.cmd "bufdo e"
 end
+local treesitter_parsers = {
+  "bash",
+  "c",
+  "cpp",
+  "dockerfile",
+  "go",
+  "hcl",
+  "html",
+  "graphql",
+  "java",
+  "javascript",
+  "json",
+  "lua",
+  "markdown",
+  "markdown_inline",
+  "mermaid",
+  "python",
+  "proto",
+  "ruby",
+  "scala",
+  "sql",
+  "terraform",
+  "vim",
+  "vimdoc",
+  "yaml",
+}
 
 return {
   {
@@ -96,12 +126,9 @@ return {
     },
   },
   {
-    "rose-pine/neovim",
-    name = "rose-pine",
+    "EdenEast/nightfox.nvim",
     opts = {
-      variant = "auto",
-      dark_variant = "moon",
-      dim_inactive_windows = true,
+      dim_inactive = true,
     },
   },
   {
@@ -375,5 +402,18 @@ return {
         desc = "Buffer Local Keymaps (which-key)",
       },
     },
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    event = "UIEnter",
+    config = function()
+      require("nvim-treesitter.configs").setup {
+        auto_install = true,
+        ensure_installed = treesitter_parsers,
+        highlight = {
+          enable = true,
+        },
+      }
+    end,
   },
 }
