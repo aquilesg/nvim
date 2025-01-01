@@ -115,6 +115,8 @@ local treesitter_parsers = {
 return {
   {
     "f-person/auto-dark-mode.nvim",
+    priority = 1000,
+    lazy = false,
     opts = {
       update_interval = 1000,
       set_dark_mode = function()
@@ -305,10 +307,10 @@ return {
       indent = {
         only_scope = true,
       },
+      scroll = {},
       quickfile = { enabled = true },
       dashboard = {
         enabled = true,
-
         sections = {
           { section = "header" },
           { section = "keys", gap = 1, padding = 1 },
@@ -358,6 +360,36 @@ return {
       },
     },
     lazy = false,
+  },
+  -- TODO: Configure this
+  {
+    "akinsho/bufferline.nvim",
+    version = "*",
+    event = "UIEnter",
+    dependencies = "nvim-tree/nvim-web-devicons",
+    config = function()
+      local bufferline = require "bufferline"
+      bufferline.setup {
+        options = {
+          style_preset = bufferline.style_preset.default,
+          themable = false,
+          indicator = {
+            style = "underline",
+          },
+          modified_icon = "󰳼 ",
+          offsets = {
+            {
+              filetype = "NvimTree",
+              text = "  File Explorer",
+              text_align = "left",
+              separator = true,
+            },
+          },
+          separator_style = "slope",
+          color_icons = false,
+        },
+      }
+    end,
   },
   {
     "nvim-lualine/lualine.nvim",

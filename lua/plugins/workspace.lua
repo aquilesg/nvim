@@ -213,4 +213,9 @@ return {
     event = "UIEnter",
     opts = {},
   },
+  {
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    opts = {},
+  },
 }
