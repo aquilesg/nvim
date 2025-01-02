@@ -144,6 +144,12 @@ return {
     "folke/noice.nvim",
     event = "UIEnter",
     opts = {
+      lsp = {
+        override = {
+          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+          ["vim.lsp.util.stylize_markdown"] = true,
+        },
+      },
       presets = {
         command_palette = true,
         long_message_to_split = true,
@@ -206,6 +212,13 @@ return {
     "winston0410/range-highlight.nvim",
     event = "BufEnter",
     dependencies = { "winston0410/cmd-parser.nvim" },
+  },
+  {
+    "brenoprata10/nvim-highlight-colors",
+    event = "UIEnter",
+    opts = {
+      render = "foreground",
+    },
   },
   {
     "sphamba/smear-cursor.nvim",
@@ -361,7 +374,6 @@ return {
     },
     lazy = false,
   },
-  -- TODO: Configure this
   {
     "akinsho/bufferline.nvim",
     version = "*",
@@ -403,9 +415,9 @@ return {
         lualine_x = {
           {
             function()
-              local buf_clients = vim.lsp.get_active_clients { bufnr = 0 }
+              local buf_clients = vim.lsp.get_clients { bufnr = 0 }
               if #buf_clients == 0 then
-                return "No LSP "
+                return ""
               end
               local buf_client_names = {}
               for _, client in pairs(buf_clients) do
@@ -422,7 +434,7 @@ return {
             cond = function()
               return require("noice").api.status.mode.has()
             end,
-            color = { fg = "#ff9e64" },
+            color = { gui = "bold" },
           },
         },
       },

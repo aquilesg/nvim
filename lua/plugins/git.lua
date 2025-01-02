@@ -106,7 +106,6 @@ return {
     },
     opts = {
       enable_builtin = true,
-      users = "assignable",
       default_to_projects_v2 = false,
       ui = {
         use_signcolumn = true,

@@ -39,7 +39,6 @@ end, { desc = "Install All Mason Packages" })
 -- Infrastructure as Code file detection
 local autocmd = vim.api.nvim_create_autocmd
 
--- Create augroups
 local terraform_group =
   vim.api.nvim_create_augroup("TerraformDetect", { clear = true })
 local ansible_group =
@@ -188,7 +187,11 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons",
     },
-    opts = {},
+    opts = {
+      lightbulb = {
+        sign = false,
+      },
+    },
   },
   {
     "rachartier/tiny-inline-diagnostic.nvim",
@@ -200,7 +203,21 @@ return {
   {
     "aznhe21/actions-preview.nvim",
     event = "LspAttach",
-    opts = {},
+    opts = {
+      telescope = {
+        sorting_strategy = "ascending",
+        layout_strategy = "vertical",
+        layout_config = {
+          width = 0.8,
+          height = 0.9,
+          prompt_position = "top",
+          preview_cutoff = 20,
+          preview_height = function(_, _, max_lines)
+            return max_lines - 15
+          end,
+        },
+      },
+    },
   },
   {
     "zeioth/garbage-day.nvim",
@@ -232,9 +249,7 @@ return {
         ["<CR>"] = {},
         ["<Tab>"] = {},
       },
-      completion = {
-        accept = { auto_brackets = { enabled = true } },
-      },
+      signature = { enabled = true },
       sources = {
         cmdline = {},
         default = function()

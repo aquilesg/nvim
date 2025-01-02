@@ -1,3 +1,4 @@
+-- Confrom Autocommands
 vim.api.nvim_create_user_command("Format", function(args)
   local range = nil
   if args.count ~= -1 then
@@ -21,6 +22,25 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
+-- Octo mapping
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "octo",
+  callback = function()
+    vim.keymap.set(
+      "i",
+      "@",
+      "@<C-x><C-o>",
+      { noremap = true, silent = true, buffer = true }
+    )
+    vim.keymap.set(
+      "i",
+      "#",
+      "#<C-x><C-o>",
+      { noremap = true, silent = true, buffer = true }
+    )
+  end,
+})
+
 local slow_format_filetypes = {
   "autopep8",
   "autoflake",
@@ -36,6 +56,7 @@ map("n", "<leader>fm", function()
   require("conform").format { async = true }
 end, { desc = "Format document" })
 
+-- Obsidian mappings
 map(
   "n",
   "<leader>ot",
@@ -88,10 +109,56 @@ map(
 
 map("n", "<leader>fr", "<cmd> GrugFar <CR>", { desc = "Find and Replace" })
 
+-- Telescope mappings
 map("n", "<leader>ff", custom.find_files, { desc = "File Search" })
 map("n", "<leader>fw", custom.livegrep, { desc = "Word Search" })
 map("n", "<leader>fb", custom.list_open_buffers, { desc = "Word Search" })
 map("n", "<leader>fc", custom.list_git_changes, { desc = "Word Search" })
+
+-- Toggle Terminal mapping
+map(
+  { "n", "t" },
+  "<A-h>",
+  '<cmd> ToggleTerm name="" <CR>',
+  { desc = "Toggle terminal" }
+)
+map(
+  "n",
+  "<A-u>",
+  '<cmd> TermExec cmd="aws-environment uat platform" name="UAT Terminal 󰵮"  <CR>',
+  { desc = "Toggle UAT terminal" }
+)
+map(
+  "n",
+  "<A-p>",
+  '<cmd> TermExec cmd="aws-environment production platform" name="Production Terminal " <CR>',
+  { desc = "Toggle Production terminal" }
+)
+map(
+  { "n", "t" },
+  "<A-a>",
+  "<cmd> ToggleTermToggleAll <CR>",
+  { desc = "Toggle all terminals" }
+)
+map(
+  { "n", "t" },
+  "<A-s>",
+  "<cmd> TermSelect <CR>",
+  { desc = "Open terminal picker" }
+)
+
+function _G.set_terminal_keymaps()
+  local opts = { buffer = 0 }
+  vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], opts)
+  vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
+  vim.keymap.set("t", "<C-h>", [[<Cmd>wincmd h<CR>]], opts)
+  vim.keymap.set("t", "<C-j>", [[<Cmd>wincmd j<CR>]], opts)
+  vim.keymap.set("t", "<C-k>", [[<Cmd>wincmd k<CR>]], opts)
+  vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], opts)
+  vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], opts)
+end
+
+vim.cmd "autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()"
 
 return {
   {
@@ -217,5 +284,41 @@ return {
     "windwp/nvim-autopairs",
     event = "InsertEnter",
     opts = {},
+  },
+  {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    cmd = {
+      "ToggleTerm",
+      "TermExec",
+      "ToggleTermToggleAll",
+    },
+    config = function()
+      map("v", "<leader>ts", function()
+        require("toggleterm").send_lines_to_terminal(
+          "single_line",
+          true,
+          { args = vim.v.count }
+        )
+      end)
+      map("v", "<leader>tl", function()
+        require("toggleterm").send_lines_to_terminal(
+          "visual_lines",
+          true,
+          { args = vim.v.count }
+        )
+      end)
+      map("v", "<leader>tv", function()
+        require("toggleterm").send_lines_to_terminal(
+          "visual_selection",
+          true,
+          { args = vim.v.count }
+        )
+      end)
+
+      require("toggleterm").setup {
+        direction = "horizontal",
+      }
+    end,
   },
 }
