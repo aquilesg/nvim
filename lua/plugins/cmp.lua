@@ -9,7 +9,6 @@ return {
     dependencies = {
       "rafamadriz/friendly-snippets",
       "petertriho/cmp-git",
-      "giuxtaposition/blink-cmp-copilot",
       "rcarriga/cmp-dap",
       "epwalsh/obsidian.nvim",
     },
@@ -52,7 +51,6 @@ return {
               "snippets",
               "buffer",
               "path",
-              "copilot",
             }
           end
         end,
@@ -61,11 +59,6 @@ return {
           codecompanion = {
             name = "CodeCompanion",
             module = "codecompanion.providers.completion.blink",
-          },
-          copilot = {
-            name = "copilot",
-            module = "blink-cmp-copilot",
-            async = true,
           },
           git = { name = "git", module = "blink.compat.source" },
           lazydev = {
