@@ -52,7 +52,7 @@ local set_plugin_theme = function(background_option)
 
   -- Reload the color theme
   if background_option == "light" then
-    vim.cmd "colorscheme dawnfox"
+    vim.cmd "colorscheme catppuccin-latte"
   else
     vim.cmd "colorscheme duskfox"
   end
@@ -127,12 +127,11 @@ return {
       end,
     },
   },
+  { "ramojus/mellifluous.nvim", opts = {} },
   {
     "catppuccin/nvim",
     name = "catppuccin",
-    opts = {
-      flavour = "mocha",
-    },
+    opts = {},
   },
   {
     "EdenEast/nightfox.nvim",
@@ -287,7 +286,7 @@ return {
       },
       pipe_table = { preset = "heavy" },
       html = {
-        enabled = true,
+        enabled = false,
         conceal_comments = false,
       },
     },
