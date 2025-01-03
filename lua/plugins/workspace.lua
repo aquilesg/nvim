@@ -148,14 +148,38 @@ map(
 )
 
 function _G.set_terminal_keymaps()
-  local opts = { buffer = 0 }
-  vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], opts)
-  vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
-  vim.keymap.set("t", "<C-h>", [[<Cmd>wincmd h<CR>]], opts)
-  vim.keymap.set("t", "<C-j>", [[<Cmd>wincmd j<CR>]], opts)
-  vim.keymap.set("t", "<C-k>", [[<Cmd>wincmd k<CR>]], opts)
-  vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], opts)
-  vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], opts)
+  map("t", "<esc>", [[<C-\><C-n>]], { buffer = 0, desc = "Exit Terminal mode" })
+  map("t", "jk", [[<C-\><C-n>]], { buffer = 0, desc = "Move direction" })
+  map(
+    "t",
+    "<C-h>",
+    [[<Cmd>wincmd h<CR>]],
+    { buffer = 0, desc = "Move to left buffer" }
+  )
+  map(
+    "t",
+    "<C-j>",
+    [[<Cmd>wincmd j<CR>]],
+    { buffer = 0, desc = "Move to buffer below" }
+  )
+  map(
+    "t",
+    "<C-k>",
+    [[<Cmd>wincmd k<CR>]],
+    { buffer = 0, desc = "Move to buffer above" }
+  )
+  map(
+    "t",
+    "<C-l>",
+    [[<Cmd>wincmd l<CR>]],
+    { buffer = 0, desc = "Move to right buffer" }
+  )
+  map(
+    "t",
+    "<C-w>",
+    [[<C-\><C-n><C-w>]],
+    { buffer = 0, desc = "Move to buffer" }
+  )
 end
 
 vim.cmd "autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()"
@@ -209,6 +233,7 @@ return {
   },
   {
     "epwalsh/obsidian.nvim",
+    event = "VeryLazy",
     cmd = {
       "ObsidianOpen",
       "ObsidianNew",
