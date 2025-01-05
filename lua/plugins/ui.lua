@@ -52,7 +52,7 @@ local set_plugin_theme = function(background_option)
 
   -- Reload the color theme
   if background_option == "light" then
-    vim.cmd "colorscheme catppuccin-latte"
+    vim.cmd "colorscheme tokyonight-day"
   else
     vim.cmd "colorscheme duskfox"
   end
@@ -128,6 +128,7 @@ return {
     },
   },
   { "ramojus/mellifluous.nvim", opts = {} },
+  { "folke/tokyonight.nvim", opts = {} },
   {
     "catppuccin/nvim",
     name = "catppuccin",

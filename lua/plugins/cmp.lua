@@ -27,7 +27,7 @@ return {
         default = function()
           local success, node = pcall(vim.treesitter.get_node)
           if vim.bo.filetype == "lua" then
-            return { "lsp", "path", "copilot", "lazydev" }
+            return { "lsp", "path", "lazydev" }
           elseif
             (
               success
