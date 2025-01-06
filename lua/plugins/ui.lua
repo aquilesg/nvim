@@ -48,6 +48,27 @@ map(
 )
 
 local set_plugin_theme = function(background_option)
+  -- Check for modified buffers
+  local modified_buffers = {}
+  for _, buf in ipairs(vim.fn.getbufinfo()) do
+    if buf.changed == 1 then
+      table.insert(modified_buffers, buf.name)
+    end
+  end
+
+  if #modified_buffers > 0 then
+    local choice = vim.fn.confirm(
+      "You have unsaved changes. Save before changing theme?",
+      "&Yes\n&No\n&Cancel",
+      1
+    )
+    if choice == 1 then
+      vim.cmd "wa"
+    elseif choice == 3 then
+      return
+    end
+  end
+
   vim.api.nvim_set_option_value("background", background_option, {})
 
   -- Reload the color theme
@@ -118,7 +139,6 @@ return {
     priority = 1000,
     lazy = false,
     opts = {
-      update_interval = 1000,
       set_dark_mode = function()
         set_plugin_theme "dark"
       end,
@@ -426,6 +446,10 @@ return {
               return table.concat(buf_client_names, ", ")
             end,
             icon = "LSP(s):",
+            cond = function()
+              local buf_clients = vim.lsp.get_clients { bufnr = 0 }
+              return #buf_clients > 0
+            end,
           },
           {
             function()

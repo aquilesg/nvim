@@ -32,7 +32,6 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
-      "hrsh7th/nvim-cmp",
       "nvim-telescope/telescope.nvim",
       { "echasnovski/mini.nvim", version = false },
       { "stevearc/dressing.nvim", opts = {} },

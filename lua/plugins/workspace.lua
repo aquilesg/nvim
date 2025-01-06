@@ -1,5 +1,4 @@
 -- Confrom Autocommands
-package.loaded["nvim-cmp"] = package.loaded["blink.compat"]
 vim.api.nvim_create_user_command("Format", function(args)
   local range = nil
   if args.count ~= -1 then
@@ -346,5 +345,16 @@ return {
         direction = "horizontal",
       }
     end,
+  },
+  {
+    "mistricky/codesnap.nvim",
+    build = "make",
+    cmd = { "CodeSnap", "CodeSnapSave", "CodeSnapASCII" },
+    opts = {
+      has_breadcrumbs = true,
+      has_line_number = true,
+      bg_theme = "peach",
+      watermark = "",
+    },
   },
 }
