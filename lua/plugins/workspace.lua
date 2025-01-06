@@ -149,7 +149,6 @@ map(
 
 function _G.set_terminal_keymaps()
   map("t", "<esc>", [[<C-\><C-n>]], { buffer = 0, desc = "Exit Terminal mode" })
-  map("t", "jk", [[<C-\><C-n>]], { buffer = 0, desc = "Move direction" })
   map(
     "t",
     "<C-h>",
