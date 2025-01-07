@@ -110,41 +110,51 @@ map(
 map("n", "<leader>fr", "<cmd> GrugFar <CR>", { desc = "Find and Replace" })
 
 -- Telescope mappings
-map("n", "<leader>ff", custom.find_files, { desc = "File Search" })
-map("n", "<leader>fw", custom.livegrep, { desc = "Word Search" })
-map("n", "<leader>fb", custom.list_open_buffers, { desc = "Word Search" })
-map("n", "<leader>fc", custom.list_git_changes, { desc = "Word Search" })
+map("n", "<leader>ff", custom.find_files, { desc = "Telescope filesearch" })
+map("n", "<leader>fw", custom.livegrep, { desc = "Telescope ripgrep" })
+map(
+  "n",
+  "<leader>fb",
+  custom.list_open_buffers,
+  { desc = "Telescope buffer selector" }
+)
+map(
+  "n",
+  "<leader>fc",
+  custom.list_git_changes,
+  { desc = "Telescope git changes" }
+)
 
 -- Toggle Terminal mapping
 map(
   { "n", "t" },
-  "<A-h>",
-  '<cmd> ToggleTerm name="" <CR>',
+  "<leader>tt",
+  "<cmd> ToggleTerm <CR>",
   { desc = "Toggle terminal" }
 )
 map(
   "n",
-  "<A-u>",
+  "<leader>tu",
   '<cmd> TermExec cmd="aws-environment uat platform" name="UAT Terminal 󰵮"  <CR>',
   { desc = "Toggle UAT terminal" }
 )
 map(
   "n",
-  "<A-p>",
+  "<leader>tp",
   '<cmd> TermExec cmd="aws-environment production platform" name="Production Terminal " <CR>',
   { desc = "Toggle Production terminal" }
 )
 map(
   { "n", "t" },
-  "<A-a>",
+  "<leader>ta",
   "<cmd> ToggleTermToggleAll <CR>",
   { desc = "Toggle all terminals" }
 )
 map(
   { "n", "t" },
-  "<A-s>",
+  "<leader>ts",
   "<cmd> TermSelect <CR>",
-  { desc = "Open terminal picker" }
+  { desc = "Open terminal select" }
 )
 
 function _G.set_terminal_keymaps()
@@ -355,5 +365,27 @@ return {
       bg_theme = "peach",
       watermark = "",
     },
+  },
+  {
+    "mrjones2014/smart-splits.nvim",
+    event = "VeryLazy",
+    config = function()
+      -- Smart window resizing
+      map("n", "<A-h>", require("smart-splits").resize_left)
+      map("n", "<A-j>", require("smart-splits").resize_down)
+      map("n", "<A-k>", require("smart-splits").resize_up)
+      map("n", "<A-l>", require("smart-splits").resize_right)
+      -- moving between splits
+      map("n", "<C-h>", require("smart-splits").move_cursor_left)
+      map("n", "<C-j>", require("smart-splits").move_cursor_down)
+      map("n", "<C-k>", require("smart-splits").move_cursor_up)
+      map("n", "<C-l>", require("smart-splits").move_cursor_right)
+      map("n", "<C-\\>", require("smart-splits").move_cursor_previous)
+      -- swapping buffers between windows
+      map("n", "<leader><leader>h", require("smart-splits").swap_buf_left)
+      map("n", "<leader><leader>j", require("smart-splits").swap_buf_down)
+      map("n", "<leader><leader>k", require("smart-splits").swap_buf_up)
+      map("n", "<leader><leader>l", require("smart-splits").swap_buf_right)
+    end,
   },
 }
