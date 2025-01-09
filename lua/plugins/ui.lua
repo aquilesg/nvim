@@ -147,6 +147,11 @@ return {
       end,
     },
   },
+  {
+    "rose-pine/neovim",
+    name = "rose-pine",
+    opts = {},
+  },
   { "ramojus/mellifluous.nvim", opts = {} },
   { "folke/tokyonight.nvim", opts = {} },
   {
@@ -186,6 +191,9 @@ return {
     version = "*",
     event = "UIEnter",
     opts = {
+      git = {
+        timeout = 1000,
+      },
       hijack_cursor = true,
       sync_root_with_cwd = true,
       update_focused_file = {
