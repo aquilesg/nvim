@@ -30,6 +30,7 @@ local ensure_installed = {
   "sqlls",
   "typescript-language-server",
   "yaml-language-server",
+  "yamlfmt",
 }
 
 vim.api.nvim_create_user_command("MasonInstallAll", function()
@@ -223,8 +224,6 @@ return {
     "zeioth/garbage-day.nvim",
     dependencies = "neovim/nvim-lspconfig",
     event = "LspAttach",
-    opts = {
-      excluded_lsp_clients = { "gopls", "pyright" },
-    },
+    opts = {},
   },
 }

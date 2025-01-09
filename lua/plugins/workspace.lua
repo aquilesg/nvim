@@ -226,6 +226,7 @@ return {
         java = { "google-java-format" },
         json = { "jq" },
         markdown = { "doctoc", "markdownlint" },
+        yaml = { "yamlfmt" },
       },
       formatters = {
         doctoc = {

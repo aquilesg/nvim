@@ -28,14 +28,12 @@ format = '[ $symbol ($profile)(\($region\)) ]($style)'
 
 [env_var.AWS_ENVIRONMENT]
 default = ""
-symbol = " "
 variable = "AWS_ENVIRONMENT"
 style = "fg:#769ff0 bg:#212736"
 format = "[$symbol $env_value - ]($style)"
 
 [env_var.AWS_ENVIRONMENT_ROLE_NAME]
 default = ""
-symbol = " "
 variable = "AWS_ROLE_NAME"
 style = "fg:#769ff0 bg:#212736"
 format = "[$symbol $env_value]($style)"
