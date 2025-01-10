@@ -150,20 +150,15 @@ return {
   {
     "rose-pine/neovim",
     name = "rose-pine",
-    opts = {},
   },
-  { "ramojus/mellifluous.nvim", opts = {} },
-  { "folke/tokyonight.nvim", opts = {} },
+  { "ramojus/mellifluous.nvim", },
+  { "folke/tokyonight.nvim", },
   {
     "catppuccin/nvim",
     name = "catppuccin",
-    opts = {},
   },
   {
     "EdenEast/nightfox.nvim",
-    opts = {
-      dim_inactive = true,
-    },
   },
   {
     "folke/noice.nvim",
