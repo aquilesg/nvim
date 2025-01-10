@@ -1,12 +1,12 @@
 local ensure_installed = {
   "bash-language-server",
+  "basedpyright",
   "black",
   "buf",
   "clangd",
   "docker-compose-language-service",
   "dockerfile-language-server",
   "doctoc",
-  "flake8",
   "gopls",
   "gofumpt",
   "google-java-format",
@@ -18,9 +18,6 @@ local ensure_installed = {
   "lua-language-server",
   "markdownlint",
   "prettier",
-  "pydocstyle",
-  "pyright",
-  "pylama",
   "ruff",
   "shellcheck",
   "shfmt",
@@ -106,7 +103,7 @@ return {
     dependencies = {
       "williamboman/mason.nvim",
     },
-    event = "UIEnter",
+    event = { "BufReadPre", "BufNewFile" },
     opts = {},
     config = function()
       local on_attach = function()

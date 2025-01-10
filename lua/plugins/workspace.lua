@@ -41,15 +41,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
-local slow_format_filetypes = {
-  "autopep8",
-  "autoflake",
-  "black",
-  "ruff",
-  "json",
-  "markdown",
-}
-
 local map = vim.keymap.set
 local custom = require "custom_functions"
 map("n", "<leader>fm", function()
@@ -193,6 +184,11 @@ end
 
 vim.cmd "autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()"
 
+local slow_format_filetypes = {
+  "python",
+  "json",
+  "markdown",
+}
 return {
   {
     "stevearc/conform.nvim",
@@ -369,7 +365,7 @@ return {
   },
   {
     "mrjones2014/smart-splits.nvim",
-    event = "VeryLazy",
+    event = "UIEnter",
     config = function()
       -- Smart window resizing
       map("n", "<A-h>", require("smart-splits").resize_left)

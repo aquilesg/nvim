@@ -11,6 +11,7 @@ return {
       "petertriho/cmp-git",
       "rcarriga/cmp-dap",
       "epwalsh/obsidian.nvim",
+      "mikavilpas/blink-ripgrep.nvim",
     },
     event = "LspAttach",
     version = "*",
@@ -38,11 +39,17 @@ return {
               )
             ) or vim.bo.filetype == "markdown"
           then
-            return { "obsidian", "obsidian_new", "obsidian_tags", "buffer" }
+            return {
+              "obsidian",
+              "obsidian_new",
+              "obsidian_tags",
+              "buffer",
+              "ripgrep",
+            }
           elseif vim.bo.filetype == "codecompanion" then
             return { "buffer", "codecompanion" }
           elseif vim.tbl_contains({ "gitcommit", "octo" }, vim.bo.filetype) then
-            return { "buffer", "git", "path" }
+            return { "buffer", "git", "path", "ripgrep" }
           elseif require("cmp_dap").is_dap_buffer() then
             return { "dap", "snippets", "buffer" }
           else
@@ -66,20 +73,59 @@ return {
             module = "lazydev.integrations.blink",
             score_offset = 100,
           },
+          ripgrep = {
+            module = "blink-ripgrep",
+            name = "Ripgrep",
+            opts = {
+              prefix_min_len = 4,
+            },
+            transform_items = function(_, items)
+              for _, item in ipairs(items) do
+                item.labelDetails = {
+                  description = "󱉶 (rg)",
+                }
+              end
+              return items
+            end,
+          },
           obsidian = {
             name = "obsidian",
             module = "blink.compat.source",
             score_offset = 100,
+            transform_items = function(_, items)
+              for _, item in ipairs(items) do
+                item.labelDetails = {
+                  description = "",
+                }
+              end
+              return items
+            end,
           },
           obsidian_new = {
             name = "obsidian_new",
             module = "blink.compat.source",
             score_offset = 100,
+            transform_items = function(_, items)
+              for _, item in ipairs(items) do
+                item.labelDetails = {
+                  description = "",
+                }
+              end
+              return items
+            end,
           },
           obsidian_tags = {
             name = "obsidian_tags",
             module = "blink.compat.source",
             score_offset = 100,
+            transform_items = function(_, items)
+              for _, item in ipairs(items) do
+                item.labelDetails = {
+                  description = "󰓹 ",
+                }
+              end
+              return items
+            end,
           },
         },
       },

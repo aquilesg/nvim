@@ -49,13 +49,16 @@ function M.load_test_suite()
     require("neotest").watch.watch,
     { desc = "Neotest watch test" }
   )
-  map("n", "<leader>to", custom.open_test, { desc = "Neotest open output" })
-  map(
-    "n",
-    "<leader>td",
-    custom.debug_nearest_test,
-    { desc = "Neotest debug nearest test" }
-  )
+  map("n", "<leader>td", function()
+    local filetype = vim.bo.filetype
+    if filetype == "go" then
+      require("dap-go").debug_test()
+    elseif filetype == "python" then
+      require("dap-python").test_method()
+    else
+      require("neotest").run.run { strategy = "dap" }
+    end
+  end, { desc = "Neotest debug nearest test" })
   map(
     "n",
     "<leader>tg",
