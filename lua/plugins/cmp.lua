@@ -18,6 +18,44 @@ return {
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
+      appearance = {
+        kind_icons = {
+          Obsidian = " ",
+          Obsidian_tags = "󰜢",
+          Obsidian_new = "󰈔",
+          RipGrep = "󱉶 ",
+          Text = "󰉿",
+          Method = "󰊕",
+          Function = "󰊕",
+          Constructor = "󰒓",
+
+          Field = "󰜢",
+          Variable = "󰆦",
+          Property = "󰖷",
+
+          Class = "󱡠",
+          Interface = "󱡠",
+          Struct = "󱡠",
+          Module = "󰅩",
+
+          Unit = "󰪚",
+          Value = "󰦨",
+          Enum = "󰦨",
+          EnumMember = "󰦨",
+
+          Keyword = "󰻾",
+          Constant = "󰏿",
+
+          Snippet = "",
+          Color = "󰏘",
+          File = "󰈔",
+          Reference = "󰬲",
+          Folder = "󰉋",
+          Event = "󱐋",
+          Operator = "󰪚",
+          TypeParameter = "󰬛",
+        },
+      },
       keymap = {
         ["<CR>"] = {},
         ["<Tab>"] = {},
@@ -80,9 +118,14 @@ return {
               prefix_min_len = 4,
             },
             transform_items = function(_, items)
+              local CompletionItemKind =
+                require("blink.cmp.types").CompletionItemKind
+              local kind_idx = #CompletionItemKind + 1
+              CompletionItemKind[kind_idx] = "RipGrep"
               for _, item in ipairs(items) do
+                item.kind = kind_idx
                 item.labelDetails = {
-                  description = "󱉶 (rg)",
+                  description = "RipGrep",
                 }
               end
               return items
@@ -93,9 +136,14 @@ return {
             module = "blink.compat.source",
             score_offset = 100,
             transform_items = function(_, items)
+              local CompletionItemKind =
+                require("blink.cmp.types").CompletionItemKind
+              local kind_idx = #CompletionItemKind + 1
+              CompletionItemKind[kind_idx] = "Obsidian"
               for _, item in ipairs(items) do
+                item.kind = kind_idx
                 item.labelDetails = {
-                  description = "",
+                  description = "Obsidan",
                 }
               end
               return items
@@ -106,9 +154,14 @@ return {
             module = "blink.compat.source",
             score_offset = 100,
             transform_items = function(_, items)
+              local CompletionItemKind =
+                require("blink.cmp.types").CompletionItemKind
+              local kind_idx = #CompletionItemKind + 1
+              CompletionItemKind[kind_idx] = "Obsidian_new"
               for _, item in ipairs(items) do
+                item.kind = kind_idx
                 item.labelDetails = {
-                  description = "",
+                  description = "Obsidian",
                 }
               end
               return items
@@ -119,9 +172,14 @@ return {
             module = "blink.compat.source",
             score_offset = 100,
             transform_items = function(_, items)
+              local CompletionItemKind =
+                require("blink.cmp.types").CompletionItemKind
+              local kind_idx = #CompletionItemKind + 1
+              CompletionItemKind[kind_idx] = "Obsidian_tags"
               for _, item in ipairs(items) do
+                item.kind = kind_idx
                 item.labelDetails = {
-                  description = "󰓹 ",
+                  description = "VaultTag",
                 }
               end
               return items
