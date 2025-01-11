@@ -20,17 +20,17 @@ return {
     opts = {
       appearance = {
         kind_icons = {
-          Obsidian = " ",
+          Obsidian = "",
           Obsidian_tags = "󰜢",
           Obsidian_new = "󰈔",
           RipGrep = "󱉶 ",
-          Text = "󰉿",
-          Method = "󰊕",
+          Text = "󰗧",
+          Method = "",
           Function = "󰊕",
           Constructor = "󰒓",
 
-          Field = "󰜢",
-          Variable = "󰆦",
+          Field = "",
+          Variable = "󱃻",
           Property = "󰖷",
 
           Class = "󱡠",
@@ -115,7 +115,7 @@ return {
             module = "blink-ripgrep",
             name = "Ripgrep",
             opts = {
-              prefix_min_len = 4,
+              prefix_min_len = 5,
             },
             transform_items = function(_, items)
               local CompletionItemKind =
