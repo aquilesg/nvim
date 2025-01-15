@@ -16,22 +16,17 @@ map(
   "<cmd> Neotest summary <CR>",
   { desc = "Neotest open summary" }
 )
-map("n", "<leader>tr", neotest.run.run, { desc = "Neotest run nearest test" })
+map("n", "<leader>tr", function()
+  neotest.run.run()
+end, { desc = "Neotest run nearest test" })
 
-map("n", "<leader>tw", neotest.watch.watch, { desc = "Neotest watch test" })
+map("n", "<leader>tw", function()
+  neotest.watch.watch()
+end, { desc = "Neotest watch test" })
 
-local open_test = function()
+map("n", "<leader>to", function()
   neotest.output.open { enter = true }
-end
-
-local debug_test = function()
-  local filetype = vim.bo.filetype
-  if filetype == "go" then
-    return require("dap-go").debug_test
-  elseif filetype == "python" then
-    return require("dap-python").test_method
-  end
-end
-
-map("n", "<leader>to", open_test, { desc = "Neotest open output" })
-map("n", "<leader>td", debug_test, { desc = "Neotest debug nearest test" })
+end, { desc = "Neotest open output" })
+map("n", "<leader>td", function()
+  require("neotest").run.run { strategy = "dap" }
+end, { desc = "Neotest debug nearest test" })

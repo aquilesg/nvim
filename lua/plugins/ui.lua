@@ -151,8 +151,8 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
   },
-  { "ramojus/mellifluous.nvim", },
-  { "folke/tokyonight.nvim", },
+  { "ramojus/mellifluous.nvim" },
+  { "folke/tokyonight.nvim" },
   {
     "catppuccin/nvim",
     name = "catppuccin",
@@ -184,7 +184,7 @@ return {
   {
     "nvim-tree/nvim-tree.lua",
     version = "*",
-    event = "UIEnter",
+    event = "VeryLazy",
     opts = {
       git = {
         timeout = 1000,
@@ -228,8 +228,17 @@ return {
   {
     "folke/todo-comments.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
+    version = "*",
     event = "LspAttach",
-    opts = {},
+    opts = {
+      keywords = {
+        AQUILES = {
+          icon = " ",
+          color = "hint",
+          alt = { "aquiles", "Aquiles" },
+        },
+      },
+    },
   },
   {
     "winston0410/range-highlight.nvim",

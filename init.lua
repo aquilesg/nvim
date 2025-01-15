@@ -22,6 +22,7 @@ vim.opt.expandtab = true
 vim.bo.softtabstop = 2
 vim.opt.fillchars:append { eob = " " }
 vim.opt.termguicolors = true
+vim.opt.textwidth = 80
 
 -- Status column stuff
 vim.api.nvim_set_hl(0, "StatusColumnSign", { fg = "#FFB3BA" })

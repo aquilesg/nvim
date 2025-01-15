@@ -18,6 +18,7 @@ local ensure_installed = {
   "lua-language-server",
   "markdownlint",
   "prettier",
+  "proselint",
   "ruff",
   "shellcheck",
   "shfmt",

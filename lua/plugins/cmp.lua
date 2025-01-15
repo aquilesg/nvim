@@ -114,6 +114,7 @@ return {
           ripgrep = {
             module = "blink-ripgrep",
             name = "Ripgrep",
+            score_offset = -10,
             opts = {
               prefix_min_len = 5,
             },

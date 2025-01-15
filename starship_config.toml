@@ -24,16 +24,14 @@ $time\
 [aws]
 symbol = "󰸏"
 style = "bg:#212736"
-format = '[ $symbol ($profile)(\($region\)) ]($style)'
+format = '[ $symbol ($profile)(\($region\))]($style)'
 
 [env_var.AWS_ENVIRONMENT]
-default = ""
 variable = "AWS_ENVIRONMENT"
 style = "fg:#769ff0 bg:#212736"
-format = "[$symbol $env_value - ]($style)"
+format = "[$symbol $env_value]($style)"
 
 [env_var.AWS_ENVIRONMENT_ROLE_NAME]
-default = ""
 variable = "AWS_ROLE_NAME"
 style = "fg:#769ff0 bg:#212736"
 format = "[$symbol $env_value]($style)"

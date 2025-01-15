@@ -4,6 +4,7 @@ vim.api.nvim_create_user_command(
   custom.load_test_suite,
   { desc = "Load test suite" }
 )
+
 return {
   {
     "rcarriga/nvim-dap-ui",
@@ -23,14 +24,16 @@ return {
       "DapStepOut",
     },
     config = function()
+      require("dapui").setup()
       require "config.nvim-dap"
     end,
+    version = "*",
   },
   {
-    "nvim-neotest/neotest",
     cmd = {
       "Neotest",
     },
+    "nvim-neotest/neotest",
     dependencies = {
       "nvim-neotest/nvim-nio",
       "nvim-neotest/neotest-python",
@@ -40,6 +43,7 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "jbyuki/one-small-step-for-vimkind",
     },
+    version = "*",
     config = function()
       require "config.neotest"
     end,
