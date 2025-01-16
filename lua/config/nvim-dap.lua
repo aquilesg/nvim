@@ -1,6 +1,5 @@
 local dap = require "dap"
 local map = vim.keymap.set
-local M = {}
 
 -- Configure python debugger
 require("dap-python").setup "~/.virtualenvs/debugpy/bin/python"
@@ -24,27 +23,30 @@ require("dap-go").setup {
 
 local dapui = require "dapui"
 dap.listeners.before.attach.dapui_config = function()
-  dapui.open()
+  dapui.open { reset = true }
 end
 dap.listeners.before.launch.dapui_config = function()
-  dapui.open()
+  dapui.open { reset = true }
 end
 dap.listeners.before.event_terminated.dapui_config = function()
-  dapui.close()
+  dapui.open { reset = true }
 end
 dap.listeners.before.event_exited.dapui_config = function()
-  dapui.close()
+  dapui.open { reset = true }
 end
 
 map("n", "<leader>dc", function()
   require("dap").continue()
 end, { desc = "Continue Dap" })
+
 map("n", "<leader>dt", function()
   require("dap").terminate()
 end, { desc = "Terminate session" })
+
 map("n", "<leader>db", function()
   require("dap").toggle_breakpoint()
 end, { desc = "Toggle breakpoint" })
+
 map("n", "<leader>dB", function()
   vim.ui.input({ prompt = "Breakpoint condition: " }, function(condition)
     vim.ui.input({ prompt = "Hit condition: " }, function(hit_condition)
@@ -58,34 +60,41 @@ map("n", "<leader>dB", function()
     end)
   end)
 end, { desc = "Set conditional breakpoint" })
+
 map("n", "<leader>dso", function()
   require("dap").step_over()
 end, { desc = "DapStepOver" })
+
 map("n", "<leader>dsi", function()
   require("dap").step_into()
 end, { desc = "DapStepInto" })
+
 map("n", "<leader>dsO", function()
   require("dap").step_out()
 end, { desc = "DapStepOut" })
+
 map("n", "<leader>drr", function()
   require("dap").restart()
 end, { desc = "Dap restart" })
+
 map("n", "<leader>drl", function()
   require("dap").run_last()
 end, { desc = "Dap run last" })
+
 map({ "n" }, "<leader>dh", function()
   require("dap.ui.widgets").hover()
 end, { desc = "Evaluate value under cursor" })
+
 map({ "n" }, "<leader>dp", function()
   require("dap.ui.widgets").preview()
 end, { desc = "Preview" })
+
 map("n", "<leader>dvf", function()
   local widgets = require "dap.ui.widgets"
   widgets.centered_float(widgets.frames)
 end, { desc = "View Frames" })
+
 map("n", "<leader>dvs", function()
   local widgets = require "dap.ui.widgets"
   widgets.centered_float(widgets.scopes)
 end, { desc = "View scopes" })
-
-return M

@@ -10,23 +10,25 @@ require("neotest").setup {
 -- Neotest
 local map = vim.keymap.set
 local neotest = require "neotest"
+
 map(
   "n",
-  "<leader>tn",
+  "<leader>ns",
   "<cmd> Neotest summary <CR>",
   { desc = "Neotest open summary" }
 )
-map("n", "<leader>tr", function()
+map("n", "<leader>nr", function()
   neotest.run.run()
 end, { desc = "Neotest run nearest test" })
 
-map("n", "<leader>tw", function()
+map("n", "<leader>nwt", function()
   neotest.watch.watch()
 end, { desc = "Neotest watch test" })
 
-map("n", "<leader>to", function()
+map("n", "<leader>no", function()
   neotest.output.open { enter = true }
 end, { desc = "Neotest open output" })
-map("n", "<leader>td", function()
+
+map("n", "<leader>ndt", function()
   require("neotest").run.run { strategy = "dap" }
 end, { desc = "Neotest debug nearest test" })

@@ -1,9 +1,7 @@
 local custom = require "custom_functions"
-vim.api.nvim_create_user_command(
-  "LoadTestSuite",
-  custom.load_test_suite,
-  { desc = "Load test suite" }
-)
+vim.api.nvim_create_user_command("LoadTestSuite", function()
+  require("lazy").load { plugins = { "nvim-dap-ui", "neotest" } }
+end, { desc = "Load test suite" })
 
 return {
   {

@@ -14,6 +14,7 @@ local ensure_installed = {
   "harper-ls",
   "html-lsp",
   "jdtls",
+  "jq",
   "json-lsp",
   "lua-language-server",
   "markdownlint",

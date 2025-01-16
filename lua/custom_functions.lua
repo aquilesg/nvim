@@ -9,13 +9,11 @@ end
 
 function M.create_disabled_markdown_lint_section()
   local cursor = vim.api.nvim_win_get_cursor(0)
-  local line = cursor[1] - 1 -- Convert to 0-based index
+  local line = cursor[1] - 1
 
-  local disable = "<!-- markdownlint-disable -->"
-  local enable = "<!-- markdownlint-enable -->"
+  local disable = "<!-- markdownlint-disable-next-line -->"
 
-  vim.api.nvim_buf_set_lines(0, line, line, false, { disable, "", "", enable })
-  vim.api.nvim_win_set_cursor(0, { line + 2, 0 })
+  vim.api.nvim_buf_set_lines(0, line, line, false, { disable })
 end
 
 function M.toggle_diffview()
@@ -24,10 +22,6 @@ function M.toggle_diffview()
   else
     vim.cmd "DiffviewClose"
   end
-end
-
-function M.load_test_suite()
-  require("lazy").load { plugins = { "nvim-dap-ui", "neotest" } }
 end
 
 function M.open_lazygit()
