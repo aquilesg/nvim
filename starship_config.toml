@@ -23,7 +23,7 @@ $time\
 
 [aws]
 symbol = "󰸏"
-style = "bg:#212736"
+style = "fg:#769ff0 bg:#212736"
 format = '[ $symbol ($profile)(\($region\))]($style)'
 
 [env_var.AWS_ENVIRONMENT]

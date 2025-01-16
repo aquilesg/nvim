@@ -165,6 +165,7 @@ return {
     event = "UIEnter",
     opts = {
       lsp = {
+        signature = { enabled = false },
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
           ["vim.lsp.util.stylize_markdown"] = true,
@@ -228,7 +229,6 @@ return {
   {
     "folke/todo-comments.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
-    version = "*",
     event = "LspAttach",
     opts = {
       keywords = {
