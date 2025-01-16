@@ -9,3 +9,5 @@ map(
   custom.create_disabled_markdown_lint_section,
   { desc = "Create disabled markdown lint section" }
 )
+
+map("n", "<leader>C", custom.change_theme, { desc = "Change colorscheme" })

@@ -29,6 +29,11 @@ function M.open_lazygit()
   snacks.lazygit.open()
 end
 
+function M.change_theme()
+  local snacks = require "snacks"
+  snacks.picker.colorschemes()
+end
+
 function M.find_files()
   local telescope_builtin = require "telescope.builtin"
   telescope_builtin.find_files {
