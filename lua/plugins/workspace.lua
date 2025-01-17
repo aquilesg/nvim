@@ -109,12 +109,6 @@ map(
   custom.list_open_buffers,
   { desc = "Telescope buffer selector" }
 )
-map(
-  "n",
-  "<leader>fc",
-  custom.list_git_changes,
-  { desc = "Telescope git changes" }
-)
 
 -- Toggle Terminal mapping
 map(
@@ -148,6 +142,57 @@ map(
   { desc = "Open terminal select" }
 )
 
+map({ "n", "t" }, "<leader>tk", function()
+  local Terminal = require("toggleterm.terminal").Terminal
+  local k9s = Terminal:new {
+    cmd = "aws-environment uat platform && kube-setup && k9s",
+    direction = "float",
+    float_opts = {
+      border = "double",
+    },
+    -- function to run on opening the terminal
+    on_open = function(term)
+      vim.cmd "startinsert!"
+      vim.api.nvim_buf_set_keymap(
+        term.bufnr,
+        "n",
+        "q",
+        "<cmd>close<CR>",
+        { noremap = true, silent = true }
+      )
+    end,
+    -- function to run on closing the terminal
+    on_close = function(term)
+      vim.cmd "startinsert!"
+    end,
+  }
+end, { desc = "Open k9s Terminal " })
+
+map({ "n", "t" }, "<leader>tK", function()
+  local Terminal = require("toggleterm.terminal").Terminal
+  local k9s = Terminal:new {
+    cmd = "aws-environment production platform && kube-setup && k9s",
+    direction = "float",
+    float_opts = {
+      border = "double",
+    },
+    -- function to run on opening the terminal
+    on_open = function(term)
+      vim.cmd "startinsert!"
+      vim.api.nvim_buf_set_keymap(
+        term.bufnr,
+        "n",
+        "q",
+        "<cmd>close<CR>",
+        { noremap = true, silent = true }
+      )
+    end,
+    -- function to run on closing the terminal
+    on_close = function(term)
+      vim.cmd "startinsert!"
+    end,
+  }
+end, { desc = "Open k9s Terminal " })
 function _G.set_terminal_keymaps()
   map("t", "<esc>", [[<C-\><C-n>]], { buffer = 0, desc = "Exit Terminal mode" })
   map(
@@ -338,6 +383,16 @@ return {
   },
   {
     "nvim-telescope/telescope.nvim",
+    opts = {
+      pickers = {
+        find_files = {
+          theme = "dropdown",
+        },
+        live_grep = {
+          theme = "dropdown",
+        },
+      },
+    },
     event = "UIEnter",
     dependencies = {
       "nvim-telescope/telescope-live-grep-args.nvim",

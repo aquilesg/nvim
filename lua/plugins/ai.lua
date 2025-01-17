@@ -18,7 +18,7 @@ map("v", "ga", "<cmd>CodeCompanionChat Add<cr>", {
 })
 map(
   "n",
-  "<leader>n",
+  "<leader>1",
   "<cmd> CodeCompanionChat <CR>",
   { desc = "New CodeCompanionChat" }
 )

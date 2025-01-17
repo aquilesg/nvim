@@ -52,17 +52,14 @@ end
 
 function M.livegrep()
   local telescope = require "telescope"
-  telescope.extensions.live_grep_args.live_grep_args()
+  telescope.extensions.live_grep_args.live_grep_args(
+    require("telescope.themes").get_dropdown {}
+  )
 end
 
 function M.list_open_buffers()
   local telescope_builtin = require "telescope.builtin"
-  telescope_builtin.buffers()
-end
-
-function M.list_git_changes()
-  local telescope_builtin = require "telescope.builtin"
-  telescope_builtin.git_status()
+  telescope_builtin.buffers(require("telescope.themes").get_dropdown {})
 end
 
 return M

@@ -23,28 +23,18 @@ map(
   "<cmd> NvimTreeFocus <cr>",
   { desc = "Focus Nvim Tree" }
 )
-
--- Trouble Diagnostics
+-- Bufferline
 map(
-  "n",
-  "<leader>qt",
-  "<cmd> Trouble diagnostics toggle <CR>",
-  { desc = "Toggle Trouble over workspace" }
+  { "n" },
+  "<S-Tab>",
+  "<cmd> BufferLineCycleNext <cr>",
+  { desc = "Cycle Bufferline Next" }
 )
 map(
-  "n",
-  "<leader>qb",
-  "<cmd> Trouble diagnostics toggle filter.buf=0 <CR>",
-  { desc = "Toggle buffer diagnostics" }
-)
-map("n", "<leader>qa", "<cmd> TodoTrouble <CR>", { desc = "Toggle TODO list" })
-
--- Document symbols
-map(
-  "n",
-  "go",
-  "<cmd> Trouble symbols toggle focus=true pinned=true results.win.relative=win results.win.position=right <CR>",
-  { desc = "Show outline" }
+  { "n" },
+  "<Tab><Shift>",
+  "<cmd> BufferLineCyclePrev <cr>",
+  { desc = "Cycle Bufferline Next" }
 )
 
 local set_plugin_theme = function(background_option)
@@ -344,68 +334,6 @@ return {
     "folke/drop.nvim",
     event = "UIEnter",
     opts = {},
-  },
-  {
-    "folke/snacks.nvim",
-    priority = 1000,
-    opts = {
-      picker = {},
-      indent = {
-        only_scope = true,
-      },
-      scroll = {},
-      quickfile = { enabled = true },
-      dashboard = {
-        enabled = true,
-        sections = {
-          { section = "header" },
-          { section = "keys", gap = 1, padding = 1 },
-          {
-            pane = 2,
-            icon = " ",
-            desc = "Browse Repo",
-            padding = 1,
-            key = "b",
-            action = function()
-              Snacks.gitbrowse()
-            end,
-          },
-          function()
-            local in_git = Snacks.git.get_root() ~= nil
-            local cmds = {
-              {
-                icon = " ",
-                title = "Open PRs",
-                cmd = "gh pr list -L 3",
-                key = "p",
-                action = function()
-                  vim.fn.jobstart("gh pr list --web", { detach = true })
-                end,
-                height = 7,
-              },
-              {
-                icon = " ",
-                title = "Git Status",
-                cmd = "git --no-pager diff --stat -B -M -C",
-                height = 10,
-              },
-            }
-            return vim.tbl_map(function(cmd)
-              return vim.tbl_extend("force", {
-                pane = 2,
-                section = "terminal",
-                enabled = in_git,
-                padding = 1,
-                ttl = 5 * 60,
-                indent = 3,
-              }, cmd)
-            end, cmds)
-          end,
-          { section = "startup" },
-        },
-      },
-    },
-    lazy = false,
   },
   {
     "akinsho/bufferline.nvim",
