@@ -3,6 +3,17 @@ vim.api.nvim_create_user_command("LoadTestSuite", function()
   require("lazy").load { plugins = { "nvim-dap-ui", "neotest" } }
 end, { desc = "Load test suite" })
 
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  pattern = "Neotest Summary*",
+  callback = function(ev)
+    vim.keymap.set("n", "q", ":bdelete<CR>", {
+      buffer = ev.buf,
+      silent = true,
+      desc = "Close neotest summary",
+    })
+  end,
+})
+
 return {
   {
     "rcarriga/nvim-dap-ui",

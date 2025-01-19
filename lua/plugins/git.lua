@@ -14,8 +14,16 @@ map(
   { desc = "List PRs for this repo" }
 )
 map("n", "<leader>o3", "<cmd> Octo pr search <CR>", { desc = "Search for PR" })
-map("n", "<leader>gl", custom.open_lazygit, { desc = "Open lazygit" })
-map("n", "<leader>dvv", custom.toggle_diffview, { desc = "Toggle Diffview" })
+map("n", "<leader>gl", function()
+  Snacks.lazygit.open()
+end, { desc = "Open lazygit" })
+map("n", "<leader>dvv", function()
+  if next(require("diffview.lib").views) == nil then
+    vim.cmd "DiffviewOpen"
+  else
+    vim.cmd "DiffviewClose"
+  end
+end, { desc = "Toggle Diffview" })
 
 -- Octo mapping
 vim.api.nvim_create_autocmd("FileType", {

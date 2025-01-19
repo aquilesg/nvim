@@ -26,13 +26,13 @@ map(
 -- Bufferline
 map(
   { "n" },
-  "<S-Tab>",
+  "<Tab>",
   "<cmd> BufferLineCycleNext <cr>",
   { desc = "Cycle Bufferline Next" }
 )
 map(
   { "n" },
-  "<Tab><Shift>",
+  "<S-Tab>",
   "<cmd> BufferLineCyclePrev <cr>",
   { desc = "Cycle Bufferline Next" }
 )
@@ -63,7 +63,7 @@ local set_plugin_theme = function(background_option)
 
   -- Reload the color theme
   if background_option == "light" then
-    vim.cmd "colorscheme tokyonight-day"
+    vim.cmd "colorscheme dawnfox"
   else
     vim.cmd "colorscheme duskfox"
   end
@@ -140,12 +140,6 @@ return {
   {
     "rose-pine/neovim",
     name = "rose-pine",
-  },
-  { "ramojus/mellifluous.nvim" },
-  { "folke/tokyonight.nvim" },
-  {
-    "catppuccin/nvim",
-    name = "catppuccin",
   },
   {
     "EdenEast/nightfox.nvim",

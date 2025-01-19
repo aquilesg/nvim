@@ -24,11 +24,6 @@ function M.toggle_diffview()
   end
 end
 
-function M.open_lazygit()
-  local snacks = require "snacks"
-  snacks.lazygit.open()
-end
-
 function M.change_theme()
   local snacks = require "snacks"
   snacks.picker.colorschemes()
