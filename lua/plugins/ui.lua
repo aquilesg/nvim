@@ -7,13 +7,13 @@ map(
   "<cmd> Noice dismiss <CR>",
   { desc = "Dismiss Noice notification" }
 )
-map("n", "<leader>x", "<cmd> bd <CR>", { desc = "Close current buffer" })
 map(
   "n",
-  "<leader>/",
+  "<leader>jk",
   ":nohlsearch<CR>",
   { silent = true, desc = "Clear search highlight" }
 )
+map("n", "<leader>x", "<cmd> bd <CR>", { desc = "Close current buffer" })
 
 -- Nvim Tree
 map({ "n" }, "<c-n>", "<cmd> NvimTreeToggle <cr>", { desc = "Open Nvim Tree" })

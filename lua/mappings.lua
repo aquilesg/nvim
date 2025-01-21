@@ -1,13 +1,15 @@
 local map = vim.keymap.set
-local custom = require "custom_functions"
 
 -- Custom functions
-map("n", "<leader>is", custom.insert_timestamp, { desc = "Insert timestamp" })
-map(
-  "n",
-  "<leader>im",
-  custom.create_disabled_markdown_lint_section,
-  { desc = "Create disabled markdown lint section" }
-)
-
-map("n", "<leader>C", custom.change_theme, { desc = "Change colorscheme" })
+map("n", "<leader>is", function()
+  local timestamp = tostring(os.date "- `%Y-%m-%d %H:%M:%S`")
+  local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
+  vim.api.nvim_buf_set_lines(0, row, row, false, { "" })
+  vim.api.nvim_buf_set_text(0, row, 0, row, 0, { timestamp })
+end, { desc = "Insert timestamp" })
+map("n", "<leader>im", function()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local line = cursor[1] - 1
+  local disable = "<!-- markdownlint-disable-next-line -->"
+  vim.api.nvim_buf_set_lines(0, line, line, false, { disable })
+end, { desc = "Create disabled markdown lint section" })

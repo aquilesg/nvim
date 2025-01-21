@@ -12,7 +12,21 @@ return {
     {
       "<leader>ff",
       function()
-        Snacks.picker.files()
+        Snacks.picker.files {
+          hidden = true,
+          follow = true,
+        }
+      end,
+      desc = "Find Files",
+    },
+    {
+      "<leader>fw",
+      function()
+        Snacks.picker.grep {
+          hidden = true,
+          follow = true,
+          buffers = false,
+        }
       end,
       desc = "Find Files",
     },

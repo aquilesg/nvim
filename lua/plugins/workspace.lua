@@ -42,7 +42,6 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 local map = vim.keymap.set
-local custom = require "custom_functions"
 map("n", "<leader>fm", function()
   require("conform").format { async = true }
 end, { desc = "Format document" })
@@ -100,16 +99,6 @@ map(
 
 map("n", "<leader>fr", "<cmd> GrugFar <CR>", { desc = "Find and Replace" })
 
--- Telescope mappings
-map("n", "<leader>ff", custom.find_files, { desc = "Telescope filesearch" })
-map("n", "<leader>fw", custom.livegrep, { desc = "Telescope ripgrep" })
-map(
-  "n",
-  "<leader>fb",
-  custom.list_open_buffers,
-  { desc = "Telescope buffer selector" }
-)
-
 -- Toggle Terminal mapping
 map(
   { "n", "t" },
@@ -142,57 +131,19 @@ map(
   { desc = "Open terminal select" }
 )
 
-map({ "n", "t" }, "<leader>tk", function()
-  local Terminal = require("toggleterm.terminal").Terminal
-  local k9s = Terminal:new {
-    cmd = "aws-environment uat platform && kube-setup && k9s",
-    direction = "float",
-    float_opts = {
-      border = "double",
-    },
-    -- function to run on opening the terminal
-    on_open = function(term)
-      vim.cmd "startinsert!"
-      vim.api.nvim_buf_set_keymap(
-        term.bufnr,
-        "n",
-        "q",
-        "<cmd>close<CR>",
-        { noremap = true, silent = true }
-      )
-    end,
-    -- function to run on closing the terminal
-    on_close = function(term)
-      vim.cmd "startinsert!"
-    end,
-  }
-end, { desc = "Open k9s Terminal " })
+map("n", "<leader>is", function()
+  local timestamp = tostring(os.date "- `%Y-%m-%d %H:%M:%S`")
+  local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
+  vim.api.nvim_buf_set_lines(0, row, row, false, { "" })
+  vim.api.nvim_buf_set_text(0, row, 0, row, 0, { timestamp })
+end, { desc = "Insert timestamp" })
+map("n", "<leader>im", function()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local line = cursor[1] - 1
+  local disable = "<!-- markdownlint-disable-next-line -->"
+  vim.api.nvim_buf_set_lines(0, line, line, false, { disable })
+end, { desc = "Create disabled markdown lint section" })
 
-map({ "n", "t" }, "<leader>tK", function()
-  local Terminal = require("toggleterm.terminal").Terminal
-  local k9s = Terminal:new {
-    cmd = "aws-environment production platform && kube-setup && k9s",
-    direction = "float",
-    float_opts = {
-      border = "double",
-    },
-    -- function to run on opening the terminal
-    on_open = function(term)
-      vim.cmd "startinsert!"
-      vim.api.nvim_buf_set_keymap(
-        term.bufnr,
-        "n",
-        "q",
-        "<cmd>close<CR>",
-        { noremap = true, silent = true }
-      )
-    end,
-    -- function to run on closing the terminal
-    on_close = function(term)
-      vim.cmd "startinsert!"
-    end,
-  }
-end, { desc = "Open k9s Terminal " })
 function _G.set_terminal_keymaps()
   map("t", "<esc>", [[<C-\><C-n>]], { buffer = 0, desc = "Exit Terminal mode" })
   map(

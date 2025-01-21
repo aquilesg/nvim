@@ -1,5 +1,4 @@
 local map = vim.keymap.set
-local custom = require "custom_functions"
 map("n", "<leader>ge", "<cmd> BlameToggle <CR>", { desc = "Toggle git blame" })
 map(
   "n",

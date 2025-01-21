@@ -108,7 +108,7 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     opts = {},
     config = function()
-      local on_attach = function()
+      local on_attach = function(client, bufnr)
         local map = vim.keymap.set
         map(
           "n",
@@ -172,9 +172,8 @@ return {
     "folke/lazydev.nvim",
     ft = "lua",
     opts = {
-      library = {
-        { path = "luvit-meta/library", words = { "vim%.uv" } },
-      },
+      { path = "snacks.nvim", words = { "Snacks" } },
+      { path = "lazy.nvim", words = { "LazyVim" } },
     },
   },
   {
