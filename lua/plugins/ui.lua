@@ -336,6 +336,12 @@ return {
     dependencies = "nvim-tree/nvim-web-devicons",
     config = function()
       local bufferline = require "bufferline"
+
+      -- Function to get highlight based on background
+      local function get_highlight(light_color, dark_color)
+        return vim.o.background == "light" and light_color or dark_color
+      end
+
       bufferline.setup {
         options = {
           style_preset = bufferline.style_preset.default,
@@ -347,13 +353,62 @@ return {
           offsets = {
             {
               filetype = "NvimTree",
-              text = "  File Explorer",
+              text = "  File Explorer",
               text_align = "left",
               separator = true,
             },
           },
           separator_style = "slope",
           color_icons = false,
+          groups = {
+            items = {
+              {
+                name = "  PRs",
+                highlight = {
+                  sp = get_highlight("#FFB3BA", "#FF8B98"), -- Pastel pink
+                  fg = get_highlight("#D85A6E", "#FF8B98"),
+                },
+                matcher = function(buf)
+                  return vim.api.nvim_buf_get_option(buf.id, "filetype")
+                    == "octo"
+                end,
+              },
+              {
+                name = "Infra",
+                highlight = {
+                  sp = get_highlight("#BAE1FF", "#96C3EB"), -- Pastel blue
+                  fg = get_highlight("#5A8ED8", "#96C3EB"),
+                },
+                matcher = function(buf)
+                  return vim.api.nvim_buf_get_name(buf.id):match "%.tf"
+                end,
+              },
+              {
+                name = "Configs",
+                highlight = {
+                  sp = get_highlight("#BAFFC9", "#98EBA6"), -- Pastel green
+                  fg = get_highlight("#5AD87A", "#98EBA6"),
+                },
+                matcher = function(buf)
+                  local get_buf = vim.api.nvim_buf_get_name
+                  return get_buf(buf.id):match "%.yaml"
+                    or get_buf(buf.id):match "%.yml"
+                end,
+              },
+              {
+                name = "Docs",
+                highlight = {
+                  sp = get_highlight("#FFE4BA", "#EBC396"), -- Pastel orange
+                  fg = get_highlight("#D8995A", "#EBC396"),
+                },
+                matcher = function(buf)
+                  local get_buf = vim.api.nvim_buf_get_name
+                  return get_buf(buf.id):match "%.md"
+                    or get_buf(buf.id):match "%.txt"
+                end,
+              },
+            },
+          },
         },
       }
     end,
