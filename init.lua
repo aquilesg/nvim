@@ -44,6 +44,15 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 vim.opt.termguicolors = true
 
+-- Render whitespaces
+vim.opt.listchars = {
+  space = "·",
+  tab = "->",
+}
+
+-- Enable list mode to show the characters
+vim.opt.list = true
+
 -- Adjust padding on enter and load
 vim.api.nvim_create_autocmd({ "UIEnter", "ColorScheme" }, {
   callback = function()

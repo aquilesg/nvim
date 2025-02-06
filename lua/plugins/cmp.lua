@@ -8,10 +8,11 @@ return {
     "saghen/blink.cmp",
     dependencies = {
       "rafamadriz/friendly-snippets",
-      "petertriho/cmp-git",
       "rcarriga/cmp-dap",
       "epwalsh/obsidian.nvim",
       "mikavilpas/blink-ripgrep.nvim",
+      "giuxtaposition/blink-cmp-copilot",
+      "Kaiser-Yang/blink-cmp-git",
     },
     event = "LspAttach",
     version = "*",
@@ -20,17 +21,19 @@ return {
     opts = {
       appearance = {
         kind_icons = {
-          Obsidian = "",
-          Obsidian_tags = "󰜢",
-          Obsidian_new = "󰈔",
+          Obsidian = " ",
+          Obsidian_tags = "󰜢 ",
+          Obsidian_new = "󰈔 ",
           RipGrep = "󱉶 ",
+          Copilot = "󱚣 ",
+          Git = "󰊢 ",
           Text = "󰗧",
           Method = "",
           Function = "󰊕",
-          Constructor = "󰒓",
+          Constructor = "󰒓 ",
 
           Field = "",
-          Variable = "󱃻",
+          Variable = "󱃻 ",
           Property = "󰖷",
 
           Class = "󱡠",
@@ -66,36 +69,51 @@ return {
         default = function()
           local success, node = pcall(vim.treesitter.get_node)
           if vim.bo.filetype == "lua" then
-            return { "lsp", "path", "lazydev" }
+            return { "lsp", "path", "lazydev", "copilot" }
           elseif
-            (
-              success
-              and node
-              and vim.tbl_contains(
-                { "comment", "line_comment", "block_comment" },
-                node:type()
-              )
-            ) or vim.bo.filetype == "markdown"
+            success
+            and node
+            and vim.tbl_contains(
+              { "comment", "line_comment", "block_comment" },
+              node:type()
+            )
           then
             return {
+              "buffer",
+              "git",
+              "ripgrep",
+            }
+          elseif
+            vim.api
+              .nvim_buf_get_name(0)
+              :find("^" .. vim.fn.expand "~/Documents/Work/") ~= nil
+          then
+            return {
+              "buffer",
+              "path",
+              "ripgrep",
               "obsidian",
               "obsidian_new",
               "obsidian_tags",
-              "buffer",
-              "ripgrep",
             }
           elseif vim.bo.filetype == "codecompanion" then
             return { "buffer", "codecompanion" }
-          elseif vim.tbl_contains({ "gitcommit", "octo" }, vim.bo.filetype) then
+          elseif
+            vim.tbl_contains({ "gitcommit", "octo" }, vim.bo.filetype)
+            and vim.fn.mode() ~= "c"
+          then
             return { "buffer", "git", "path", "ripgrep" }
           elseif require("cmp_dap").is_dap_buffer() then
             return { "dap", "snippets", "buffer" }
+          elseif vim.bo.filetype == "markdown" then
+            return { "buffer", "path", "ripgrep", "git" }
           else
             return {
               "lsp",
               "snippets",
               "buffer",
               "path",
+              "copilot",
             }
           end
         end,
@@ -105,7 +123,6 @@ return {
             name = "CodeCompanion",
             module = "codecompanion.providers.completion.blink",
           },
-          git = { name = "git", module = "blink.compat.source" },
           lazydev = {
             name = "LazyDev",
             module = "lazydev.integrations.blink",
@@ -182,6 +199,40 @@ return {
                 item.labelDetails = {
                   description = "VaultTag",
                 }
+              end
+              return items
+            end,
+          },
+          copilot = {
+            name = "copilot",
+            module = "blink-cmp-copilot",
+            async = true,
+            transform_items = function(_, items)
+              local CompletionItemKind =
+                require("blink.cmp.types").CompletionItemKind
+              local kind_idx = #CompletionItemKind + 1
+              CompletionItemKind[kind_idx] = "Copilot"
+              for _, item in ipairs(items) do
+                item.kind = kind_idx
+              end
+              return items
+            end,
+          },
+          git = {
+            module = "blink-cmp-git",
+            async = true,
+            score_offset = -10,
+            name = "Git",
+            opts = {
+              use_items_pre_cache = false,
+            },
+            transform_items = function(_, items)
+              local CompletionItemKind =
+                require("blink.cmp.types").CompletionItemKind
+              local kind_idx = #CompletionItemKind + 1
+              CompletionItemKind[kind_idx] = "Git"
+              for _, item in ipairs(items) do
+                item.kind = kind_idx
               end
               return items
             end,

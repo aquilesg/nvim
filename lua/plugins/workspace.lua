@@ -22,6 +22,52 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
+-- Close Filetypes of a Buffer
+vim.api.nvim_create_user_command("CloseFiletypeBuffers", function()
+  local filetypes = {}
+  for _, buf in ipairs(vim.fn.range(1, vim.fn.bufnr "$")) do
+    -- Check if the buffer is valid and listed
+    if vim.api.nvim_buf_is_valid(buf) and vim.fn.buflisted(buf) == 1 then
+      local bufname = vim.fn.bufname(buf)
+      if bufname ~= "" then
+        local ft = vim.bo[buf].filetype
+        if not vim.tbl_contains(filetypes, ft) then
+          table.insert(filetypes, ft)
+        end
+      end
+    end
+  end
+
+  local ft_message = "Available filetypes:\n"
+  for i, ft in ipairs(filetypes) do
+    ft_message = ft_message .. tostring(i) .. ": " .. ft .. "\n"
+  end
+
+  vim.api.nvim_notify(ft_message, 2, {})
+
+  local selected_num = tonumber(
+    vim.fn.input "Enter the number corresponding to the filetype to close buffers: "
+  )
+
+  if selected_num == nil or selected_num < 1 or selected_num > #filetypes then
+    print "Invalid selection"
+    return
+  end
+
+  local selected_ft = filetypes[selected_num]
+
+  for _, buf in ipairs(vim.fn.range(1, vim.fn.bufnr "$")) do
+    -- Verify the buffer again before proceeding
+    if
+      vim.api.nvim_buf_is_valid(buf)
+      and vim.fn.buflisted(buf) == 1
+      and vim.bo[buf].filetype == selected_ft
+    then
+      vim.cmd("bdelete " .. buf)
+    end
+  end
+end, {})
+
 -- Octo mapping
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "octo",
@@ -101,11 +147,12 @@ map("n", "<leader>fr", "<cmd> GrugFar <CR>", { desc = "Find and Replace" })
 
 -- Toggle Terminal mapping
 map(
-  { "n", "t" },
+  { "n" },
   "<leader>tt",
   "<cmd> ToggleTerm <CR>",
   { desc = "Toggle terminal" }
 )
+map({ "t" }, "<C-t>", "<cmd> ToggleTerm <CR>", { desc = "Toggle terminal" })
 map(
   "n",
   "<leader>tu",
@@ -119,17 +166,23 @@ map(
   { desc = "Toggle Production terminal" }
 )
 map(
-  { "n", "t" },
+  { "n" },
   "<leader>ta",
   "<cmd> ToggleTermToggleAll <CR>",
   { desc = "Toggle all terminals" }
 )
 map(
-  { "n", "t" },
+  { "n" },
   "<leader>ts",
   "<cmd> TermSelect <CR>",
   { desc = "Open terminal select" }
 )
+map({ "n" }, "<leader>td", function()
+  local terminal = require("toggleterm.terminal").Terminal
+  local gh_dash =
+    terminal:new { cmd = "gh dash", hidden = true, direction = "float" }
+  gh_dash:toggle()
+end, { desc = "Open gh dash" })
 
 map("n", "<leader>is", function()
   local timestamp = tostring(os.date "- `%Y-%m-%d %H:%M:%S`")

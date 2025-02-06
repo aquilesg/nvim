@@ -65,7 +65,7 @@ local set_plugin_theme = function(background_option)
   if background_option == "light" then
     vim.cmd "colorscheme dawnfox"
   else
-    vim.cmd "colorscheme duskfox"
+    vim.cmd "colorscheme nordfox"
   end
 
   -- Close unnamed buffers
@@ -363,32 +363,20 @@ return {
           groups = {
             items = {
               {
-                name = "  PRs",
-                highlight = {
-                  sp = get_highlight("#FFB3BA", "#FF8B98"), -- Pastel pink
-                  fg = get_highlight("#D85A6E", "#FF8B98"),
-                },
+                name = " PRs",
                 matcher = function(buf)
                   return vim.api.nvim_buf_get_option(buf.id, "filetype")
                     == "octo"
                 end,
               },
               {
-                name = "Infra",
-                highlight = {
-                  sp = get_highlight("#BAE1FF", "#96C3EB"), -- Pastel blue
-                  fg = get_highlight("#5A8ED8", "#96C3EB"),
-                },
+                name = "󱥊 Infra",
                 matcher = function(buf)
                   return vim.api.nvim_buf_get_name(buf.id):match "%.tf"
                 end,
               },
               {
-                name = "Configs",
-                highlight = {
-                  sp = get_highlight("#BAFFC9", "#98EBA6"), -- Pastel green
-                  fg = get_highlight("#5AD87A", "#98EBA6"),
-                },
+                name = " Configs",
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
                   return get_buf(buf.id):match "%.yaml"
@@ -396,11 +384,7 @@ return {
                 end,
               },
               {
-                name = "Docs",
-                highlight = {
-                  sp = get_highlight("#FFE4BA", "#EBC396"), -- Pastel orange
-                  fg = get_highlight("#D8995A", "#EBC396"),
-                },
+                name = "󰈙 Docs",
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
                   return get_buf(buf.id):match "%.md"
