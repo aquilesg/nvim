@@ -36,7 +36,7 @@ vim.opt.statuscolumn = "%#SignColumn#%s %#LineNumber#%l %#RelativeNumber#%r "
 
 vim.api.nvim_set_option("clipboard", "unnamed")
 vim.diagnostic.config {
-  virtual_text = false,
+  virtual_lines = false,
 }
 
 -- NVIM Tree

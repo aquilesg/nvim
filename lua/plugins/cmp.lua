@@ -95,6 +95,7 @@ return {
               "obsidian",
               "obsidian_new",
               "obsidian_tags",
+              "markdown",
             }
           elseif vim.bo.filetype == "codecompanion" then
             return { "buffer", "codecompanion" }
@@ -102,11 +103,11 @@ return {
             vim.tbl_contains({ "gitcommit", "octo" }, vim.bo.filetype)
             and vim.fn.mode() ~= "c"
           then
-            return { "buffer", "git", "path", "ripgrep" }
+            return { "buffer", "git", "path", "ripgrep", "markdown" }
           elseif require("cmp_dap").is_dap_buffer() then
             return { "dap", "snippets", "buffer" }
           elseif vim.bo.filetype == "markdown" then
-            return { "buffer", "path", "ripgrep", "git" }
+            return { "buffer", "path", "ripgrep", "git", "markdown" }
           else
             return {
               "lsp",
@@ -236,6 +237,11 @@ return {
               end
               return items
             end,
+          },
+          markdown = {
+            name = "RenderMarkdown",
+            module = "render-markdown.integ.blink",
+            fallbacks = { "lsp" },
           },
         },
       },

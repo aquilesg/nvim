@@ -391,6 +391,28 @@ return {
                     or get_buf(buf.id):match "%.txt"
                 end,
               },
+              {
+                name = "󰈙 Docs",
+                matcher = function(buf)
+                  local get_buf = vim.api.nvim_buf_get_name
+                  return get_buf(buf.id):match "%.md"
+                    or get_buf(buf.id):match "%.txt"
+                end,
+              },
+              {
+                name = " Go",
+                matcher = function(buf)
+                  local get_buf = vim.api.nvim_buf_get_name
+                  return get_buf(buf.id):match "%.go"
+                end,
+              },
+              {
+                name = " Python",
+                matcher = function(buf)
+                  local get_buf = vim.api.nvim_buf_get_name
+                  return get_buf(buf.id):match "%.py"
+                end,
+              },
             },
           },
         },
