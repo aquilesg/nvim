@@ -73,6 +73,7 @@ return {
   },
   {
     "zbirenbaum/copilot.lua",
+    event = "LspAttach",
     opts = {
       suggestion = { enabled = false },
       panel = { enabled = false },
