@@ -35,9 +35,7 @@ vim.opt.relativenumber = true
 vim.opt.statuscolumn = "%#SignColumn#%s %#LineNumber#%l %#RelativeNumber#%r "
 
 vim.api.nvim_set_option("clipboard", "unnamed")
-vim.diagnostic.config {
-  virtual_lines = false,
-}
+vim.diagnostic.config { virtual_text = false }
 
 -- NVIM Tree
 vim.g.loaded_netrw = 1

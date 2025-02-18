@@ -59,8 +59,8 @@ return {
         ["<Tab>"] = {},
       },
       signature = { enabled = true },
+      cmdline = { enabled = false },
       sources = {
-        cmdline = {},
         default = function()
           local success, node = pcall(vim.treesitter.get_node)
           if vim.bo.filetype == "lua" then
@@ -148,7 +148,7 @@ return {
           obsidian = {
             name = "obsidian",
             module = "blink.compat.source",
-            score_offset = 100,
+            score_offset = 10,
             transform_items = function(_, items)
               local CompletionItemKind =
                 require("blink.cmp.types").CompletionItemKind
@@ -166,7 +166,7 @@ return {
           obsidian_new = {
             name = "obsidian_new",
             module = "blink.compat.source",
-            score_offset = 100,
+            score_offset = 10,
             transform_items = function(_, items)
               local CompletionItemKind =
                 require("blink.cmp.types").CompletionItemKind
@@ -184,7 +184,7 @@ return {
           obsidian_tags = {
             name = "obsidian_tags",
             module = "blink.compat.source",
-            score_offset = 100,
+            score_offset = 10,
             transform_items = function(_, items)
               local CompletionItemKind =
                 require("blink.cmp.types").CompletionItemKind
@@ -202,6 +202,7 @@ return {
           copilot = {
             name = "copilot",
             module = "blink-cmp-copilot",
+            score_offset = -10,
             async = true,
             transform_items = function(_, items)
               local CompletionItemKind =
