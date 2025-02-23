@@ -120,6 +120,7 @@ local treesitter_parsers = {
   "terraform",
   "vim",
   "vimdoc",
+  "xml",
   "yaml",
 }
 

@@ -481,4 +481,37 @@ return {
       map("n", "<leader><leader>l", require("smart-splits").swap_buf_right)
     end,
   },
+  {
+    "neo451/feed.nvim",
+    cmd = "Feed",
+    opts = {
+      feeds = {
+        {
+          "https://aws.amazon.com/blogs/infrastructure-and-automation/feed/",
+          name = "AWS News - Infra",
+          tags = { "aws", "infrastructure", "automation" },
+        },
+        {
+          "https://aws.amazon.com/blogs/architecture/feed/",
+          name = "AWS News - Architecture",
+          tags = { "aws", "architecture" },
+        },
+        {
+          "https://aws.amazon.com/blogs/aws/feed/",
+          name = "AWS News",
+          tags = { "aws", "news" },
+        },
+        {
+          "https://aws.amazon.com/blogs/database/feed/",
+          name = "AWS News - Database",
+          tags = { "aws", "database", "infrastructure" },
+        },
+        {
+          "https://aws.amazon.com/blogs/devops/feed/",
+          name = "AWS News - DevOps",
+          tags = { "aws", "devops", "infrastructure" },
+        },
+      },
+    },
+  },
 }
