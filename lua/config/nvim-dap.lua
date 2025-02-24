@@ -98,3 +98,7 @@ map("n", "<leader>dvs", function()
   local widgets = require "dap.ui.widgets"
   widgets.centered_float(widgets.scopes)
 end, { desc = "View scopes" })
+
+map("n", "<leader>du", function()
+  require("dapui").toggle()
+end, { desc = "Toggle Dap UI" })

@@ -481,6 +481,7 @@ return {
       map("n", "<leader><leader>l", require("smart-splits").swap_buf_right)
     end,
   },
+  { "shortcuts/no-neck-pain.nvim", cmd = "NoNeckPain" },
   {
     "neo451/feed.nvim",
     cmd = "Feed",

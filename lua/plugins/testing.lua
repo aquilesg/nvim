@@ -12,6 +12,16 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     })
   end,
 })
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  pattern = "neotest-*",
+  callback = function(ev)
+    vim.keymap.set("n", "q", ":bdelete<CR>", {
+      buffer = ev.buf,
+      silent = true,
+      desc = "Close neotest window",
+    })
+  end,
+})
 
 return {
   {

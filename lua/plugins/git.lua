@@ -183,4 +183,15 @@ return {
     cmd = { "BlameToggle" },
     opts = {},
   },
+  {
+    "NeogitOrg/neogit",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "sindrets/diffview.nvim",
+    },
+    cmd = { "Neogit" },
+    opts = {
+      process_spinner = true,
+    },
+  },
 }

@@ -1,3 +1,4 @@
+local options = require "vim.filetype.options"
 return {
   "folke/snacks.nvim",
   priority = 1000,

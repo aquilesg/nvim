@@ -81,7 +81,8 @@ return {
           elseif
             vim.api
               .nvim_buf_get_name(0)
-              :find("^" .. vim.fn.expand "~/Documents/Work/") ~= nil
+              :find("^" .. vim.fn.expand "~/Documents/Work/")
+            ~= nil
           then
             return {
               "buffer",
