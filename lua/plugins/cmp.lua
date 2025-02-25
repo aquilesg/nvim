@@ -84,15 +84,28 @@ return {
               :find("^" .. vim.fn.expand "~/Documents/Work/")
             ~= nil
           then
-            return {
-              "buffer",
-              "path",
-              "ripgrep",
-              "obsidian",
-              "obsidian_new",
-              "obsidian_tags",
-              "markdown",
-            }
+            -- Check if we're in a code block
+            local success, node = pcall(vim.treesitter.get_node)
+            if success and node and node:type() == "code_fence_content" then
+              return {
+                "buffer",
+                "snippets",
+                "path",
+                "ripgrep",
+                "path",
+                "markdown",
+              }
+            else
+              return {
+                "buffer",
+                "path",
+                "ripgrep",
+                "obsidian",
+                "obsidian_new",
+                "obsidian_tags",
+                "markdown",
+              }
+            end
           elseif vim.bo.filetype == "codecompanion" then
             return { "buffer", "codecompanion" }
           elseif
