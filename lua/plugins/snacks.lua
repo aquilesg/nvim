@@ -90,7 +90,6 @@ return {
   },
   opts = {
     picker = {},
-    image = {},
     indent = {
       only_scope = true,
     },
