@@ -486,6 +486,7 @@ return {
     "neo451/feed.nvim",
     cmd = "Feed",
     opts = {
+      layout = { padding = { enabled = false } },
       feeds = {
         {
           "https://aws.amazon.com/blogs/infrastructure-and-automation/feed/",
