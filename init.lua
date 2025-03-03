@@ -1,13 +1,9 @@
 if vim.env.PROF then
-  -- example for lazy.nvim
-  -- change this to the correct path for your plugin manager
   local snacks = vim.fn.stdpath "data" .. "/lazy/snacks.nvim"
   vim.opt.rtp:append(snacks)
   require("snacks.profiler").startup {
     startup = {
-      event = "VimEnter", -- stop profiler on this event. Defaults to `VimEnter`
-      -- event = "UIEnter",
-      -- event = "VeryLazy",
+      event = "VimEnter",
     },
   }
 end
@@ -24,17 +20,12 @@ vim.opt.fillchars:append { eob = " " }
 vim.opt.termguicolors = true
 vim.opt.textwidth = 80
 
--- Status column stuff
-vim.api.nvim_set_hl(0, "StatusColumnSign", { fg = "#FFB3BA" })
-vim.api.nvim_set_hl(0, "StatusColumnLineNr", { fg = "#BAFFC9" })
-vim.api.nvim_set_hl(0, "StatusColumnRelative", { fg = "#BAE1FF" })
-
 -- Set statuscolumn with highlight groups
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.statuscolumn = "%#SignColumn#%s %#LineNumber#%l %#RelativeNumber#%r "
 
-vim.api.nvim_set_option("clipboard", "unnamed")
+vim.api.nvim_set_option_value("clipboard", "unnamed", {})
 vim.diagnostic.config { virtual_text = false }
 
 -- NVIM Tree
