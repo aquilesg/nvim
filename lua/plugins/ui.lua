@@ -90,7 +90,7 @@ local set_plugin_theme = function(background_option)
   for _, plugin in ipairs(ui_plugins) do
     local plugin_info = lazy.plugins()[plugin]
     if plugin_info and plugin_info._.working then
-      vim.cmd("Lazy reload " .. plugin)
+      require("lazy").reload { plugins = { plugin } }
     end
   end
 
@@ -123,6 +123,46 @@ local treesitter_parsers = {
   "xml",
   "yaml",
 }
+
+-- Rendering Markdown
+local mermaid_rendering_enabled = false
+vim.api.nvim_create_user_command("RenderMermaid", function()
+  mermaid_rendering_enabled = not mermaid_rendering_enabled
+  if mermaid_rendering_enabled then
+    require("image").setup {
+      processor = "magick_cli",
+      integrations = {
+        markdown = { enabled = true },
+      },
+    }
+    require("diagram").setup {
+      integrations = {
+        require "diagram.integrations.markdown",
+        require "diagram.integrations.neorg",
+      },
+      renderer_options = {
+        mermaid = {
+          theme = "forest",
+          background = "transparent",
+          width = 800,
+          height = 800,
+        },
+      },
+    }
+  else
+    require("image").setup {
+      processor = "magick_cli",
+      integrations = {
+        markdown = { enabled = false },
+      },
+    }
+    require("diagram").setup {
+      integrations = {},
+    }
+
+    require("lazy").reload { plugins = { "image", "diagram" } }
+  end
+end, { desc = "Render Mermaid Diagrams" })
 
 return {
   {
@@ -487,5 +527,17 @@ return {
         },
       }
     end,
+  },
+  {
+    "3rd/image.nvim",
+    build = false,
+    lazy = false,
+  },
+  {
+    "3rd/diagram.nvim",
+    lazy = true,
+    dependencies = {
+      "3rd/image.nvim",
+    },
   },
 }
