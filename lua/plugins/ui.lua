@@ -529,7 +529,14 @@ return {
     end,
   },
   {
-    "3rd/diagram.nvim",
-    dependencies = { "3rd/image.nvim", build = false },
+    "3rd/image.nvim",
+    ft = "markdown",
+    build = false,
+    opts = {
+      processor = "magick_cli",
+      integrations = {
+        markdown = { enabled = false },
+      },
+    },
   },
 }

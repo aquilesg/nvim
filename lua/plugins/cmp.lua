@@ -8,7 +8,6 @@ return {
     "saghen/blink.cmp",
     dependencies = {
       "rafamadriz/friendly-snippets",
-      "rcarriga/cmp-dap",
       "epwalsh/obsidian.nvim",
       "mikavilpas/blink-ripgrep.nvim",
       "giuxtaposition/blink-cmp-copilot",
@@ -113,8 +112,6 @@ return {
             and vim.fn.mode() ~= "c"
           then
             return { "buffer", "git", "path", "ripgrep", "markdown" }
-          elseif require("cmp_dap").is_dap_buffer() then
-            return { "dap", "snippets", "buffer" }
           elseif vim.bo.filetype == "markdown" then
             return { "buffer", "path", "ripgrep", "git", "markdown" }
           else
@@ -128,7 +125,6 @@ return {
           end
         end,
         providers = {
-          dap = { name = "dap", module = "blink.compat.source" },
           codecompanion = {
             name = "CodeCompanion",
             module = "codecompanion.providers.completion.blink",
