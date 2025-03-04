@@ -529,15 +529,7 @@ return {
     end,
   },
   {
-    "3rd/image.nvim",
-    build = false,
-    lazy = false,
-  },
-  {
     "3rd/diagram.nvim",
-    lazy = true,
-    dependencies = {
-      "3rd/image.nvim",
-    },
+    dependencies = { "3rd/image.nvim", build = false },
   },
 }

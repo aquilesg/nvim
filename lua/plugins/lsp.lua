@@ -193,13 +193,6 @@ return {
     },
   },
   {
-    "rachartier/tiny-inline-diagnostic.nvim",
-    event = "LspAttach",
-    opts = {
-      preset = "ghost",
-    },
-  },
-  {
     "aznhe21/actions-preview.nvim",
     event = "LspAttach",
     opts = {

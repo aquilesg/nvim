@@ -18,20 +18,14 @@ vim.opt.expandtab = true
 vim.bo.softtabstop = 2
 vim.opt.fillchars:append { eob = " " }
 vim.opt.termguicolors = true
-vim.opt.textwidth = 80
-
--- Set statuscolumn with highlight groups
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.statuscolumn = "%#SignColumn#%s %#LineNumber#%l %#RelativeNumber#%r "
-
 vim.api.nvim_set_option_value("clipboard", "unnamed", {})
-vim.diagnostic.config { virtual_text = false }
+vim.diagnostic.config { virtual_text = false, virtual_lines = true }
 
 -- NVIM Tree
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 vim.opt.termguicolors = true
+vim.wo.number = true
 
 -- Render whitespaces
 vim.opt.listchars = {

@@ -513,6 +513,11 @@ return {
           name = "AWS News - DevOps",
           tags = { "aws", "devops", "infrastructure" },
         },
+        {
+          "http://platformengineering.org/blog/rss.xml",
+          name = "Platform Engineering-Blog",
+          tags = { "infrastructure" },
+        },
       },
     },
   },
