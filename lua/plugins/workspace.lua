@@ -15,6 +15,12 @@ vim.api.nvim_create_user_command("Format", function(args)
     range = range,
   }
 end, { range = true })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "markdown" },
+  callback = function()
+    vim.bo.textwidth = 80
+  end,
+})
 
 vim.api.nvim_create_autocmd("BufWritePre", {
   callback = function()
@@ -43,7 +49,7 @@ vim.api.nvim_create_user_command("CloseFiletypeBuffers", function()
     ft_message = ft_message .. tostring(i) .. ": " .. ft .. "\n"
   end
 
-  vim.api.nvim_notify(ft_message, 2, {})
+  vim.notify(ft_message, vim.log.levels.INFO, {})
 
   local selected_num = tonumber(
     vim.fn.input "Enter the number corresponding to the filetype to close buffers: "
@@ -155,14 +161,20 @@ map(
 map({ "t" }, "<C-t>", "<cmd> ToggleTerm <CR>", { desc = "Toggle terminal" })
 map(
   "n",
+  "<leader>ti",
+  '<cmd> TermExec cmd="aws-environment integration3 platform" name="Integration3 Terminal" <CR>',
+  { desc = "Toggle Integration3 terminal" }
+)
+map(
+  "n",
   "<leader>tu",
-  '<cmd> TermExec cmd="aws-environment uat platform" name="UAT Terminal 󰵮"  <CR>',
+  '<cmd> TermExec cmd="aws-environment uat platform" name="UAT Terminal"  <CR>',
   { desc = "Toggle UAT terminal" }
 )
 map(
   "n",
   "<leader>tp",
-  '<cmd> TermExec cmd="aws-environment production platform" name="Production Terminal " <CR>',
+  '<cmd> TermExec cmd="aws-environment production platform" name="Production Terminal" <CR>',
   { desc = "Toggle Production terminal" }
 )
 map(
@@ -198,6 +210,7 @@ map("n", "<leader>im", function()
 end, { desc = "Create disabled markdown lint section" })
 
 function _G.set_terminal_keymaps()
+  map("t", "<C-[>", [[<C-\><C-n>]], { buffer = 0, desc = "Exit Terminal mode" })
   map("t", "<esc>", [[<C-\><C-n>]], { buffer = 0, desc = "Exit Terminal mode" })
   map(
     "t",
