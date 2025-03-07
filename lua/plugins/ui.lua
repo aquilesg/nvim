@@ -124,46 +124,6 @@ local treesitter_parsers = {
   "yaml",
 }
 
--- Rendering Markdown
-local mermaid_rendering_enabled = false
-vim.api.nvim_create_user_command("RenderMermaid", function()
-  mermaid_rendering_enabled = not mermaid_rendering_enabled
-  if mermaid_rendering_enabled then
-    require("image").setup {
-      processor = "magick_cli",
-      integrations = {
-        markdown = { enabled = true },
-      },
-    }
-    require("diagram").setup {
-      integrations = {
-        require "diagram.integrations.markdown",
-        require "diagram.integrations.neorg",
-      },
-      renderer_options = {
-        mermaid = {
-          theme = "forest",
-          background = "transparent",
-          width = 800,
-          height = 800,
-        },
-      },
-    }
-  else
-    require("image").setup {
-      processor = "magick_cli",
-      integrations = {
-        markdown = { enabled = false },
-      },
-    }
-    require("diagram").setup {
-      integrations = {},
-    }
-
-    require("lazy").reload { plugins = { "image", "diagram" } }
-  end
-end, { desc = "Render Mermaid Diagrams" })
-
 return {
   {
     "f-person/auto-dark-mode.nvim",
@@ -182,6 +142,7 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
   },
+  { "alexxGmZ/e-ink.nvim" },
   {
     "EdenEast/nightfox.nvim",
   },
@@ -342,6 +303,10 @@ return {
           },
         },
       },
+      code = {
+        sign = false,
+        border = "thin",
+      },
       pipe_table = { preset = "heavy" },
       html = {
         enabled = false,
@@ -377,12 +342,6 @@ return {
     dependencies = "nvim-tree/nvim-web-devicons",
     config = function()
       local bufferline = require "bufferline"
-
-      -- Function to get highlight based on background
-      local function get_highlight(light_color, dark_color)
-        return vim.o.background == "light" and light_color or dark_color
-      end
-
       bufferline.setup {
         options = {
           style_preset = bufferline.style_preset.default,

@@ -337,7 +337,7 @@ return {
     opts = {},
   },
   {
-    "epwalsh/obsidian.nvim",
+    "obsidian-nvim/obsidian.nvim",
     event = "VeryLazy",
     cmd = {
       "ObsidianOpen",
@@ -376,6 +376,14 @@ return {
       },
       ui = {
         enable = false,
+      },
+      mappings = {
+        ["<cr>"] = {
+          action = function()
+            return require("obsidian").util.gf_passthrough()
+          end,
+          opts = { noremap = false, expr = true, buffer = true },
+        },
       },
       use_advanced_uri = true,
       suppress_missing_scope = {

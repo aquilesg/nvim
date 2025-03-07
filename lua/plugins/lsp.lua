@@ -18,6 +18,7 @@ local ensure_installed = {
   "json-lsp",
   "lua-language-server",
   "markdownlint",
+  "marksman",
   "prettier",
   "proselint",
   "ruff",
@@ -33,7 +34,8 @@ local ensure_installed = {
 }
 
 vim.api.nvim_create_user_command("MasonInstallAll", function()
-  vim.cmd("MasonInstall " .. table.concat(ensure_installed, " "))
+  local packages = table.concat(ensure_installed, " ")
+  vim.cmd("MasonInstall " .. packages)
 end, { desc = "Install All Mason Packages" })
 
 -- Infrastructure as Code file detection
@@ -108,7 +110,7 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     opts = {},
     config = function()
-      local on_attach = function(client, bufnr)
+      local on_attach = function(_, _)
         local map = vim.keymap.set
         map(
           "n",
