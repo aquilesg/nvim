@@ -63,7 +63,7 @@ local set_plugin_theme = function(background_option)
 
   -- Reload the color theme
   if background_option == "light" then
-    vim.cmd "colorscheme dawnfox"
+    vim.cmd "colorscheme edge"
   else
     vim.cmd "colorscheme nordfox"
   end
@@ -143,6 +143,7 @@ return {
     name = "rose-pine",
   },
   { "alexxGmZ/e-ink.nvim" },
+  { "sainnhe/edge" },
   {
     "EdenEast/nightfox.nvim",
   },

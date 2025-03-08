@@ -37,14 +37,7 @@ return {
       { "stevearc/dressing.nvim", opts = {} },
     },
     opts = {
-      display = {
-        chat = {
-          render_headers = false,
-        },
-        diff = {
-          provider = "mini_diff",
-        },
-      },
+      display = {},
       strategies = {
         chat = {
           adapter = "anthropic",

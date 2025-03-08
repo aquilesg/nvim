@@ -53,6 +53,13 @@ return {
       desc = "Diagnostics",
     },
     {
+      "<leader>gl",
+      function()
+        Snacks.lazygit.open()
+      end,
+      desc = "Open Lazy git",
+    },
+    {
       "<leader>vm",
       function()
         Snacks.picker.marks()

@@ -13,9 +13,6 @@ map(
   { desc = "List PRs for this repo" }
 )
 map("n", "<leader>o3", "<cmd> Octo pr search <CR>", { desc = "Search for PR" })
-map("n", "<leader>gl", function()
-  Snacks.lazygit.open()
-end, { desc = "Open lazygit" })
 map("n", "<leader>dvv", function()
   if next(require("diffview.lib").views) == nil then
     vim.cmd "DiffviewOpen"

@@ -1,5 +1,25 @@
 vim.api.nvim_create_user_command("LoadTestSuite", function()
   require("lazy").load { plugins = { "nvim-dap", "neotest" } }
+  local dap, dv = require "dap", require "dap-view"
+  dap.listeners.before.attach["dap-view-config"] = function()
+    dv.open()
+  end
+  dap.listeners.before.launch["dap-view-config"] = function()
+    dv.open()
+  end
+  dap.listeners.before.event_terminated["dap-view-config"] = function()
+    dv.close()
+  end
+  dap.listeners.before.event_exited["dap-view-config"] = function()
+    dv.close()
+  end
+
+  vim.api.nvim_create_autocmd({ "FileType" }, {
+    pattern = { "dap-view", "dap-view-term", "dap-repl" },
+    callback = function(evt)
+      vim.keymap.set("n", "q", "<C-w>q", { silent = true, buffer = evt.buf })
+    end,
+  })
 end, { desc = "Load test suite" })
 
 vim.api.nvim_create_autocmd("BufWinEnter", {
@@ -50,25 +70,25 @@ return {
     },
     keys = {
       {
-        "<leader>dv",
+        "<leader>dc",
         function()
           require("dap").continue()
         end,
-        desc = "Continue Dap",
+        desc = "Dap Continue",
       },
       {
         "<leader>dt",
         function()
           require("dap").terminate()
         end,
-        desc = "Terminate Dap",
+        desc = "Dap Terminate",
       },
       {
         "<leader>db",
         function()
           require("dap").toggle_breakpoint()
         end,
-        desc = "Toggle Dap breakpoint",
+        desc = "Dap toggle breakpoint",
       },
       {
         "<leader>dB",
@@ -94,7 +114,7 @@ return {
             end
           )
         end,
-        desc = "Set Dap Conditional breakpoint",
+        desc = "Dap Set Conditional breakpoint",
       },
       {
         "<leader>dso",
@@ -108,7 +128,7 @@ return {
         function()
           require("dap").step_into()
         end,
-        desc = "Dap Step Into",
+        desc = "dap step into",
       },
       {
         "<leader>dsO",
@@ -118,14 +138,14 @@ return {
         desc = "Dap Step Out",
       },
       {
-        "<leader>drr",
+        "<leader>dr",
         function()
           require("dap").restart()
         end,
         desc = "Dap Restart",
       },
       {
-        "<leader>drl",
+        "<leader>dl",
         function()
           require("dap").run_last()
         end,
@@ -134,25 +154,24 @@ return {
       {
         "<leader>dK",
         function()
-          require("dap.ui.widgets").hover()
+          require("dap.ui.widgets").hover(nil, { border = "rounded" })
         end,
         desc = "Evaluate Value under cursor",
-      },
-      {
-        "<leader>dp",
-        function()
-          local widgets = require "dap.ui.widgets"
-          widgets.centered_float(widgets.frames)
-        end,
-        desc = "View Frames",
       },
       {
         "<leader>dP",
         function()
           local widgets = require "dap.ui.widgets"
-          widgets.centered_float(widgets.scopes)
+          widgets.centered_float(widgets.scopes, { border = "rounded" })
         end,
         desc = "View Scopes",
+      },
+      {
+        "<leader>du",
+        function()
+          require("dap-view").toggle()
+        end,
+        desc = "Toggle Dap View",
       },
     },
   },
