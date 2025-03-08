@@ -219,4 +219,9 @@ return {
     event = "LspAttach",
     opts = {},
   },
+  {
+    "NotAShelf/syntax-gaslighting.nvim",
+    event = "LspAttach",
+    opts = { gaslighting_chance = 5 },
+  },
 }

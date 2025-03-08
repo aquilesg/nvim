@@ -19,7 +19,7 @@ vim.bo.softtabstop = 2
 vim.opt.fillchars:append { eob = " " }
 vim.opt.termguicolors = true
 vim.api.nvim_set_option_value("clipboard", "unnamed", {})
-vim.diagnostic.config { virtual_text = false, virtual_lines = true }
+vim.diagnostic.config { virtual_lines = true }
 
 -- NVIM Tree
 vim.g.loaded_netrw = 1
