@@ -168,6 +168,16 @@ return {
           require("lspconfig")[server_name].setup(opts)
         end,
       }
+      require("lspconfig").yamlls.setup {
+        settings = {
+          yaml = {
+            schemaStore = {
+              url = "https://platform-api.us-east-1.uat.grnds.com/api/json/catalog.json",
+              enable = os.getenv "AWS_USERNAME" ~= nil,
+            },
+          },
+        },
+      }
     end,
   },
   {
@@ -218,10 +228,5 @@ return {
     dependencies = "neovim/nvim-lspconfig",
     event = "LspAttach",
     opts = {},
-  },
-  {
-    "NotAShelf/syntax-gaslighting.nvim",
-    event = "LspAttach",
-    opts = { gaslighting_chance = 5 },
   },
 }
