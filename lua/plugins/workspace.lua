@@ -539,6 +539,11 @@ return {
           name = "Platform Engineering-Blog",
           tags = { "infrastructure" },
         },
+        {
+          "https://istio.io/latest/blog/feed.xml",
+          name = "Istio Blog",
+          tags = { "istio", "blog" },
+        },
       },
     },
   },
