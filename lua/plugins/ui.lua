@@ -145,6 +145,10 @@ return {
   { "alexxGmZ/e-ink.nvim" },
   { "sainnhe/edge" },
   {
+    "rktjmp/lush.nvim",
+    { dir = "~/Repos/ciapre/", lazy = true },
+  },
+  {
     "EdenEast/nightfox.nvim",
   },
   {
