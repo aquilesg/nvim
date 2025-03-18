@@ -65,7 +65,7 @@ local set_plugin_theme = function(background_option)
   if background_option == "light" then
     vim.cmd "colorscheme edge"
   else
-    vim.cmd "colorscheme nordfox"
+    vim.cmd "colorscheme ciapre"
   end
 
   -- Close unnamed buffers
