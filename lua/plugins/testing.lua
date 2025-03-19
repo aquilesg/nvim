@@ -198,40 +198,35 @@ return {
         },
       }
     end,
-  },
-  keys = {
-    {
-      "<leader>ns",
-      "<cmd> Neotest summary <CR>",
-      desc = "Neotest Open Summary",
-    },
-    {
-      "<leader>nr",
-      function()
-        require("neotest").run.run()
-      end,
-      desc = "Neotest Run nearest test",
-    },
-    {
-      "<leader>nw",
-      function()
-        require("neotest").watch.watch()
-      end,
-      desc = "Neotest watch test",
-    },
-    {
-      "<leader>ns",
-      function()
-        require("neotest").output.open { enter = true }
-      end,
-      desc = "Neotest open oputput",
-    },
-    {
-      "<leader>ns",
-      function()
-        require("neotest").run.run { strategy = "dap" }
-      end,
-      desc = "Neotest debug nearest test",
+    keys = {
+      {
+        "<leader>nr",
+        function()
+          require("neotest").run.run()
+        end,
+        desc = "Neotest Run nearest test",
+      },
+      {
+        "<leader>nw",
+        function()
+          require("neotest").watch.watch()
+        end,
+        desc = "Neotest watch test",
+      },
+      {
+        "<leader>ns",
+        function()
+          require("neotest").output.open { enter = true }
+        end,
+        desc = "Neotest open oputput",
+      },
+      {
+        "<leader>nd",
+        function()
+          require("neotest").run.run { strategy = "dap" }
+        end,
+        desc = "Neotest debug nearest test",
+      },
     },
   },
 }
