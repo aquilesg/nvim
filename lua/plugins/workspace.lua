@@ -356,8 +356,8 @@ return {
     opts = {
       workspaces = {
         {
-          name = "Work",
-          path = "~/Documents/Work",
+          name = "SecondBrain",
+          path = "~/Repos/brain",
           overrides = {
             daily_notes = {
               folder = "DailyNotes",
