@@ -98,57 +98,6 @@ map("n", "<leader>fm", function()
   require("conform").format { async = true }
 end, { desc = "Format document" })
 
--- Obsidian mappings
-map(
-  "n",
-  "<leader>ot",
-  "<cmd> ObsidianToday <CR>",
-  { desc = "Open today's note" }
-)
-map(
-  "n",
-  "<leader>ou",
-  "<cmd> ObsidianTomorrow <CR>",
-  { desc = "Open tomorrow's note" }
-)
-map(
-  "n",
-  "<leader>oy",
-  "<cmd> ObsidianYesterday <CR>",
-  { desc = "Open yesterday's note" }
-)
-map(
-  "n",
-  "<leader>osn",
-  "<cmd> ObsidianSearch <CR>",
-  { desc = "Obsidian search notes" }
-)
-map("n", "<leader>ost", "<cmd> ObsidianTags <CR>", { desc = "Search for tags" })
-map(
-  "n",
-  "<leader>oq",
-  "<cmd> ObsidianQuickSwitch <CR>",
-  { desc = "Quick switch to different note" }
-)
-map(
-  "n",
-  "<leader>oo",
-  "<cmd> ObsidianOpen <CR>",
-  { desc = "Open current file in Obsidian" }
-)
-map(
-  "n",
-  "<leader>op",
-  "<cmd> ObsidianPasteImg <CR>",
-  { desc = "Paste image into Obsidian note" }
-)
-map(
-  "n",
-  "<leader>on",
-  "<cmd> ObsidianNewFromTemplate <CR>",
-  { desc = "Create new note from template" }
-)
-
 map("n", "<leader>fr", "<cmd> GrugFar <CR>", { desc = "Find and Replace" })
 
 -- Toggle Terminal mapping
@@ -335,64 +284,6 @@ return {
     version = "*",
     event = "UIEnter",
     opts = {},
-  },
-  {
-    "obsidian-nvim/obsidian.nvim",
-    event = "VeryLazy",
-    cmd = {
-      "ObsidianOpen",
-      "ObsidianNew",
-      "ObsidianQuickSwitch",
-      "ObsidianToday",
-      "ObsidianYesterday",
-      "ObsidianWorkspace",
-      "ObsidianTemplate",
-      "ObsidianSearch",
-      "ObsidianNewFromTemplate",
-    },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
-    opts = {
-      workspaces = {
-        {
-          name = "SecondBrain",
-          path = "~/Repos/brain",
-          overrides = {
-            daily_notes = {
-              folder = "DailyNotes",
-              template = "daily.md",
-            },
-            templates = {
-              subdir = "Templates",
-              substitutions = {
-                pretty_date = function()
-                  return os.date "%B %d, %Y"
-                end,
-              },
-            },
-          },
-        },
-      },
-      ui = {
-        enable = false,
-      },
-      mappings = {
-        ["<cr>"] = {
-          action = function()
-            return require("obsidian").util.gf_passthrough()
-          end,
-          opts = { noremap = false, expr = true, buffer = true },
-        },
-      },
-      use_advanced_uri = true,
-      suppress_missing_scope = {
-        projects_v2 = true,
-      },
-      follow_url_func = function(url)
-        vim.fn.jobstart { "open", url }
-      end,
-    },
   },
   {
     "MagicDuck/grug-far.nvim",
