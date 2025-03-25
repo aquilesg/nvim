@@ -20,7 +20,7 @@ return {
       "<cmd> ObsidianSearch <CR>",
       desc = "Obsidian search notes",
     },
-    { "leader>ost", "<cmd> ObsidianTags <CR>", desc = "Search for tags" },
+    { "<leader>ost", "<cmd> ObsidianTags <CR>", desc = "Search for tags" },
     {
       "<leader>oq",
       "<cmd> ObsidianQuickSwitch <CR>",
@@ -37,9 +37,9 @@ return {
       desc = "Paste image into Obsidian note",
     },
     {
-      "<leader>on",
-      "<cmd> ObsidianNewFromTemplate <CR>",
-      desc = "Create new note from template",
+      "<leader>ont",
+      "<cmd> ObsidianNewFromTemplate Work/Tasks/ <cr>",
+      desc = "Create new work task",
     },
   },
   opts = {

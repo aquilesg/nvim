@@ -2,17 +2,17 @@ local map = vim.keymap.set
 map("n", "<leader>ge", "<cmd> BlameToggle <CR>", { desc = "Toggle git blame" })
 map(
   "n",
-  "<leader>o1",
+  "<leader>1",
   "<cmd> Octo pr create draft <CR>",
   { desc = "Create new PR" }
 )
 map(
   "n",
-  "<leader>o2",
+  "<leader>2",
   "<cmd> Octo pr list <CR>",
   { desc = "List PRs for this repo" }
 )
-map("n", "<leader>o3", "<cmd> Octo pr search <CR>", { desc = "Search for PR" })
+map("n", "<leader>3", "<cmd> Octo pr search <CR>", { desc = "Search for PR" })
 map("n", "<leader>dvv", function()
   if next(require("diffview.lib").views) == nil then
     vim.cmd "DiffviewOpen"
