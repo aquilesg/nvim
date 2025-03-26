@@ -63,7 +63,7 @@ local set_plugin_theme = function(background_option)
 
   -- Reload the color theme
   if background_option == "light" then
-    vim.cmd "colorscheme edge"
+    vim.cmd "colorscheme lighty"
   else
     vim.cmd "colorscheme ciapre"
   end
@@ -147,6 +147,7 @@ return {
   {
     "rktjmp/lush.nvim",
     { dir = "~/Repos/ciapre/", lazy = true },
+    { dir = "~/Repos/lighty/", lazy = true },
   },
   {
     "EdenEast/nightfox.nvim",

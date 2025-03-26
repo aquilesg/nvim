@@ -54,6 +54,17 @@ return {
           delve = {
             initialize_timeout_sec = 45,
           },
+          dap_configurations = {
+            {
+              type = "go",
+              name = "Debug (Build Flags)",
+              request = "launch",
+              program = "${file}",
+              buildFlags = function()
+                return require("dap-go").get_build_flags()
+              end,
+            },
+          },
         },
       },
       "mfussenegger/nvim-dap-python",
@@ -214,11 +225,18 @@ return {
         desc = "Neotest watch test",
       },
       {
-        "<leader>ns",
+        "<leader>no",
         function()
           require("neotest").output.open { enter = true }
         end,
         desc = "Neotest open oputput",
+      },
+      {
+        "<leader>ns",
+        function()
+          require("neotest").summary.toggle()
+        end,
+        desc = "Neotest open summary",
       },
       {
         "<leader>nd",
