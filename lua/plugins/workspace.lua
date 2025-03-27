@@ -191,6 +191,12 @@ function _G.set_terminal_keymaps()
     [[<C-\><C-n><C-w>]],
     { buffer = 0, desc = "Move to buffer" }
   )
+  map(
+    "t",
+    "<F13>",
+    "<Cmd>BufferClose<CR>",
+    { buffer = 0, desc = "Move to buffer" }
+  )
 end
 
 vim.cmd "autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()"

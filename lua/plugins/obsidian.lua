@@ -1,8 +1,9 @@
 local function create_obsidian_note(note_dir, template_name)
+  local user_title = vim.fn.input { prompt = template_name .. " title: " }
   local client = require("obsidian").get_client()
   local gen_id = client:new_note_id()
   local note = client:create_note {
-    title = gen_id,
+    title = user_title,
     id = gen_id,
     dir = note_dir,
     no_write = false,
@@ -98,8 +99,10 @@ return {
           templates = {
             subdir = "Templates",
             substitutions = {
-              pretty_date = function()
-                return os.date "%B %d, %Y"
+              topic = function()
+                return vim.fn.input {
+                  prompt = "Research Topic: ",
+                }
               end,
             },
           },
