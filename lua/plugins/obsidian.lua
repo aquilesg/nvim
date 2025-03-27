@@ -1,3 +1,16 @@
+local function create_obsidian_note(note_dir, template_name)
+  local client = require("obsidian").get_client()
+  local gen_id = client:new_note_id()
+  local note = client:create_note {
+    title = gen_id,
+    id = gen_id,
+    dir = note_dir,
+    no_write = false,
+    template = template_name,
+  }
+  client:open_note(note)
+end
+
 return {
   "obsidian-nvim/obsidian.nvim",
   lazy = true,
@@ -37,9 +50,39 @@ return {
       desc = "Paste image into Obsidian note",
     },
     {
-      "<leader>ont",
-      "<cmd> ObsidianNewFromTemplate Work/Tasks/ <cr>",
-      desc = "Create new work task",
+      "<leader>onwt",
+      function()
+        create_obsidian_note("Work/Tasks/", "WorkTask")
+      end,
+      desc = "Create new Work Task",
+    },
+    {
+      "<leader>onwd",
+      function()
+        create_obsidian_note("Work/Docs/", "WorkDocument")
+      end,
+      desc = "Create new Work Document",
+    },
+    {
+      "<leader>onwr",
+      function()
+        create_obsidian_note("Work/Research/", "WorkResearch")
+      end,
+      desc = "Create new Work Research Document",
+    },
+    {
+      "<leader>onwi",
+      function()
+        create_obsidian_note("Work/Initiatives/", "WorkInitiative")
+      end,
+      desc = "Create new Work Initiative",
+    },
+    {
+      "<leader>onwe",
+      function()
+        create_obsidian_note("Work/Events/", "WorkEvent")
+      end,
+      desc = "Create new Work Event",
     },
   },
   opts = {

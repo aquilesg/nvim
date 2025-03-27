@@ -80,7 +80,7 @@ return {
           elseif
             vim.api
               .nvim_buf_get_name(0)
-              :find("^" .. vim.fn.expand "~/Repos/brain/")
+              :find("^" .. vim.fn.expand "~/Repos/brain")
             ~= nil
           then
             -- Check if we're in a code block
