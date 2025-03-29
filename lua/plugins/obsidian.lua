@@ -4,12 +4,38 @@ local function create_obsidian_note(note_dir, template_name)
   local gen_id = client:new_note_id()
   local note = client:create_note {
     title = user_title,
-    id = gen_id,
+    id = user_title .. "-" .. gen_id,
     dir = note_dir,
     no_write = false,
     template = template_name,
   }
   client:open_note(note)
+end
+
+local function note_has_tags(note, tags)
+  local has_tags = true
+  for _, tag in ipairs(tags) do
+    has_tags = has_tags and note:has_tag(tag)
+    if not has_tags then
+      break
+    end
+  end
+  return has_tags
+end
+
+local function open_incomplete_notes_by_tags(incomplete_delimiter, tags)
+  local client = require("obsidian").get_client()
+  client:find_notes_async(incomplete_delimiter, function(notes)
+    for _, note in ipairs(notes) do
+      if note_has_tags(note, tags) then
+        client:open_note(note)
+      end
+    end
+  end, {
+    sort = false,
+    include_templates = false,
+    ignore_case = true,
+  })
 end
 
 return {
@@ -84,6 +110,65 @@ return {
         create_obsidian_note("Work/Events/", "WorkEvent")
       end,
       desc = "Create new Work Event",
+    },
+    {
+      "<leader>onpd",
+      function()
+        create_obsidian_note("Personal/Docs/", "PersonalDocument")
+      end,
+      desc = "Create New Personal Document",
+    },
+    {
+      "<leader>onpr",
+      function()
+        create_obsidian_note("Personal/Research/", "PersonalResearchDocument")
+      end,
+      desc = "Create New Personal Document",
+    },
+    {
+      "<leader>onr",
+      function()
+        create_obsidian_note("Personal/Recipes/", "Recipes")
+      end,
+      desc = "Create New Recipe Document",
+    },
+    -- Maintenance commands
+    {
+      "<leader>ocwt",
+      function()
+        open_incomplete_notes_by_tags("status: in-progress", { "Work/task" })
+      end,
+      desc = "Open current Work tasks",
+    },
+    {
+      "<leader>ocwi",
+      function()
+        open_incomplete_notes_by_tags(
+          "status: in-progress",
+          { "Work/initiative" }
+        )
+      end,
+      desc = "Open current Work initiatives",
+    },
+    {
+      "<leader>ocws",
+      function()
+        open_incomplete_notes_by_tags(
+          "status: in-progress",
+          { "Work/categorize" }
+        )
+      end,
+      desc = "Open current Work items that are stale",
+    },
+    {
+      "<leader>ocps",
+      function()
+        open_incomplete_notes_by_tags(
+          "status: in-progress",
+          { "categorize", "personal" }
+        )
+      end,
+      desc = "Open current Personal items that are stale",
     },
   },
   opts = {
