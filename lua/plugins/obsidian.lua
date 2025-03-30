@@ -1,14 +1,17 @@
-local function create_obsidian_note(note_dir, template_name)
+local function create_obsidian_note(note_dir, template_name, should_not_open)
   local user_title = vim.fn.input { prompt = template_name .. " title: " }
   local client = require("obsidian").get_client()
-  local gen_id = client:new_note_id()
+  local gen_id = client:new_note_id(user_title)
   local note = client:create_note {
     title = user_title,
-    id = user_title .. "-" .. gen_id,
+    id = gen_id,
     dir = note_dir,
     no_write = false,
     template = template_name,
   }
+  if should_not_open then
+    return gen_id
+  end
   client:open_note(note)
 end
 
@@ -37,6 +40,49 @@ local function open_incomplete_notes_by_tags(incomplete_delimiter, tags)
     ignore_case = true,
   })
 end
+
+local function update_current_note_field(field, value, note)
+  local client = require("obsidian").get_client()
+  if note == nil then
+    note = client:current_note(vim.api.nvim_get_current_buf(), {
+      load_contents = false,
+      collect_anchor_links = false,
+      collect_blocks = false,
+    })
+  end
+
+  if note ~= nil then
+    local front_matter = note:frontmatter()
+    front_matter[field] = value
+    note:save_to_buffer {
+      frontmatter = front_matter,
+      insert_frontmatter = true,
+    }
+    note:save()
+  end
+end
+
+local directories = {
+  WorkTask = "Work/Tasks/",
+  WorkDocument = "Work/Docs/",
+  WorkResearch = "Work/Research/",
+  WorkInitiative = "Work/Initiatives/",
+  WorkEvents = "Work/Events/",
+  PersonalDocument = "Personal/Docs/",
+  PersonalResearchDocument = "Personal/Research/",
+  Recipe = "Personal/Recipes/",
+}
+
+local template_names = {
+  WorkTask = "WorkTask",
+  WorkDocument = "WorkDocument",
+  WorkResearch = "WorkResearch",
+  WorkInitiative = "WorkInitiative",
+  WorkEvents = "WorkEvents",
+  PersonalDocument = "PersonalDocument",
+  PersonalResearchDocument = "PersonalResearchDocument",
+  Recipe = "Recipes",
+}
 
 return {
   "obsidian-nvim/obsidian.nvim",
@@ -72,63 +118,78 @@ return {
       desc = "Open current file in Obsidian",
     },
     {
-      "<leader>op",
+      "<leader>oip",
       "<cmd> ObsidianPasteImg <CR>",
       desc = "Paste image into Obsidian note",
     },
     {
       "<leader>onwt",
       function()
-        create_obsidian_note("Work/Tasks/", "WorkTask")
+        create_obsidian_note(directories.WorkTask, template_names.WorkTask)
       end,
       desc = "Create new Work Task",
     },
     {
       "<leader>onwd",
       function()
-        create_obsidian_note("Work/Docs/", "WorkDocument")
+        create_obsidian_note(
+          directories.WorkDocument,
+          template_names.WorkDocument
+        )
       end,
       desc = "Create new Work Document",
     },
     {
       "<leader>onwr",
       function()
-        create_obsidian_note("Work/Research/", "WorkResearch")
+        create_obsidian_note(
+          directories.WorkResearch,
+          template_names.WorkResearch
+        )
       end,
       desc = "Create new Work Research Document",
     },
     {
       "<leader>onwi",
       function()
-        create_obsidian_note("Work/Initiatives/", "WorkInitiative")
+        create_obsidian_note(
+          directories.WorkInitiative,
+          template_names.WorkInitiative
+        )
       end,
       desc = "Create new Work Initiative",
     },
     {
       "<leader>onwe",
       function()
-        create_obsidian_note("Work/Events/", "WorkEvent")
+        create_obsidian_note(directories.WorkEvents, template_names.WorkEvents)
       end,
       desc = "Create new Work Event",
     },
     {
       "<leader>onpd",
       function()
-        create_obsidian_note("Personal/Docs/", "PersonalDocument")
+        create_obsidian_note(
+          directories.PersonalDocument,
+          template_names.PersonalDocument
+        )
       end,
       desc = "Create New Personal Document",
     },
     {
       "<leader>onpr",
       function()
-        create_obsidian_note("Personal/Research/", "PersonalResearchDocument")
+        create_obsidian_note(
+          directories.PersonalResearchDocument,
+          template_names.PersonalResearchDocument
+        )
       end,
-      desc = "Create New Personal Document",
+      desc = "Create New Personal ResearchDocument",
     },
     {
       "<leader>onr",
       function()
-        create_obsidian_note("Personal/Recipes/", "Recipes")
+        create_obsidian_note(directories.Recipe, template_names.Recipe)
       end,
       desc = "Create New Recipe Document",
     },
@@ -169,6 +230,55 @@ return {
         )
       end,
       desc = "Open current Personal items that are stale",
+    },
+    -- Status change
+    {
+      "<leader>omc",
+      function()
+        update_current_note_field("status", "complete")
+      end,
+      desc = "Mark complete",
+    },
+    {
+      "<leader>omi",
+      function()
+        update_current_note_field("status", "in-progress")
+      end,
+      desc = "Mark document in progress",
+    },
+    {
+      "<leader>oma",
+      function()
+        update_current_note_field("status", "abandoned")
+      end,
+      desc = "Mark document abandoned",
+    },
+    {
+      "<leader>oil",
+      function()
+        local template_keys = {}
+        for k, _ in pairs(template_names) do
+          table.insert(template_keys, k)
+        end
+        vim.ui.select(template_keys, {
+          prompt = "Document Type",
+        }, function(choice)
+          local id = create_obsidian_note(
+            directories[choice],
+            template_names[choice],
+            true
+          )
+          local text = "[[" .. id .. "]]"
+          local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+          local current_line = vim.api.nvim_get_current_line()
+          local new_line = string.sub(current_line, 1, col)
+            .. text
+            .. string.sub(current_line, col + 1)
+          vim.api.nvim_set_current_line(new_line)
+          vim.api.nvim_win_set_cursor(0, { row, col + #text })
+        end)
+      end,
+      desc = "Insert Link to Document",
     },
   },
   opts = {

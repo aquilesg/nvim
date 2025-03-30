@@ -7,6 +7,7 @@ map("n", "<leader>is", function()
   vim.api.nvim_buf_set_lines(0, row, row, false, { "" })
   vim.api.nvim_buf_set_text(0, row, 0, row, 0, { timestamp })
 end, { desc = "Insert timestamp" })
+
 map("n", "<leader>im", function()
   local cursor = vim.api.nvim_win_get_cursor(0)
   local line = cursor[1] - 1
