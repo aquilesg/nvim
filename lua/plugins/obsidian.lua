@@ -10,7 +10,7 @@ local function create_obsidian_note(note_dir, template_name, should_not_open)
     template = template_name,
   }
   if should_not_open then
-    return gen_id
+    return gen_id, user_title
   end
   client:open_note(note)
 end
@@ -263,12 +263,12 @@ return {
         vim.ui.select(template_keys, {
           prompt = "Document Type",
         }, function(choice)
-          local id = create_obsidian_note(
+          local id, title = create_obsidian_note(
             directories[choice],
             template_names[choice],
             true
           )
-          local text = "[[" .. id .. "]]"
+          local text = "[[" .. id .. "|" .. title .. "]]"
           local row, col = unpack(vim.api.nvim_win_get_cursor(0))
           local current_line = vim.api.nvim_get_current_line()
           local new_line = string.sub(current_line, 1, col)
