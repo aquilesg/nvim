@@ -15,6 +15,7 @@ vim.opt.cmdheight = 0
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
+vim.o.winborder = "rounded"
 vim.bo.softtabstop = 2
 vim.opt.fillchars:append { eob = " " }
 vim.opt.termguicolors = true
