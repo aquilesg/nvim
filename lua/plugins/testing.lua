@@ -79,6 +79,36 @@ return {
         },
       },
     },
+    config = function()
+      -- Configure DAP listeners when the plugin loads
+      local dap, dv = require "dap", require "dap-view"
+
+      dap.listeners.before.attach["dap-view-config"] = function()
+        dv.open()
+      end
+      dap.listeners.before.launch["dap-view-config"] = function()
+        dv.open()
+      end
+      dap.listeners.before.event_terminated["dap-view-config"] = function()
+        dv.close()
+      end
+      dap.listeners.before.event_exited["dap-view-config"] = function()
+        dv.close()
+      end
+
+      -- Create autocmd for DAP-related windows
+      vim.api.nvim_create_autocmd({ "FileType" }, {
+        pattern = { "dap-view", "dap-view-term", "dap-repl" },
+        callback = function(evt)
+          vim.keymap.set(
+            "n",
+            "q",
+            "<C-w>q",
+            { silent = true, buffer = evt.buf }
+          )
+        end,
+      })
+    end,
     keys = {
       {
         "<leader>dc",

@@ -1,3 +1,4 @@
+local is_brain = require("config.custom_func").is_in_brain
 return {
   {
     "saghen/blink.compat",
@@ -77,12 +78,7 @@ return {
               "git",
               "ripgrep",
             }
-          elseif
-            vim.api
-              .nvim_buf_get_name(0)
-              :find("^" .. vim.fn.expand "~/Repos/brain")
-            ~= nil
-          then
+          elseif is_brain(0) then
             -- Check if we're in a code block
             local success, node = pcall(vim.treesitter.get_node)
             if success and node and node:type() == "code_fence_content" then

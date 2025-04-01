@@ -1,5 +1,6 @@
 --  Nvim Tree Mappings
 local map = vim.keymap.set
+local is_brain = require("config.custom_func").is_in_brain
 
 map(
   "n",
@@ -371,8 +372,9 @@ return {
               {
                 name = " PRs",
                 matcher = function(buf)
-                  return vim.api.nvim_buf_get_option(buf.id, "filetype")
-                    == "octo"
+                  return vim.api.nvim_get_option_value("filetype", {
+                    buf = buf.id,
+                  }) == "octo"
                 end,
               },
               {
@@ -390,19 +392,19 @@ return {
                 end,
               },
               {
-                name = "󰈙 Docs",
+                name = " Brain",
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.md"
-                    or get_buf(buf.id):match "%.txt"
+                  return get_buf(buf.id):match "%.md" and is_brain(buf.id)
                 end,
               },
               {
                 name = "󰈙 Docs",
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.md"
-                    or get_buf(buf.id):match "%.txt"
+                  return (
+                    get_buf(buf.id):match "%.md" or get_buf(buf.id):match "%.txt"
+                  ) and not is_brain(buf.id)
                 end,
               },
               {

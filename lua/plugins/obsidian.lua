@@ -58,7 +58,6 @@ local function update_current_note_field(field, value, note)
       frontmatter = front_matter,
       insert_frontmatter = true,
     }
-    note:save()
   end
 end
 
@@ -78,11 +77,22 @@ local template_names = {
   WorkDocument = "WorkDocument",
   WorkResearch = "WorkResearch",
   WorkInitiative = "WorkInitiative",
-  WorkEvents = "WorkEvents",
+  WorkEvents = "WorkEvent",
   PersonalDocument = "PersonalDocument",
   PersonalResearchDocument = "PersonalResearchDocument",
   Recipe = "Recipes",
 }
+
+local note_status = {
+  in_progress = "in-progress",
+  in_review = "in-review",
+  abandoned = "abandoned",
+  complete = "complete",
+}
+
+local function create_status_front_matter(status)
+  return "status: " .. status
+end
 
 return {
   "obsidian-nvim/obsidian.nvim",
@@ -197,7 +207,14 @@ return {
     {
       "<leader>ocwt",
       function()
-        open_incomplete_notes_by_tags("status: in-progress", { "Work/task" })
+        open_incomplete_notes_by_tags(
+          create_status_front_matter(note_status.in_progress),
+          { "Work/task" }
+        )
+        open_incomplete_notes_by_tags(
+          create_status_front_matter(note_status.in_review),
+          { "Work/task" }
+        )
       end,
       desc = "Open current Work tasks",
     },
@@ -205,7 +222,7 @@ return {
       "<leader>ocwi",
       function()
         open_incomplete_notes_by_tags(
-          "status: in-progress",
+          note_status.in_progress,
           { "Work/initiative" }
         )
       end,
@@ -215,7 +232,7 @@ return {
       "<leader>ocws",
       function()
         open_incomplete_notes_by_tags(
-          "status: in-progress",
+          note_status.in_progress,
           { "Work/categorize" }
         )
       end,
@@ -225,7 +242,7 @@ return {
       "<leader>ocps",
       function()
         open_incomplete_notes_by_tags(
-          "status: in-progress",
+          note_status.in_progress,
           { "categorize", "personal" }
         )
       end,
@@ -235,23 +252,30 @@ return {
     {
       "<leader>omc",
       function()
-        update_current_note_field("status", "complete")
+        update_current_note_field("status", note_status.complete)
       end,
       desc = "Mark complete",
     },
     {
       "<leader>omi",
       function()
-        update_current_note_field("status", "in-progress")
+        update_current_note_field("status", note_status.in_progress)
       end,
       desc = "Mark document in progress",
     },
     {
       "<leader>oma",
       function()
-        update_current_note_field("status", "abandoned")
+        update_current_note_field("status", note_status.abandoned)
       end,
       desc = "Mark document abandoned",
+    },
+    {
+      "<leader>omr",
+      function()
+        update_current_note_field("status", note_status.in_review)
+      end,
+      desc = "Mark document as in-review",
     },
     {
       "<leader>oil",

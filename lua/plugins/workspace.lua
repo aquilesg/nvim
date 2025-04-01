@@ -15,6 +15,7 @@ vim.api.nvim_create_user_command("Format", function(args)
     range = range,
   }
 end, { range = true })
+
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "markdown" },
   callback = function()
@@ -399,7 +400,13 @@ return {
       map("n", "<leader><leader>l", require("smart-splits").swap_buf_right)
     end,
   },
-  { "shortcuts/no-neck-pain.nvim", cmd = "NoNeckPain" },
+  {
+    "shortcuts/no-neck-pain.nvim",
+    cmd = "NoNeckPain",
+    opts = {
+      width = 200,
+    },
+  },
   {
     "neo451/feed.nvim",
     cmd = "Feed",

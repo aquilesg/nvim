@@ -15,12 +15,11 @@ vim.opt.cmdheight = 0
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
-vim.o.winborder = "rounded"
 vim.bo.softtabstop = 2
 vim.opt.fillchars:append { eob = " " }
 vim.opt.termguicolors = true
 vim.api.nvim_set_option_value("clipboard", "unnamed", {})
-vim.diagnostic.config { virtual_lines = true }
+vim.diagnostic.config { virtual_lines = false }
 
 -- NVIM Tree
 vim.g.loaded_netrw = 1
