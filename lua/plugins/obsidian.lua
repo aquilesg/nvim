@@ -1,7 +1,41 @@
+local directories = {
+  WorkTask = "Work/Tasks/",
+  WorkDocument = "Work/Docs/",
+  WorkResearch = "Work/Research/",
+  WorkInitiative = "Work/Initiatives/",
+  WorkEvents = "Work/Events/",
+  PersonalDocument = "Personal/Docs/",
+  PersonalResearchDocument = "Personal/Research/",
+  Recipe = "Personal/Recipes/",
+}
+
+local template_names = {
+  WorkTask = "WorkTask",
+  WorkDocument = "WorkDocument",
+  WorkResearch = "WorkResearch",
+  WorkInitiative = "WorkInitiative",
+  WorkEvents = "WorkEvent",
+  PersonalDocument = "PersonalDocument",
+  PersonalResearchDocument = "PersonalResearchDocument",
+  Recipe = "Recipes",
+}
+
+local note_status = {
+  in_progress = "in-progress",
+  in_review = "in-review",
+  abandoned = "abandoned",
+  complete = "complete",
+}
+
 local function create_obsidian_note(note_dir, template_name, should_not_open)
   local user_title = vim.fn.input { prompt = template_name .. " title: " }
   local client = require("obsidian").get_client()
-  local gen_id = client:new_note_id(user_title)
+  local gen_id
+  if note_dir == directories.Recipe then
+    gen_id = user_title .. "-" .. client:new_note_id(user_title)
+  else
+    gen_id = client:new_note_id(user_title)
+  end
   local note = client:create_note {
     title = user_title,
     id = gen_id,
@@ -60,35 +94,6 @@ local function update_current_note_field(field, value, note)
     }
   end
 end
-
-local directories = {
-  WorkTask = "Work/Tasks/",
-  WorkDocument = "Work/Docs/",
-  WorkResearch = "Work/Research/",
-  WorkInitiative = "Work/Initiatives/",
-  WorkEvents = "Work/Events/",
-  PersonalDocument = "Personal/Docs/",
-  PersonalResearchDocument = "Personal/Research/",
-  Recipe = "Personal/Recipes/",
-}
-
-local template_names = {
-  WorkTask = "WorkTask",
-  WorkDocument = "WorkDocument",
-  WorkResearch = "WorkResearch",
-  WorkInitiative = "WorkInitiative",
-  WorkEvents = "WorkEvent",
-  PersonalDocument = "PersonalDocument",
-  PersonalResearchDocument = "PersonalResearchDocument",
-  Recipe = "Recipes",
-}
-
-local note_status = {
-  in_progress = "in-progress",
-  in_review = "in-review",
-  abandoned = "abandoned",
-  complete = "complete",
-}
 
 local function create_status_front_matter(status)
   return "status: " .. status
