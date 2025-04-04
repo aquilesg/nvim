@@ -1,27 +1,3 @@
-vim.api.nvim_create_user_command("LoadTestSuite", function()
-  require("lazy").load { plugins = { "nvim-dap", "neotest" } }
-  local dap, dv = require "dap", require "dap-view"
-  dap.listeners.before.attach["dap-view-config"] = function()
-    dv.open()
-  end
-  dap.listeners.before.launch["dap-view-config"] = function()
-    dv.open()
-  end
-  dap.listeners.before.event_terminated["dap-view-config"] = function()
-    dv.close()
-  end
-  dap.listeners.before.event_exited["dap-view-config"] = function()
-    dv.close()
-  end
-
-  vim.api.nvim_create_autocmd({ "FileType" }, {
-    pattern = { "dap-view", "dap-view-term", "dap-repl" },
-    callback = function(evt)
-      vim.keymap.set("n", "q", "<C-w>q", { silent = true, buffer = evt.buf })
-    end,
-  })
-end, { desc = "Load test suite" })
-
 vim.api.nvim_create_autocmd("BufWinEnter", {
   pattern = "Neotest Summary*",
   callback = function(ev)
@@ -45,9 +21,10 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 
 return {
   {
-    "mfussenegger/nvim-dap",
-    lazy = true,
+    "rcarriga/nvim-dap-ui",
     dependencies = {
+      "mfussenegger/nvim-dap",
+      "nvim-neotest/nvim-nio",
       {
         "leoluz/nvim-dap-go",
         opts = {
@@ -68,46 +45,22 @@ return {
         },
       },
       "mfussenegger/nvim-dap-python",
-      {
-        "igorlfs/nvim-dap-view",
-        opts = {
-          windows = {
-            terminal = {
-              hide = { "go" },
-            },
-          },
-        },
-      },
     },
     config = function()
-      -- Configure DAP listeners when the plugin loads
-      local dap, dv = require "dap", require "dap-view"
-
-      dap.listeners.before.attach["dap-view-config"] = function()
-        dv.open()
+      require("dapui").setup()
+      local dap, dapui = require "dap", require "dapui"
+      dap.listeners.before.attach.dapui_config = function()
+        dapui.open()
       end
-      dap.listeners.before.launch["dap-view-config"] = function()
-        dv.open()
+      dap.listeners.before.launch.dapui_config = function()
+        dapui.open()
       end
-      dap.listeners.before.event_terminated["dap-view-config"] = function()
-        dv.close()
+      dap.listeners.before.event_terminated.dapui_config = function()
+        dapui.close()
       end
-      dap.listeners.before.event_exited["dap-view-config"] = function()
-        dv.close()
+      dap.listeners.before.event_exited.dapui_config = function()
+        dapui.close()
       end
-
-      -- Create autocmd for DAP-related windows
-      vim.api.nvim_create_autocmd({ "FileType" }, {
-        pattern = { "dap-view", "dap-view-term", "dap-repl" },
-        callback = function(evt)
-          vim.keymap.set(
-            "n",
-            "q",
-            "<C-w>q",
-            { silent = true, buffer = evt.buf }
-          )
-        end,
-      })
     end,
     keys = {
       {
@@ -115,7 +68,7 @@ return {
         function()
           require("dap").continue()
         end,
-        desc = "Dap Continue",
+        desc = "Dap Continue / Start",
       },
       {
         "<leader>dt",
@@ -210,9 +163,9 @@ return {
       {
         "<leader>du",
         function()
-          require("dap-view").toggle()
+          require("dapui").toggle()
         end,
-        desc = "Toggle Dap View",
+        desc = "View Scopes",
       },
     },
   },
@@ -235,7 +188,11 @@ return {
           require "neotest-python" {
             dap = { justMyCode = false },
           },
-          require "neotest-go" {},
+          require "neotest-go" {
+            dap = {
+              args = { "-gcflags=all=-N -l" },
+            },
+          },
         },
       }
     end,
@@ -267,13 +224,6 @@ return {
           require("neotest").summary.toggle()
         end,
         desc = "Neotest open summary",
-      },
-      {
-        "<leader>nd",
-        function()
-          require("neotest").run.run { strategy = "dap" }
-        end,
-        desc = "Neotest debug nearest test",
       },
     },
   },
