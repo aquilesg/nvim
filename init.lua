@@ -14,7 +14,6 @@ vim.opt.wrap = false
 vim.opt.cmdheight = 0
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
-vim.opt.textwidth = 80
 vim.opt.expandtab = true
 vim.bo.softtabstop = 2
 vim.opt.fillchars:append { eob = " " }

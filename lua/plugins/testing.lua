@@ -24,27 +24,9 @@ return {
     "rcarriga/nvim-dap-ui",
     dependencies = {
       "mfussenegger/nvim-dap",
-      "nvim-neotest/nvim-nio",
-      {
-        "leoluz/nvim-dap-go",
-        opts = {
-          delve = {
-            initialize_timeout_sec = 45,
-          },
-          dap_configurations = {
-            {
-              type = "go",
-              name = "Debug (Build Flags)",
-              request = "launch",
-              program = "${file}",
-              buildFlags = function()
-                return require("dap-go").get_build_flags()
-              end,
-            },
-          },
-        },
-      },
       "mfussenegger/nvim-dap-python",
+      "nvim-neotest/nvim-nio",
+      "leoluz/nvim-dap-go",
     },
     config = function()
       require("dapui").setup()
@@ -61,6 +43,24 @@ return {
       dap.listeners.before.event_exited.dapui_config = function()
         dapui.close()
       end
+      require("dap-python").setup()
+      require("dap-go").setup {
+        delve = {
+          initialize_timeout_sec = 45,
+        },
+        dap_configurations = {
+          {
+            type = "go",
+            name = "Debug (Build Flags)",
+            request = "launch",
+            program = "${file}",
+            buildFlags = require("dap-go").get_build_flags(),
+          },
+        },
+      }
+      require("dap-go").debug_test {
+        buildFlags = "-tags=integration",
+      }
     end,
     keys = {
       {
@@ -224,6 +224,13 @@ return {
           require("neotest").summary.toggle()
         end,
         desc = "Neotest open summary",
+      },
+      {
+        "<leader>nd",
+        function()
+          require("neotest").run.run { strategy = "dap" }
+        end,
+        desc = "Neotest Debug closest test",
       },
     },
   },
