@@ -258,6 +258,7 @@ return {
       "<leader>omc",
       function()
         update_current_note_field("status", note_status.complete)
+        update_current_note_field("completion_date", os.date "%Y-%m-%d")
       end,
       desc = "Mark complete",
     },
@@ -283,7 +284,7 @@ return {
       desc = "Mark document as in-review",
     },
     {
-      "<leader>oil",
+      "<F2>",
       function()
         local template_keys = {}
         for k, _ in pairs(template_names) do
@@ -297,7 +298,7 @@ return {
             template_names[choice],
             true
           )
-          local text = "[[" .. id .. "|" .. title .. "]]"
+          local text = " [[" .. id .. "|" .. title .. "]]"
           local row, col = unpack(vim.api.nvim_win_get_cursor(0))
           local current_line = vim.api.nvim_get_current_line()
           local new_line = string.sub(current_line, 1, col)
@@ -307,6 +308,7 @@ return {
           vim.api.nvim_win_set_cursor(0, { row, col + #text })
         end)
       end,
+      mode = { "n", "i" },
       desc = "Insert Link to Document",
     },
   },
