@@ -236,20 +236,14 @@ return {
     {
       "<leader>ocws",
       function()
-        open_incomplete_notes_by_tags(
-          note_status.in_progress,
-          { "Work/categorize" }
-        )
+        open_incomplete_notes_by_tags("", { "Work/categorize" })
       end,
       desc = "Open current Work items that are stale",
     },
     {
       "<leader>ocps",
       function()
-        open_incomplete_notes_by_tags(
-          note_status.in_progress,
-          { "categorize", "personal" }
-        )
+        open_incomplete_notes_by_tags("", { "categorize", "personal" })
       end,
       desc = "Open current Personal items that are stale",
     },
