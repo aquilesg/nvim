@@ -18,9 +18,11 @@ local template_names = {
   PersonalDocument = "PersonalDocument",
   PersonalResearchDocument = "PersonalResearchDocument",
   Recipe = "Recipes",
+  template = "template",
 }
 
 local note_status = {
+  all_notes = "",
   in_progress = "in-progress",
   in_review = "in-review",
   abandoned = "abandoned",
@@ -58,6 +60,19 @@ local function note_has_tags(note, tags)
     end
   end
   return has_tags
+end
+
+local function search_all_notes_for_tag(tags)
+  local client = require("obsidian").get_client()
+  client:find_notes_async(tags, function(notes)
+    for _, note in ipairs(notes) do
+      client:open_note(note)
+    end
+  end, {
+    sort = false,
+    include_templates = false,
+    ignore_case = true,
+  })
 end
 
 local function open_incomplete_notes_by_tags(incomplete_delimiter, tags)
@@ -236,16 +251,23 @@ return {
     {
       "<leader>ocws",
       function()
-        open_incomplete_notes_by_tags("", { "Work/categorize" })
+        search_all_notes_for_tag { "Work/categorize" }
       end,
       desc = "Open current Work items that are stale",
     },
     {
       "<leader>ocps",
       function()
-        open_incomplete_notes_by_tags("", { "categorize", "personal" })
+        search_all_notes_for_tag { "Personal/categorize" }
       end,
       desc = "Open current Personal items that are stale",
+    },
+    {
+      "<leader>ocpt",
+      function()
+        open_incomplete_notes_by_tags(note_status.in_progress, { "Personal" })
+      end,
+      desc = "Open current Personal items that are in progress",
     },
     -- Status change
     {
@@ -276,6 +298,13 @@ return {
         update_current_note_field("status", note_status.in_review)
       end,
       desc = "Mark document as in-review",
+    },
+    {
+      "<leader>omR",
+      function()
+        update_current_note_field("review_complete", os.date "%Y-%m-%d")
+      end,
+      desc = "Mark review complete",
     },
     {
       "<F2>",
