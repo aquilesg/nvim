@@ -403,7 +403,8 @@ return {
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
                   return (
-                    get_buf(buf.id):match "%.md" or get_buf(buf.id):match "%.txt"
+                    get_buf(buf.id):match "%.md"
+                    or get_buf(buf.id):match "%.txt"
                   ) and not is_brain(buf.id)
                 end,
               },
@@ -419,6 +420,13 @@ return {
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
                   return get_buf(buf.id):match "%.py"
+                end,
+              },
+              {
+                name = " Bash",
+                matcher = function(buf)
+                  local get_buf = vim.api.nvim_buf_get_name
+                  return get_buf(buf.id):match "%.sh"
                 end,
               },
             },
