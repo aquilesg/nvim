@@ -75,6 +75,23 @@ local function search_all_notes_for_tag(tags)
   })
 end
 
+local function open_notes_by_document_frontmatter(document_type, status)
+  local client = require("obsidian").get_client()
+  local search_term = "document_type: " .. document_type
+  client:find_notes_async(search_term, function(notes)
+    for _, note in ipairs(notes) do
+      local current_status = note:get_field "status"
+      if current_status == status then
+        client:open_note(note)
+      end
+    end
+  end, {
+    sort = false,
+    include_templates = false,
+    ignore_case = true,
+  })
+end
+
 local function open_incomplete_notes_by_tags(incomplete_delimiter, tags)
   local client = require("obsidian").get_client()
   client:find_notes_async(incomplete_delimiter, function(notes)
@@ -241,10 +258,11 @@ return {
     {
       "<leader>ocwi",
       function()
-        open_incomplete_notes_by_tags(
-          note_status.in_progress,
-          { "Work/initiative" }
+        open_notes_by_document_frontmatter(
+          "initiative",
+          note_status.in_progress
         )
+        open_notes_by_document_frontmatter("initiative", note_status.in_review)
       end,
       desc = "Open current Work initiatives",
     },
