@@ -25,6 +25,7 @@ local note_status = {
   all_notes = "",
   in_progress = "in-progress",
   in_review = "in-review",
+  review_complete = "review-complete",
   abandoned = "abandoned",
   complete = "complete",
 }
@@ -306,7 +307,13 @@ return {
     {
       "<leader>oma",
       function()
-        update_current_note_field("status", note_status.abandoned)
+        vim.ui.input({
+          prompt = "Why was this abandoned?",
+        }, function(response)
+          update_current_note_field("status", note_status.abandoned)
+          update_current_note_field("abandon_date", os.date "%Y-%m-%d")
+          update_current_note_field("abandon_reason", response)
+        end)
       end,
       desc = "Mark document abandoned",
     },
@@ -314,12 +321,14 @@ return {
       "<leader>omr",
       function()
         update_current_note_field("status", note_status.in_review)
+        update_current_note_field("review_start", os.date "%Y-%m-%d")
       end,
       desc = "Mark document as in-review",
     },
     {
       "<leader>omR",
       function()
+        update_current_note_field("status", note_status.review_complete)
         update_current_note_field("review_complete", os.date "%Y-%m-%d")
       end,
       desc = "Mark review complete",
@@ -339,7 +348,7 @@ return {
             template_names[choice],
             true
           )
-          local text = " [[" .. id .. "|" .. title .. "]]"
+          local text = "[[" .. id .. "|" .. title .. "]]"
           local row, col = unpack(vim.api.nvim_win_get_cursor(0))
           local current_line = vim.api.nvim_get_current_line()
           local new_line = string.sub(current_line, 1, col)

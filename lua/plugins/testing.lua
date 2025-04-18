@@ -41,6 +41,14 @@ return {
                 return require("dap-go").get_build_flags()
               end,
             },
+            {
+              type = "go",
+              name = "Attach to Running Delve server",
+              request = "attach",
+              mode = "remote",
+              host = "localhost",
+              port = 2345,
+            },
           },
         },
       },
