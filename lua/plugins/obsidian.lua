@@ -275,6 +275,14 @@ return {
       desc = "Open current Work items that are stale",
     },
     {
+      "<leader>ocwr",
+      function()
+        open_notes_by_document_frontmatter("research", note_status.in_progress)
+        open_notes_by_document_frontmatter("research", note_status.in_review)
+      end,
+      desc = "Open current Work Research",
+    },
+    {
       "<leader>ocps",
       function()
         search_all_notes_for_tag { "Personal/categorize" }
@@ -330,6 +338,7 @@ return {
       function()
         update_current_note_field("status", note_status.review_complete)
         update_current_note_field("review_complete", os.date "%Y-%m-%d")
+        update_current_note_field("reviewed", "yes")
       end,
       desc = "Mark review complete",
     },

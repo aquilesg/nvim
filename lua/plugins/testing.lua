@@ -85,21 +85,15 @@ return {
           vim.ui.input(
             { prompt = "Breakpoint condition: " },
             function(condition)
-              vim.ui.input(
-                { prompt = "Hit condition: " },
-                function(hit_condition)
-                  vim.ui.input(
-                    { prompt = "Log message: " },
-                    function(log_message)
-                      require("dap").set_breakpoint(
-                        condition ~= "" and condition or nil,
-                        hit_condition ~= "" and hit_condition or nil,
-                        log_message ~= "" and log_message or nil
-                      )
-                    end
+              vim.ui.input({ prompt = "Hit count: " }, function(hit_condition)
+                vim.ui.input({ prompt = "Log message: " }, function(log_message)
+                  require("dap").set_breakpoint(
+                    condition ~= "" and condition or nil,
+                    hit_condition ~= "" and hit_condition or nil,
+                    log_message ~= "" and log_message or nil
                   )
-                end
-              )
+                end)
+              end)
             end
           )
         end,
@@ -198,6 +192,13 @@ return {
           require("neotest").run.run()
         end,
         desc = "Neotest Run nearest test",
+      },
+      {
+        "<leader>nd",
+        function()
+          require("neotest").run.run { strategy = "dap" }
+        end,
+        desc = "Neotest Debug nearest test",
       },
       {
         "<leader>nw",

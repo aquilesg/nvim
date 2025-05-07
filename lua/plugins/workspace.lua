@@ -363,7 +363,7 @@ return {
       end)
 
       require("toggleterm").setup {
-        direction = "horizontal",
+        direction = "float",
       }
     end,
   },
@@ -402,9 +402,16 @@ return {
   },
   {
     "shortcuts/no-neck-pain.nvim",
-    cmd = "NoNeckPain",
+    keys = {
+      {
+        "<leader>nn",
+        function()
+          require("no-neck-pain").toggle()
+        end,
+      },
+    },
     opts = {
-      width = 200,
+      width = 150,
     },
   },
   {

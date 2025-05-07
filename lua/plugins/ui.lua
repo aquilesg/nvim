@@ -140,18 +140,12 @@ return {
     },
   },
   {
-    "rose-pine/neovim",
-    name = "rose-pine",
+    "webhooked/kanso.nvim",
   },
-  { "alexxGmZ/e-ink.nvim" },
-  { "sainnhe/edge" },
   {
     "rktjmp/lush.nvim",
     { dir = "~/Repos/ciapre/", lazy = true },
     { dir = "~/Repos/lighty/", lazy = true },
-  },
-  {
-    "EdenEast/nightfox.nvim",
   },
   {
     "folke/noice.nvim",
@@ -380,22 +374,22 @@ return {
               {
                 name = "󱥊 Infra",
                 matcher = function(buf)
-                  return vim.api.nvim_buf_get_name(buf.id):match "%.tf"
+                  return vim.api.nvim_buf_get_name(buf.id):match "%.tf$"
                 end,
               },
               {
                 name = " Configs",
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.yaml"
-                    or get_buf(buf.id):match "%.yml"
+                  return get_buf(buf.id):match "%.yaml$"
+                    or get_buf(buf.id):match "%.yml$"
                 end,
               },
               {
                 name = " Brain",
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.md" and is_brain(buf.id)
+                  return get_buf(buf.id):match "%.md$" and is_brain(buf.id)
                 end,
               },
               {
@@ -403,8 +397,8 @@ return {
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
                   return (
-                    get_buf(buf.id):match "%.md"
-                    or get_buf(buf.id):match "%.txt"
+                    get_buf(buf.id):match "%.md$"
+                    or get_buf(buf.id):match "%.txt$"
                   ) and not is_brain(buf.id)
                 end,
               },
@@ -412,21 +406,28 @@ return {
                 name = " Go",
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.go"
+                  return get_buf(buf.id):match "%.go$"
                 end,
               },
               {
                 name = " Python",
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.py"
+                  return get_buf(buf.id):match "%.py$"
                 end,
               },
               {
                 name = " Bash",
                 matcher = function(buf)
                   local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.sh"
+                  return get_buf(buf.id):match "%.sh$"
+                end,
+              },
+              {
+                name = "󰢱 Lua",
+                matcher = function(buf)
+                  local get_buf = vim.api.nvim_buf_get_name
+                  return get_buf(buf.id):match "%.lua$"
                 end,
               },
             },
