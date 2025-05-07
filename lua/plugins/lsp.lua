@@ -1,4 +1,4 @@
-local ensure_installed = {
+local ensure_installed_local = {
   "bash-language-server",
   "basedpyright",
   "black",
@@ -34,7 +34,7 @@ local ensure_installed = {
 }
 
 vim.api.nvim_create_user_command("MasonInstallAll", function()
-  local packages = table.concat(ensure_installed, " ")
+  local packages = table.concat(ensure_installed_local, " ")
   vim.cmd("MasonInstall " .. packages)
 end, { desc = "Install All Mason Packages" })
 
@@ -104,8 +104,9 @@ return {
   },
   {
     "williamboman/mason-lspconfig.nvim",
+    version = "v1.32.0",
     dependencies = {
-      "williamboman/mason.nvim",
+      {"williamboman/mason.nvim", version = "v1.11.0"},
     },
     event = { "BufReadPre", "BufNewFile" },
     opts = {},
