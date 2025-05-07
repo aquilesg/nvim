@@ -11,7 +11,7 @@ return {
       "rafamadriz/friendly-snippets",
       "obsidian.nvim/obsidian.nvim",
       "mikavilpas/blink-ripgrep.nvim",
-      "giuxtaposition/blink-cmp-copilot",
+      "fang2hou/blink-copilot",
       "Kaiser-Yang/blink-cmp-git",
     },
     event = "LspAttach",
@@ -25,7 +25,6 @@ return {
           Obsidian_tags = "󰜢 ",
           Obsidian_new = "󰈔 ",
           RipGrep = "󱉶 ",
-          Copilot = "󱚣 ",
           Git = "󰊢 ",
           Text = "󰗧",
           Method = "",
@@ -89,6 +88,7 @@ return {
                 "ripgrep",
                 "path",
                 "markdown",
+                "copilot",
               }
             else
               return {
@@ -101,8 +101,6 @@ return {
                 "markdown",
               }
             end
-          elseif vim.bo.filetype == "codecompanion" then
-            return { "buffer", "codecompanion" }
           elseif
             vim.tbl_contains({ "gitcommit", "octo" }, vim.bo.filetype)
             and vim.fn.mode() ~= "c"
@@ -121,10 +119,6 @@ return {
           end
         end,
         providers = {
-          codecompanion = {
-            name = "CodeCompanion",
-            module = "codecompanion.providers.completion.blink",
-          },
           lazydev = {
             name = "LazyDev",
             module = "lazydev.integrations.blink",
@@ -207,7 +201,7 @@ return {
           },
           copilot = {
             name = "copilot",
-            module = "blink-cmp-copilot",
+            module = "blink-copilot",
             score_offset = -10,
             async = true,
             transform_items = function(_, items)
