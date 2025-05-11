@@ -99,14 +99,10 @@ autocmd({ "BufRead", "BufNewFile" }, {
 
 return {
   {
-    "neovim/nvim-lspconfig",
-    event = "UIEnter",
-  },
-  {
     "williamboman/mason-lspconfig.nvim",
-    version = "v1.32.0",
     dependencies = {
-      {"williamboman/mason.nvim", version = "v1.11.0"},
+      { "williamboman/mason.nvim", opts = {} },
+      { "neovim/nvim-lspconfig" },
     },
     event = { "BufReadPre", "BufNewFile" },
     opts = {},
@@ -164,12 +160,8 @@ return {
 
       require("mason").setup()
       require("mason-lspconfig").setup()
-      require("mason-lspconfig").setup_handlers {
-        function(server_name)
-          require("lspconfig")[server_name].setup(opts)
-        end,
-      }
-      require("lspconfig").yamlls.setup {
+      vim.lsp.config("*", opts)
+      vim.lsp.config("yamlls", {
         settings = {
           yaml = {
             schemaStore = {
@@ -178,7 +170,7 @@ return {
             },
           },
         },
-      }
+      })
     end,
   },
   {
