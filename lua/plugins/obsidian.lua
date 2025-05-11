@@ -397,6 +397,22 @@ return {
     ui = {
       enable = false,
     },
+    callbacks = {
+      ---@param client obsidian.Client
+      ---@param note obsidian.Note
+      enter_note = function(client, note)
+        local aliases = note.aliases
+        if aliases and #aliases > 0 then
+          local shortest = aliases[1]
+          for _, alias in ipairs(aliases) do
+            if #alias < #shortest then
+              shortest = alias
+            end
+          end
+          vim.api.nvim_buf_set_name(0, shortest)
+        end
+      end,
+    },
     mappings = {
       ["<cr>"] = {
         action = function()
