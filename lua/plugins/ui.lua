@@ -345,6 +345,10 @@ return {
       local bufferline = require "bufferline"
       bufferline.setup {
         options = {
+          name_formatter = function(buf)
+            return vim.b[buf.bufnr] and vim.b[buf.bufnr].obsidian_alias
+              or buf.name
+          end,
           style_preset = bufferline.style_preset.default,
           themable = false,
           indicator = {

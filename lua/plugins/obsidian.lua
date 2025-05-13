@@ -409,7 +409,7 @@ return {
               shortest = alias
             end
           end
-          vim.api.nvim_buf_set_name(0, shortest)
+          vim.b.obsidian_alias = shortest
         end
       end,
     },
