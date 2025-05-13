@@ -409,7 +409,7 @@ return {
               shortest = alias
             end
           end
-          vim.b.obsidian_alias = shortest
+          vim.b.obsidian_alias = note.bufnr .. "  " .. shortest
         end
       end,
     },
