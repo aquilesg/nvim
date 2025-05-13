@@ -34,9 +34,13 @@ local ensure_installed_local = {
 }
 
 vim.api.nvim_create_user_command("MasonInstallAll", function()
-  local packages = table.concat(ensure_installed_local, " ")
-  vim.cmd("MasonInstall " .. packages)
-end, { desc = "Install All Mason Packages" })
+  local registry = require("mason-registry")
+  for _, pkg in ipairs(ensure_installed_local) do
+    if not registry.is_installed(pkg) then
+      vim.cmd("MasonInstall " .. pkg)
+    end
+  end
+end, {})
 
 -- Infrastructure as Code file detection
 local autocmd = vim.api.nvim_create_autocmd

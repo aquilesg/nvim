@@ -6,7 +6,14 @@ return {
       { "nvim-lua/plenary.nvim" },
     },
     build = "make tiktoken",
-    opts = {},
+    opts = {
+      mappings = {
+        reset = {
+          normal = "<C-r>",
+          insert = "<C-r>",
+        },
+      },
+    },
     keys = {
       {
         "<leader>a",
