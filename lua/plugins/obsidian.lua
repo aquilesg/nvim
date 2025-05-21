@@ -28,6 +28,7 @@ local note_status = {
   review_complete = "review-complete",
   abandoned = "abandoned",
   complete = "complete",
+  blocked = "blocked",
 }
 
 local function create_obsidian_note(note_dir, template_name, should_not_open)
@@ -253,6 +254,10 @@ return {
           create_status_front_matter(note_status.in_review),
           { "Work/task" }
         )
+        open_incomplete_notes_by_tags(
+          create_status_front_matter(note_status.blocked),
+          { "Work/task" }
+        )
       end,
       desc = "Open current Work tasks",
     },
@@ -324,6 +329,18 @@ return {
         end)
       end,
       desc = "Mark document abandoned",
+    },
+    {
+      -- TODO: it'd be nice if this automatically backlinked
+      "<leader>omb",
+      function()
+        vim.ui.input({
+          prompt = "Why is this blocked? (Link ticket if available)",
+        }, function(response)
+          update_current_note_field(note_status.blocked, note_status.blocked)
+          update_current_note_field("blocked_date", os.date "%Y-%m-%d")
+        end)
+      end,
     },
     {
       "<leader>omr",
