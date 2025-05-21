@@ -95,7 +95,18 @@ return {
     },
   },
   opts = {
-    picker = {},
+    picker = {
+      ui_select = true,
+      layout = {
+        preset = "ivy",
+      },
+      previewers = {
+        diff = {
+          builtin = false,
+          cmd = { "DiffviewOpen" },
+        },
+      },
+    },
     image = {},
     indent = {
       only_scope = true,
