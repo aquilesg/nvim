@@ -268,23 +268,6 @@ return {
     opts = {},
   },
   {
-    "nvim-telescope/telescope.nvim",
-    opts = {
-      pickers = {
-        find_files = {
-          theme = "dropdown",
-        },
-        live_grep = {
-          theme = "dropdown",
-        },
-      },
-    },
-    event = "UIEnter",
-    dependencies = {
-      "nvim-telescope/telescope-live-grep-args.nvim",
-    },
-  },
-  {
     "numToStr/Comment.nvim",
     event = "UIEnter",
     opts = {},

@@ -451,6 +451,9 @@ return {
       sections = {
         lualine_x = {
           {
+            "g:obsidian",
+          },
+          {
             function()
               local buf_clients = vim.lsp.get_clients { bufnr = 0 }
               if #buf_clients == 0 then

@@ -18,7 +18,18 @@ local template_names = {
   PersonalDocument = "PersonalDocument",
   PersonalResearchDocument = "PersonalResearchDocument",
   Recipe = "Recipes",
-  template = "template",
+}
+
+local document_types = {
+  initiative = "initiative",
+  task = "task",
+  research = "research",
+  event = "event",
+  investigation = "investigation",
+  guide = "guide",
+  reference = "reference",
+  note = "note",
+  plan = "plan",
 }
 
 local note_status = {
@@ -30,6 +41,57 @@ local note_status = {
   complete = "complete",
   blocked = "blocked",
 }
+
+local function get_notes_by_tags(tags)
+  local client = require("obsidian").get_client()
+  local found_notes = {}
+
+  for _, tag in ipairs(tags) do
+    local found_notes_tags = client:find_notes(tag, {
+      sort = false,
+      include_templates = false,
+      ignore_case = true,
+    })
+
+    found_notes = vim.list_extend(found_notes, found_notes_tags)
+  end
+  return found_notes
+end
+
+local function display_note_picker(note_table, prompt, opts)
+  opts = opts or {}
+  local pickers = require "telescope.pickers"
+  local finders = require "telescope.finders"
+  local conf = require("telescope.config").values
+  local actions = require "telescope.actions"
+  local action_state = require "telescope.actions.state"
+
+  pickers
+    .new(opts, {
+      prompt_title = prompt,
+      finder = finders.new_table {
+        results = note_table,
+        entry_maker = function(note)
+          return {
+            value = note,
+            display = note:display_name(),
+            ordinal = note:display_name(),
+          }
+        end,
+      },
+      sorter = conf.generic_sorter(opts),
+      attach_mappings = function(prompt_bufnr, _)
+        actions.select_default:replace(function()
+          local client = require("obsidian").get_client()
+          actions.close(prompt_bufnr)
+          local selected_note = action_state.get_selected_entry().value
+          client:open_note(selected_note)
+        end)
+        return true
+      end,
+    })
+    :find()
+end
 
 local function create_obsidian_note(note_dir, template_name, should_not_open)
   local user_title = vim.fn.input { prompt = template_name .. " title: " }
@@ -53,60 +115,26 @@ local function create_obsidian_note(note_dir, template_name, should_not_open)
   client:open_note(note)
 end
 
-local function note_has_tags(note, tags)
-  local has_tags = true
-  for _, tag in ipairs(tags) do
-    has_tags = has_tags and note:has_tag(tag)
-    if not has_tags then
-      break
+local function get_incomplete_notes_by_document_type(document_type)
+  local incomplete_delimiter =
+    { note_status.in_progress, note_status.in_review, note_status.blocked }
+  local client = require("obsidian").get_client()
+  local found_notes = {}
+  local search_term = "document_type: " .. document_type
+  local all_notes = client:find_notes(search_term, {
+    sort = false,
+    include_templates = false,
+    ignore_case = true,
+  })
+
+  for _, delimiter in ipairs(incomplete_delimiter) do
+    for _, note in ipairs(all_notes) do
+      if note:get_field "status" == delimiter then
+        table.insert(found_notes, note)
+      end
     end
   end
-  return has_tags
-end
-
-local function search_all_notes_for_tag(tags)
-  local client = require("obsidian").get_client()
-  client:find_notes_async(tags, function(notes)
-    for _, note in ipairs(notes) do
-      client:open_note(note)
-    end
-  end, {
-    sort = false,
-    include_templates = false,
-    ignore_case = true,
-  })
-end
-
-local function open_notes_by_document_frontmatter(document_type, status)
-  local client = require("obsidian").get_client()
-  local search_term = "document_type: " .. document_type
-  client:find_notes_async(search_term, function(notes)
-    for _, note in ipairs(notes) do
-      local current_status = note:get_field "status"
-      if current_status == status then
-        client:open_note(note)
-      end
-    end
-  end, {
-    sort = false,
-    include_templates = false,
-    ignore_case = true,
-  })
-end
-
-local function open_incomplete_notes_by_tags(incomplete_delimiter, tags)
-  local client = require("obsidian").get_client()
-  client:find_notes_async(incomplete_delimiter, function(notes)
-    for _, note in ipairs(notes) do
-      if note_has_tags(note, tags) then
-        client:open_note(note)
-      end
-    end
-  end, {
-    sort = false,
-    include_templates = false,
-    ignore_case = true,
-  })
+  return found_notes
 end
 
 local function update_current_note_field(field, value, note)
@@ -129,8 +157,39 @@ local function update_current_note_field(field, value, note)
   end
 end
 
-local function create_status_front_matter(status)
-  return "status: " .. status
+local function get_incomplete_notes_by_tags(tags)
+  local incomplete_delimiter =
+    { note_status.in_progress, note_status.in_review, note_status.blocked }
+  local found_notes = {}
+
+  local tagged_notes = get_notes_by_tags(tags)
+  for _, note in ipairs(tagged_notes) do
+    local current_status = note:get_field "status"
+    if vim.tbl_contains(incomplete_delimiter, current_status) then
+      table.insert(found_notes, note)
+    end
+  end
+  return found_notes
+end
+
+local function modify_note_status(status, note)
+  local client = require("obsidian").get_client()
+  if note == nil then
+    note = client:current_note(vim.api.nvim_get_current_buf(), {
+      load_contents = false,
+      collect_anchor_links = false,
+      collect_blocks = false,
+    })
+  end
+  if note ~= nil then
+    local front_matter = note:frontmatter()
+    front_matter["status"] = status
+    front_matter[status .. "-modification-date"] = os.date "%Y-%m-%d"
+    note:save_to_buffer {
+      frontmatter = front_matter,
+      insert_frontmatter = true,
+    }
+  end
 end
 
 return {
@@ -246,58 +305,53 @@ return {
     {
       "<leader>ocwt",
       function()
-        open_incomplete_notes_by_tags(
-          create_status_front_matter(note_status.in_progress),
-          { "Work/task" }
-        )
-        open_incomplete_notes_by_tags(
-          create_status_front_matter(note_status.in_review),
-          { "Work/task" }
-        )
-        open_incomplete_notes_by_tags(
-          create_status_front_matter(note_status.blocked),
-          { "Work/task" }
-        )
+        local notes = get_incomplete_notes_by_tags { "Work/task" }
+        display_note_picker(notes, "Chose the Work Task to open")
       end,
       desc = "Open current Work tasks",
     },
     {
       "<leader>ocwi",
       function()
-        open_notes_by_document_frontmatter(
-          "initiative",
-          note_status.in_progress
-        )
-        open_notes_by_document_frontmatter("initiative", note_status.in_review)
+        local initiatives =
+          get_incomplete_notes_by_document_type(document_types.initiative)
+        display_note_picker(initiatives, "Pick initiative to open")
       end,
       desc = "Open current Work initiatives",
     },
     {
       "<leader>ocws",
       function()
-        search_all_notes_for_tag { "Work/categorize" }
+        local stale_notes = get_notes_by_tags { "Work/categorize" }
+        display_note_picker(stale_notes, "Pick stale note")
       end,
       desc = "Open current Work items that are stale",
     },
     {
       "<leader>ocwr",
       function()
-        open_notes_by_document_frontmatter("research", note_status.in_progress)
-        open_notes_by_document_frontmatter("research", note_status.in_review)
+        local research_documents =
+          get_incomplete_notes_by_document_type(document_types.research)
+        display_note_picker(
+          research_documents,
+          "Pick research document to open"
+        )
       end,
       desc = "Open current Work Research",
     },
     {
       "<leader>ocps",
       function()
-        search_all_notes_for_tag { "Personal/categorize" }
+        local stale_notes = get_notes_by_tags { "Personal/categorize" }
+        display_note_picker(stale_notes, "Pick stale note")
       end,
       desc = "Open current Personal items that are stale",
     },
     {
       "<leader>ocpt",
       function()
-        open_incomplete_notes_by_tags(note_status.in_progress, { "Personal" })
+        local notes = get_incomplete_notes_by_tags { "Personal" }
+        display_note_picker(notes, "Chose document to open")
       end,
       desc = "Open current Personal items that are in progress",
     },
@@ -305,15 +359,14 @@ return {
     {
       "<leader>omc",
       function()
-        update_current_note_field("status", note_status.complete)
-        update_current_note_field("completion_date", os.date "%Y-%m-%d")
+        modify_note_status(note_status.complete)
       end,
       desc = "Mark complete",
     },
     {
       "<leader>omi",
       function()
-        update_current_note_field("status", note_status.in_progress)
+        modify_note_status(note_status.in_progress)
       end,
       desc = "Mark document in progress",
     },
@@ -323,8 +376,7 @@ return {
         vim.ui.input({
           prompt = "Why was this abandoned?",
         }, function(response)
-          update_current_note_field("status", note_status.abandoned)
-          update_current_note_field("abandon_date", os.date "%Y-%m-%d")
+          modify_note_status(note_status.abandoned)
           update_current_note_field("abandon_reason", response)
         end)
       end,
@@ -337,25 +389,22 @@ return {
         vim.ui.input({
           prompt = "Why is this blocked? (Link ticket if available)",
         }, function(response)
-          update_current_note_field(note_status.blocked, note_status.blocked)
-          update_current_note_field("blocked_date", os.date "%Y-%m-%d")
+          modify_note_status(note_status.blocked)
+          update_current_note_field("blocked-reason", response)
         end)
       end,
     },
     {
       "<leader>omr",
       function()
-        update_current_note_field("status", note_status.in_review)
-        update_current_note_field("review_start", os.date "%Y-%m-%d")
+        modify_note_status(note_status.in_review)
       end,
       desc = "Mark document as in-review",
     },
     {
       "<leader>omR",
       function()
-        update_current_note_field("status", note_status.review_complete)
-        update_current_note_field("review_complete", os.date "%Y-%m-%d")
-        update_current_note_field("reviewed", "yes")
+        modify_note_status(note_status.review_complete)
       end,
       desc = "Mark review complete",
     },
@@ -438,7 +487,10 @@ return {
         opts = { noremap = false, expr = true, buffer = true },
       },
     },
-    use_advanced_uri = true,
+    open_notes_in = "vsplit",
+    open = {
+      use_advanced_uri = true,
+    },
     suppress_missing_scope = {
       projects_v2 = true,
     },
