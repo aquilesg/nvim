@@ -34,7 +34,7 @@ local ensure_installed_local = {
 }
 
 vim.api.nvim_create_user_command("MasonInstallAll", function()
-  local registry = require("mason-registry")
+  local registry = require "mason-registry"
   for _, pkg in ipairs(ensure_installed_local) do
     if not registry.is_installed(pkg) then
       vim.cmd("MasonInstall " .. pkg)

@@ -15,6 +15,7 @@ local template_names = {
   WorkResearch = "WorkResearch",
   WorkInitiative = "WorkInitiative",
   WorkEvents = "WorkEvent",
+  WorkProjectScoping = "WorkProjectScoping",
   PersonalDocument = "PersonalDocument",
   PersonalResearchDocument = "PersonalResearchDocument",
   Recipe = "Recipes",
@@ -30,6 +31,7 @@ local document_types = {
   reference = "reference",
   note = "note",
   plan = "plan",
+  project_scoping = "project_scoping",
 }
 
 local note_status = {
@@ -38,6 +40,7 @@ local note_status = {
   in_review = "in-review",
   review_complete = "review-complete",
   abandoned = "abandoned",
+  draft = "draft",
   complete = "complete",
   blocked = "blocked",
 }
@@ -275,6 +278,16 @@ return {
       desc = "Create new Work Event",
     },
     {
+      "<leader>onws",
+      function()
+        create_obsidian_note(
+          directories.WorkResearch,
+          template_names.WorkProjectScoping
+        )
+      end,
+      desc = "Create new Work Project Scope",
+    },
+    {
       "<leader>onpd",
       function()
         create_obsidian_note(
@@ -409,7 +422,7 @@ return {
       desc = "Mark review complete",
     },
     {
-      "<F2>",
+      "<leader>oid",
       function()
         local template_keys = {}
         for k, _ in pairs(template_names) do
@@ -433,7 +446,7 @@ return {
           vim.api.nvim_win_set_cursor(0, { row, col + #text })
         end)
       end,
-      mode = { "n", "i" },
+      mode = { "n" },
       desc = "Insert Link to Document",
     },
   },

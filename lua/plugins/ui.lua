@@ -64,7 +64,7 @@ local set_plugin_theme = function(background_option)
 
   -- Reload the color theme
   if background_option == "light" then
-    vim.cmd "colorscheme lighty"
+    vim.cmd "colorscheme kanagawa-paper-canvas"
   else
     vim.cmd "colorscheme ciapre"
   end
@@ -140,7 +140,7 @@ return {
     },
   },
   {
-    "webhooked/kanso.nvim",
+    "thesimonho/kanagawa-paper.nvim",
   },
   {
     "rktjmp/lush.nvim",

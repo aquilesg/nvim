@@ -16,13 +16,6 @@ vim.api.nvim_create_user_command("Format", function(args)
   }
 end, { range = true })
 
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "markdown" },
-  callback = function()
-    vim.bo.textwidth = 80
-  end,
-})
-
 vim.api.nvim_create_autocmd("BufWritePre", {
   callback = function()
     require("conform").format { async = true, lsp_fallback = true }
@@ -74,25 +67,6 @@ vim.api.nvim_create_user_command("CloseFiletypeBuffers", function()
     end
   end
 end, {})
-
--- Octo mapping
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "octo",
-  callback = function()
-    vim.keymap.set(
-      "i",
-      "@",
-      "@<C-x><C-o>",
-      { noremap = true, silent = true, buffer = true }
-    )
-    vim.keymap.set(
-      "i",
-      "#",
-      "#<C-x><C-o>",
-      { noremap = true, silent = true, buffer = true }
-    )
-  end,
-})
 
 local map = vim.keymap.set
 map("n", "<leader>fm", function()
