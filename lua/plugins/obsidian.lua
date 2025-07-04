@@ -492,14 +492,6 @@ return {
         end
       end,
     },
-    mappings = {
-      ["<cr>"] = {
-        action = function()
-          return require("obsidian").util.gf_passthrough()
-        end,
-        opts = { noremap = false, expr = true, buffer = true },
-      },
-    },
     open_notes_in = "vsplit",
     open = {
       use_advanced_uri = true,

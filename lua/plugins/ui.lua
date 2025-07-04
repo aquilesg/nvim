@@ -64,7 +64,7 @@ local set_plugin_theme = function(background_option)
 
   -- Reload the color theme
   if background_option == "light" then
-    vim.cmd "colorscheme kanagawa-paper-canvas"
+    vim.cmd "colorscheme tokyobones"
   else
     vim.cmd "colorscheme ciapre"
   end
@@ -140,7 +140,7 @@ return {
     },
   },
   {
-    "thesimonho/kanagawa-paper.nvim",
+    "zenbones-theme/zenbones.nvim",
   },
   {
     "rktjmp/lush.nvim",
@@ -176,6 +176,9 @@ return {
     opts = {
       git = {
         timeout = 1000,
+      },
+      filters = {
+        git_ignored = false,
       },
       hijack_cursor = true,
       sync_root_with_cwd = true,
@@ -258,6 +261,7 @@ return {
       "nvim-tree/nvim-web-devicons",
     },
     opts = {
+      completions = { lsp = { enabled = true } },
       heading = {
         width = { "full", "block", "full", "block" },
         min_width = 30,

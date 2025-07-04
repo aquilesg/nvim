@@ -12,6 +12,7 @@ return {
       "obsidian.nvim/obsidian.nvim",
       "mikavilpas/blink-ripgrep.nvim",
       "fang2hou/blink-copilot",
+      "archie-judd/blink-cmp-words",
       "Kaiser-Yang/blink-cmp-git",
     },
     event = "LspAttach",
@@ -67,10 +68,13 @@ return {
           elseif
             success
             and node
-            and vim.tbl_contains(
-              { "comment", "line_comment", "block_comment" },
-              node:type()
-            )
+            and vim.tbl_contains({
+              "comment",
+              "line_comment",
+              "block_comment",
+              "dictionary",
+              "thesaurus",
+            }, node:type())
           then
             return {
               "buffer",
@@ -87,8 +91,9 @@ return {
                 "path",
                 "ripgrep",
                 "path",
-                "markdown",
                 "copilot",
+                "dictionary",
+                "thesaurus",
               }
             else
               return {
@@ -98,16 +103,15 @@ return {
                 "obsidian",
                 "obsidian_new",
                 "obsidian_tags",
-                "markdown",
+                "dictionary",
+                "thesaurus",
               }
             end
           elseif
             vim.tbl_contains({ "gitcommit", "octo" }, vim.bo.filetype)
             and vim.fn.mode() ~= "c"
           then
-            return { "buffer", "git", "path", "ripgrep", "markdown" }
-          elseif vim.bo.filetype == "markdown" then
-            return { "buffer", "path", "ripgrep", "git", "markdown" }
+            return { "buffer", "git", "path", "ripgrep" }
           else
             return {
               "lsp",
@@ -119,6 +123,17 @@ return {
           end
         end,
         providers = {
+          thesaurus = {
+            name = "blink-cmp-words",
+            module = "blink-cmp-words.thesaurus",
+            opts = {},
+          },
+
+          dictionary = {
+            name = "blink-cmp-words",
+            module = "blink-cmp-words.dictionary",
+            opts = {},
+          },
           lazydev = {
             name = "LazyDev",
             module = "lazydev.integrations.blink",
@@ -233,11 +248,6 @@ return {
               end
               return items
             end,
-          },
-          markdown = {
-            name = "RenderMarkdown",
-            module = "render-markdown.integ.blink",
-            fallbacks = { "lsp" },
           },
         },
       },
