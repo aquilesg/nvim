@@ -141,9 +141,9 @@ local function get_incomplete_notes_by_document_type(document_type)
 end
 
 local function update_current_note_field(field, value, note)
-  local client = require("obsidian").get_client()
+  local client = require "obsidian.note"
   if note == nil then
-    note = client:current_note(vim.api.nvim_get_current_buf(), {
+    note = client.from_buffer(vim.api.nvim_get_current_buf(), {
       load_contents = false,
       collect_anchor_links = false,
       collect_blocks = false,
@@ -176,9 +176,9 @@ local function get_incomplete_notes_by_tags(tags)
 end
 
 local function modify_note_status(status, note)
-  local client = require("obsidian").get_client()
+  local client = require "obsidian.note"
   if note == nil then
-    note = client:current_note(vim.api.nvim_get_current_buf(), {
+    note = client.from_buffer(vim.api.nvim_get_current_buf(), {
       load_contents = false,
       collect_anchor_links = false,
       collect_blocks = false,
@@ -204,33 +204,33 @@ return {
   keys = {
     {
       "<leader>ot",
-      "<cmd> ObsidianToday <CR>",
+      "<cmd> Obsidian today <CR>",
       desc = "Open today's note",
     },
     {
       "<leader>oy",
-      "<cmd> ObsidianYesterday <CR>",
+      "<cmd> Obsidian yesterday <CR>",
       desc = "Open yesterday's note",
     },
     {
       "<leader>osn",
-      "<cmd> ObsidianSearch <CR>",
+      "<cmd> Obsidian search <CR>",
       desc = "Obsidian search notes",
     },
-    { "<leader>ost", "<cmd> ObsidianTags <CR>", desc = "Search for tags" },
+    { "<leader>ost", "<cmd> Obsidian tags <CR>", desc = "Search for tags" },
     {
       "<leader>oq",
-      "<cmd> ObsidianQuickSwitch <CR>",
+      "<cmd> Obsidian quick_switch <CR>",
       desc = "Quick switch to different note",
     },
     {
       "<leader>oo",
-      "<cmd> ObsidianOpen <CR>",
+      "<cmd> Obsidian open <CR>",
       desc = "Open current file in Obsidian",
     },
     {
       "<leader>oip",
-      "<cmd> ObsidianPasteImg <CR>",
+      "<cmd> Obsidian paste_img <CR>",
       desc = "Paste image into Obsidian note",
     },
     {
