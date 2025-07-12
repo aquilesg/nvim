@@ -1,5 +1,5 @@
-vim.api.nvim_create_autocmd("BufWinEnter", {
-  pattern = "Neotest Summary*",
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "neotest-summary",
   callback = function(ev)
     vim.keymap.set("n", "q", ":bdelete<CR>", {
       buffer = ev.buf,
@@ -8,13 +8,14 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     })
   end,
 })
-vim.api.nvim_create_autocmd("BufWinEnter", {
-  pattern = "neotest*",
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "neotest-output",
   callback = function(ev)
     vim.keymap.set("n", "q", ":bdelete<CR>", {
       buffer = ev.buf,
       silent = true,
-      desc = "Close neotest window",
+      desc = "Close neotest output",
     })
   end,
 })

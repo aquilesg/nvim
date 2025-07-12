@@ -171,11 +171,21 @@ return {
   },
   {
     "nvim-tree/nvim-tree.lua",
-    version = "*",
-    event = "VeryLazy",
+    keys = {
+      {
+        "<c-n>",
+        "<cmd> NvimTreeToggle <cr>",
+        desc = "Open Nvim Tree",
+      },
+      {
+        "<leader>e",
+        "<cmd> NvimTreeFocus <cr>",
+        desc = "Focus Nvim Tree",
+      },
+    },
     opts = {
       git = {
-        timeout = 1000,
+        timeout = 5000,
       },
       filters = {
         git_ignored = false,
@@ -203,7 +213,6 @@ return {
   },
   {
     "folke/trouble.nvim",
-    event = "LspAttach",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       modes = {
@@ -219,7 +228,6 @@ return {
   {
     "folke/todo-comments.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
-    event = "LspAttach",
     opts = {
       keywords = {
         AQUILES = {
@@ -237,7 +245,7 @@ return {
   },
   {
     "brenoprata10/nvim-highlight-colors",
-    event = "UIEnter",
+    event = "BufEnter",
     opts = {
       render = "foreground",
     },
@@ -246,7 +254,7 @@ return {
     "sphamba/smear-cursor.nvim",
     event = "UIEnter",
     opts = {
-      stiffness = 0.8,
+      stiffness = 0.5,
       trailing_stiffness = 0.6,
       trailing_exponent = 0,
       distance_stop_animating = 0.5,
