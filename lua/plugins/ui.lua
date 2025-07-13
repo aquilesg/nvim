@@ -16,28 +16,6 @@ map(
 )
 map("n", "<leader>x", "<cmd> bd <CR>", { desc = "Close current buffer" })
 
--- Nvim Tree
-map({ "n" }, "<c-n>", "<cmd> NvimTreeToggle <cr>", { desc = "Open Nvim Tree" })
-map(
-  { "n" },
-  "<leader>e",
-  "<cmd> NvimTreeFocus <cr>",
-  { desc = "Focus Nvim Tree" }
-)
--- Bufferline
-map(
-  { "n" },
-  "<Tab>",
-  "<cmd> BufferLineCycleNext <cr>",
-  { desc = "Cycle Bufferline Next" }
-)
-map(
-  { "n" },
-  "<S-Tab>",
-  "<cmd> BufferLineCyclePrev <cr>",
-  { desc = "Cycle Bufferline Next" }
-)
-
 local set_plugin_theme = function(background_option)
   -- Check for modified buffers
   local modified_buffers = {}
@@ -350,6 +328,18 @@ return {
   },
   {
     "akinsho/bufferline.nvim",
+    keys = {
+      {
+        "<Tab>",
+        "<cmd> BufferLineCycleNext <cr>",
+        desc = "Cycle Bufferline Next",
+      },
+      {
+        "<S-Tab>",
+        "<cmd> BufferLineCyclePrev <cr>",
+        desc = "Cycle Bufferline Next",
+      },
+    },
     version = "*",
     event = "UIEnter",
     dependencies = "nvim-tree/nvim-web-devicons",

@@ -73,53 +73,6 @@ map("n", "<leader>fm", function()
   require("conform").format { async = true }
 end, { desc = "Format document" })
 
-map("n", "<leader>fr", "<cmd> GrugFar <CR>", { desc = "Find and Replace" })
-
--- Toggle Terminal mapping
-map(
-  { "n" },
-  "<leader>tt",
-  "<cmd> ToggleTerm <CR>",
-  { desc = "Toggle terminal" }
-)
-map({ "t" }, "<C-t>", "<cmd> ToggleTerm <CR>", { desc = "Toggle terminal" })
-map(
-  "n",
-  "<leader>ti",
-  '<cmd> TermExec cmd="aws-environment integration3 platform" name="Integration3 Terminal" <CR>',
-  { desc = "Toggle Integration3 terminal" }
-)
-map(
-  "n",
-  "<leader>tu",
-  '<cmd> TermExec cmd="aws-environment uat platform" name="UAT Terminal"  <CR>',
-  { desc = "Toggle UAT terminal" }
-)
-map(
-  "n",
-  "<leader>tp",
-  '<cmd> TermExec cmd="aws-environment production platform" name="Production Terminal" <CR>',
-  { desc = "Toggle Production terminal" }
-)
-map(
-  { "n" },
-  "<leader>ta",
-  "<cmd> ToggleTermToggleAll <CR>",
-  { desc = "Toggle all terminals" }
-)
-map(
-  { "n" },
-  "<leader>ts",
-  "<cmd> TermSelect <CR>",
-  { desc = "Open terminal select" }
-)
-map({ "n" }, "<leader>td", function()
-  local terminal = require("toggleterm.terminal").Terminal
-  local gh_dash =
-    terminal:new { cmd = "gh dash", hidden = true, direction = "float" }
-  gh_dash:toggle()
-end, { desc = "Open gh dash" })
-
 map("n", "<leader>is", function()
   local timestamp = tostring(os.date "- `%Y-%m-%d %H:%M:%S`")
   local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
@@ -132,49 +85,6 @@ map("n", "<leader>im", function()
   local disable = "<!-- markdownlint-disable-next-line -->"
   vim.api.nvim_buf_set_lines(0, line, line, false, { disable })
 end, { desc = "Create disabled markdown lint section" })
-
-function _G.set_terminal_keymaps()
-  map("t", "<C-[>", [[<C-\><C-n>]], { buffer = 0, desc = "Exit Terminal mode" })
-  map("t", "<esc>", [[<C-\><C-n>]], { buffer = 0, desc = "Exit Terminal mode" })
-  map(
-    "t",
-    "<C-h>",
-    [[<Cmd>wincmd h<CR>]],
-    { buffer = 0, desc = "Move to left buffer" }
-  )
-  map(
-    "t",
-    "<C-j>",
-    [[<Cmd>wincmd j<CR>]],
-    { buffer = 0, desc = "Move to buffer below" }
-  )
-  map(
-    "t",
-    "<C-k>",
-    [[<Cmd>wincmd k<CR>]],
-    { buffer = 0, desc = "Move to buffer above" }
-  )
-  map(
-    "t",
-    "<C-l>",
-    [[<Cmd>wincmd l<CR>]],
-    { buffer = 0, desc = "Move to right buffer" }
-  )
-  map(
-    "t",
-    "<C-w>",
-    [[<C-\><C-n><C-w>]],
-    { buffer = 0, desc = "Move to buffer" }
-  )
-  map(
-    "t",
-    "<F13>",
-    "<Cmd>BufferClose<CR>",
-    { buffer = 0, desc = "Move to buffer" }
-  )
-end
-
-vim.cmd "autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()"
 
 local slow_format_filetypes = {
   "python",
@@ -231,9 +141,14 @@ return {
   },
   {
     "MagicDuck/grug-far.nvim",
-    cmd = {
-      "GrugFar",
+    keys = {
+      {
+        "<leader>fr",
+        "<cmd> GrugFar <CR>",
+        desc = "Find and Replace",
+      },
     },
+
     opts = {},
   },
   {
@@ -252,42 +167,6 @@ return {
     opts = {},
   },
   {
-    "akinsho/toggleterm.nvim",
-    version = "*",
-    cmd = {
-      "ToggleTerm",
-      "TermExec",
-      "ToggleTermToggleAll",
-    },
-    config = function()
-      map("v", "<leader>ts", function()
-        require("toggleterm").send_lines_to_terminal(
-          "single_line",
-          true,
-          { args = vim.v.count }
-        )
-      end)
-      map("v", "<leader>tl", function()
-        require("toggleterm").send_lines_to_terminal(
-          "visual_lines",
-          true,
-          { args = vim.v.count }
-        )
-      end)
-      map("v", "<leader>tv", function()
-        require("toggleterm").send_lines_to_terminal(
-          "visual_selection",
-          true,
-          { args = vim.v.count }
-        )
-      end)
-
-      require("toggleterm").setup {
-        direction = "float",
-      }
-    end,
-  },
-  {
     "mistricky/codesnap.nvim",
     build = "make",
     cmd = { "CodeSnap", "CodeSnapSave", "CodeSnapASCII" },
@@ -300,25 +179,80 @@ return {
   },
   {
     "mrjones2014/smart-splits.nvim",
-    event = "UIEnter",
-    config = function()
-      -- Smart window resizing
-      map("n", "<A-h>", require("smart-splits").resize_left)
-      map("n", "<A-j>", require("smart-splits").resize_down)
-      map("n", "<A-k>", require("smart-splits").resize_up)
-      map("n", "<A-l>", require("smart-splits").resize_right)
-      -- moving between splits
-      map("n", "<C-h>", require("smart-splits").move_cursor_left)
-      map("n", "<C-j>", require("smart-splits").move_cursor_down)
-      map("n", "<C-k>", require("smart-splits").move_cursor_up)
-      map("n", "<C-l>", require("smart-splits").move_cursor_right)
-      map("n", "<C-\\>", require("smart-splits").move_cursor_previous)
-      -- swapping buffers between windows
-      map("n", "<leader><leader>h", require("smart-splits").swap_buf_left)
-      map("n", "<leader><leader>j", require("smart-splits").swap_buf_down)
-      map("n", "<leader><leader>k", require("smart-splits").swap_buf_up)
-      map("n", "<leader><leader>l", require("smart-splits").swap_buf_right)
-    end,
+    keys = {
+      {
+        "<A-h>",
+        function()
+          require("smart-splits").resize_left()
+        end,
+      },
+      {
+        "<A-j>",
+        function()
+          require("smart-splits").resize_down()
+        end,
+      },
+      {
+        "<A-k>",
+        function()
+          require("smart-splits").resize_up()
+        end,
+      },
+      {
+        "<A-l>",
+        function()
+          require("smart-splits").resize_right()
+        end,
+      },
+      {
+        "<C-h>",
+        function()
+          require("smart-splits").move_cursor_left()
+        end,
+      },
+      {
+        "<C-j>",
+        function()
+          require("smart-splits").move_cursor_down()
+        end,
+      },
+      {
+        "<C-k>",
+        function()
+          require("smart-splits").move_cursor_up()
+        end,
+      },
+      {
+        "<C-l>",
+        function()
+          require("smart-splits").move_cursor_right()
+        end,
+      },
+      {
+        "<leader><leader>h",
+        function()
+          require("smart-splits").swap_buf_left()
+        end,
+      },
+      {
+        "<leader><leader>j",
+        function()
+          require("smart-splits").swap_buf_down()
+        end,
+      },
+      {
+        "<leader><leader>k",
+        function()
+          require("smart-splits").swap_buf_up()
+        end,
+      },
+      {
+        "<leader><leader>l",
+        function()
+          require("smart-splits").swap_buf_right()
+        end,
+      },
+    },
   },
   {
     "shortcuts/no-neck-pain.nvim",
@@ -332,69 +266,6 @@ return {
     },
     opts = {
       width = 150,
-    },
-  },
-  {
-    "neo451/feed.nvim",
-    cmd = "Feed",
-    opts = {
-      layout = { padding = { enabled = false } },
-      feeds = {
-        {
-          "https://aws.amazon.com/blogs/infrastructure-and-automation/feed/",
-          name = "AWS News - Infra",
-          tags = { "aws", "infrastructure", "automation" },
-        },
-        {
-          "https://aws.amazon.com/blogs/architecture/feed/",
-          name = "AWS News - Architecture",
-          tags = { "aws", "architecture" },
-        },
-        {
-          "https://aws.amazon.com/blogs/aws/feed/",
-          name = "AWS News",
-          tags = { "aws", "news" },
-        },
-        {
-          "https://aws.amazon.com/blogs/database/feed/",
-          name = "AWS News - Database",
-          tags = { "aws", "database", "infrastructure" },
-        },
-        {
-          "https://aws.amazon.com/blogs/devops/feed/",
-          name = "AWS News - DevOps",
-          tags = { "aws", "devops", "infrastructure" },
-        },
-        {
-          "http://platformengineering.org/blog/rss.xml",
-          name = "Platform Engineering-Blog",
-          tags = { "infrastructure" },
-        },
-        {
-          "https://istio.io/latest/blog/feed.xml",
-          name = "Istio Blog",
-          tags = { "istio", "blog" },
-        },
-      },
-    },
-  },
-  {
-    "linrongbin16/gitlinker.nvim",
-    cmd = "GitLink",
-    opts = {},
-    keys = {
-      {
-        "<leader>gy",
-        "<cmd>GitLink<cr>",
-        mode = { "n", "v" },
-        desc = "Yank git link",
-      },
-      {
-        "<leader>gY",
-        "<cmd>GitLink!<cr>",
-        mode = { "n", "v" },
-        desc = "Open git link",
-      },
     },
   },
 }
