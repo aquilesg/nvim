@@ -191,6 +191,28 @@ return {
   },
   {
     "folke/trouble.nvim",
+    keys = {
+      {
+        "<leader>vD",
+        "<cmd>Trouble diagnostics toggle<cr>",
+        desc = "Diagnostics (Trouble)",
+      },
+      {
+        "<leader>vd",
+        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+        desc = "Buffer Diagnostics (Trouble)",
+      },
+      {
+        "<leader>go",
+        "<cmd>Trouble symbols toggle<cr>",
+        desc = "Symbols (Trouble)",
+      },
+      {
+        "<leader>vt",
+        "<cmd>Trouble todo<cr>",
+        desc = "View todos",
+      },
+    },
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       modes = {

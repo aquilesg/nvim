@@ -52,28 +52,5 @@ return {
       end,
       desc = "Git Status",
     },
-    {
-      "<leader>vD",
-      function()
-        require("telescope.builtin").diagnostics {}
-      end,
-      desc = "Diagnostics",
-    },
-    {
-      "<leader>vd",
-      function()
-        require("telescope.builtin").diagnostics {
-          bufnr = 0,
-        }
-      end,
-      desc = "Diagnostics",
-    },
-    {
-      "<leader>go",
-      function()
-        require("telescope.builtin").lsp_document_symbols { show_line = true }
-      end,
-      desc = "LSP Symbols",
-    },
   },
 }
