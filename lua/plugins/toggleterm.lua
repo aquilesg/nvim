@@ -81,6 +81,11 @@ return {
       },
       -- Work Specific things
       {
+        "<leader>tT",
+        '<cmd> TermExec cmd="make test" name="Testing" <CR>',
+        desc = "Run Make test",
+      },
+      {
         "<leader>ti",
         '<cmd> TermExec cmd="aws-environment integration3 platform" name="Integration3 East Terminal" <CR>',
         desc = "Toggle Integration3 terminal in East Region",

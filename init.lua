@@ -20,6 +20,12 @@ vim.opt.fillchars:append { eob = " " }
 vim.opt.termguicolors = true
 vim.api.nvim_set_option_value("clipboard", "unnamed", {})
 vim.diagnostic.config { virtual_lines = false }
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  pattern = "*",
+  callback = function()
+    vim.o.foldmethod = "manual"
+  end,
+})
 
 -- NVIM Tree
 vim.g.loaded_netrw = 1

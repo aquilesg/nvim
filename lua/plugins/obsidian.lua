@@ -36,21 +36,21 @@ local document_types = {
 
 local note_status = {
   all_notes = "",
-  in_progress = "in-progress",
-  in_review = "in-review",
-  review_complete = "review-complete",
+  in_progress = "In Progress",
+  in_review = "In Review",
+  review_complete = "Review Complete",
   abandoned = "abandoned",
   draft = "draft",
-  complete = "complete",
+  complete = "completed",
   blocked = "blocked",
 }
 
 local function get_notes_by_tags(tags)
-  local client = require("obsidian").get_client()
+  local search_client = require "obsidian.search"
   local found_notes = {}
 
   for _, tag in ipairs(tags) do
-    local found_notes_tags = client:find_notes(tag, {
+    local found_notes_tags = search_client.find_notes(tag, {
       sort = false,
       include_templates = false,
       ignore_case = true,
@@ -88,7 +88,7 @@ local function display_note_picker(note_table, prompt, opts)
           local client = require("obsidian").get_client()
           actions.close(prompt_bufnr)
           local selected_note = action_state.get_selected_entry().value
-          client:open_note(selected_note)
+          selected_note:open {}
         end)
         return true
       end,
@@ -98,33 +98,27 @@ end
 
 local function create_obsidian_note(note_dir, template_name, should_not_open)
   local user_title = vim.fn.input { prompt = template_name .. " title: " }
-  local client = require("obsidian").get_client()
-  local gen_id
-  if note_dir == directories.Recipe then
-    gen_id = user_title .. "-" .. client:new_note_id(user_title)
-  else
-    gen_id = client:new_note_id(user_title)
-  end
-  local note = client:create_note {
+  local Note = require "obsidian.Note"
+  local note = Note.create {
     title = user_title,
-    id = gen_id,
     dir = note_dir,
-    no_write = false,
+    should_write = true,
     template = template_name,
   }
+
   if should_not_open then
-    return gen_id, user_title
+    return note
   end
-  client:open_note(note)
+  note:open()
 end
 
 local function get_incomplete_notes_by_document_type(document_type)
   local incomplete_delimiter =
     { note_status.in_progress, note_status.in_review, note_status.blocked }
-  local client = require("obsidian").get_client()
+  local search_client = require "obsidian.search"
   local found_notes = {}
   local search_term = "document_type: " .. document_type
-  local all_notes = client:find_notes(search_term, {
+  local all_notes = search_client.find_notes(search_term, {
     sort = false,
     include_templates = false,
     ignore_case = true,
@@ -187,7 +181,6 @@ local function modify_note_status(status, note)
   if note ~= nil then
     local front_matter = note:frontmatter()
     front_matter["status"] = status
-    front_matter[status .. "-modification-date"] = os.date "%Y-%m-%d"
     note:save_to_buffer {
       frontmatter = front_matter,
       insert_frontmatter = true,
@@ -373,6 +366,7 @@ return {
       "<leader>omc",
       function()
         modify_note_status(note_status.complete)
+        update_current_note_field("completedDate", os.date "%Y-%m-%d")
       end,
       desc = "Mark complete",
     },
@@ -431,12 +425,12 @@ return {
         vim.ui.select(template_keys, {
           prompt = "Document Type",
         }, function(choice)
-          local id, title = create_obsidian_note(
+          local note = create_obsidian_note(
             directories[choice],
             template_names[choice],
             true
           )
-          local text = "[[" .. id .. "|" .. title .. "]]"
+          local text = "[[" .. note.id .. "|" .. note.title .. "]]"
           local row, col = unpack(vim.api.nvim_win_get_cursor(0))
           local current_line = vim.api.nvim_get_current_line()
           local new_line = string.sub(current_line, 1, col)
@@ -444,6 +438,7 @@ return {
             .. string.sub(current_line, col + 1)
           vim.api.nvim_set_current_line(new_line)
           vim.api.nvim_win_set_cursor(0, { row, col + #text })
+          note:open()
         end)
       end,
       mode = { "n" },
@@ -452,6 +447,12 @@ return {
   },
   opts = {
     legacy_commands = false,
+    statusline = {
+      enabled = false,
+    },
+    footer = {
+      enabled = true,
+    },
     workspaces = {
       {
         name = "SecondBrain",

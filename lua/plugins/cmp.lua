@@ -125,12 +125,13 @@ return {
         providers = {
           thesaurus = {
             name = "blink-cmp-words",
+            score_offset = -20,
             module = "blink-cmp-words.thesaurus",
             opts = {},
           },
-
           dictionary = {
             name = "blink-cmp-words",
+            score_offset = -20,
             module = "blink-cmp-words.dictionary",
             opts = {},
           },

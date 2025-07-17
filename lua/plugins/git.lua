@@ -142,12 +142,12 @@ return {
       },
       {
         "<leader>2",
-        "<cmd> Octo pr create draft <CR>",
+        "<cmd> Octo pr list <CR>",
         desc = "List PRs for this repo",
       },
       {
         "<leader>3",
-        "<cmd> Octo pr create draft <CR>",
+        "<cmd> Octo pr search <CR>",
         desc = "Search for PR",
       },
     },
@@ -206,9 +206,11 @@ return {
   {
     "FabijanZulj/blame.nvim",
     keys = {
-      "<leader>ge",
-      "<cmd> BlameToggle <CR>",
-      desc = "Toggle git blame",
+      {
+        "<leader>ge",
+        "<cmd> BlameToggle <CR>",
+        desc = "Toggle git blame",
+      },
     },
     opts = {},
   },

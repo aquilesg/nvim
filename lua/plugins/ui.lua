@@ -42,7 +42,7 @@ local set_plugin_theme = function(background_option)
 
   -- Reload the color theme
   if background_option == "light" then
-    vim.cmd "colorscheme tokyobones"
+    vim.cmd "colorscheme oxocarbon"
   else
     vim.cmd "colorscheme ciapre"
   end
@@ -119,6 +119,12 @@ return {
   },
   {
     "zenbones-theme/zenbones.nvim",
+  },
+  {
+    "nyoom-engineering/oxocarbon.nvim",
+  },
+  {
+    "folke/tokyonight.nvim",
   },
   {
     "rktjmp/lush.nvim",
@@ -474,9 +480,6 @@ return {
       },
       sections = {
         lualine_x = {
-          {
-            "g:obsidian",
-          },
           {
             function()
               local buf_clients = vim.lsp.get_clients { bufnr = 0 }
