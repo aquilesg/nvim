@@ -96,16 +96,38 @@ local function display_note_picker(note_table, prompt, opts)
     :find()
 end
 
+local function camelCaseTitle(title)
+  return (
+    title
+      :gsub("(%a)([%w_']*)", function(first, rest)
+        return first:upper() .. rest:lower()
+      end)
+      :gsub("%s+", "")
+  )
+end
+
 local function create_obsidian_note(note_dir, template_name, should_not_open)
   local user_title = vim.fn.input { prompt = template_name .. " title: " }
   local Note = require "obsidian.Note"
-  local note = Note.create {
-    title = user_title,
-    dir = note_dir,
-    should_write = true,
-    template = template_name,
-  }
-
+  local note
+  -- For recipes we don't want to generate the weird name
+  if note_dir == directories.Recipe then
+    local userId = camelCaseTitle(user_title)
+    note = Note.create {
+      title = user_title,
+      id = userId,
+      dir = note_dir,
+      should_write = true,
+      template = template_name,
+    }
+  else
+    note = Note.create {
+      title = user_title,
+      dir = note_dir,
+      should_write = true,
+      template = template_name,
+    }
+  end
   if should_not_open then
     return note
   end
