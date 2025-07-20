@@ -12,7 +12,6 @@ return {
       "obsidian.nvim/obsidian.nvim",
       "mikavilpas/blink-ripgrep.nvim",
       "fang2hou/blink-copilot",
-      "archie-judd/blink-cmp-words",
       "Kaiser-Yang/blink-cmp-git",
     },
     event = "LspAttach",
@@ -72,8 +71,6 @@ return {
               "comment",
               "line_comment",
               "block_comment",
-              "dictionary",
-              "thesaurus",
             }, node:type())
           then
             return {
@@ -92,8 +89,6 @@ return {
                 "ripgrep",
                 "path",
                 "copilot",
-                "dictionary",
-                "thesaurus",
               }
             else
               return {
@@ -103,8 +98,6 @@ return {
                 "obsidian",
                 "obsidian_new",
                 "obsidian_tags",
-                "dictionary",
-                "thesaurus",
               }
             end
           elseif
@@ -123,18 +116,6 @@ return {
           end
         end,
         providers = {
-          thesaurus = {
-            name = "blink-cmp-words",
-            score_offset = -20,
-            module = "blink-cmp-words.thesaurus",
-            opts = {},
-          },
-          dictionary = {
-            name = "blink-cmp-words",
-            score_offset = -20,
-            module = "blink-cmp-words.dictionary",
-            opts = {},
-          },
           lazydev = {
             name = "LazyDev",
             module = "lazydev.integrations.blink",
