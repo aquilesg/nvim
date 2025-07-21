@@ -136,7 +136,7 @@ return {
   {
     "kylechui/nvim-surround",
     version = "*",
-    event = "UIEnter",
+    event = "VeryLazy",
     opts = {},
   },
   {
@@ -158,12 +158,12 @@ return {
   },
   {
     "numToStr/Comment.nvim",
-    event = "UIEnter",
+    event = "VeryLazy",
     opts = {},
   },
   {
     "windwp/nvim-autopairs",
-    event = "InsertEnter",
+    event = "VeryLazy",
     opts = {},
   },
   {

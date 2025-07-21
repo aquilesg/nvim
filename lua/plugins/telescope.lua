@@ -10,7 +10,6 @@ return {
       },
     },
   },
-  event = "UIEnter",
   dependencies = {
     "nvim-telescope/telescope-live-grep-args.nvim",
   },

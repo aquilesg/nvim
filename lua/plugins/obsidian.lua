@@ -212,7 +212,6 @@ end
 
 return {
   "obsidian-nvim/obsidian.nvim",
-  lazy = true,
   dependencies = {
     "nvim-lua/plenary.nvim",
   },

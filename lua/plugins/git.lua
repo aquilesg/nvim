@@ -130,7 +130,6 @@ return {
         end)
       end,
     },
-    event = "UIEnter",
   },
   {
     "pwntester/octo.nvim",
