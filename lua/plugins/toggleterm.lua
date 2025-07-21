@@ -79,6 +79,18 @@ return {
         "<cmd> ToggleTermSetName <CR>",
         { desc = "Open terminal select" },
       },
+      -- Backup for obsidian
+      {
+        "<leader>tB",
+        function()
+          local Terminal = require("toggleterm.terminal").Terminal
+          local git = Terminal:new {
+            cmd = "git add . && git commit -m 'Back up $(date +\"%Y-%d-%m:%H-%M-%S\")'",
+            dir = "~/Repos/brain/",
+          }
+        end,
+        { desc = "Backup Obsidian Repository" },
+      },
       -- Work Specific things
       {
         "<leader>tT",
