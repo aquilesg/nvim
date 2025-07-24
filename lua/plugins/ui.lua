@@ -42,7 +42,7 @@ local set_plugin_theme = function(background_option)
 
   -- Reload the color theme
   if background_option == "light" then
-    vim.cmd "colorscheme oxocarbon"
+    vim.cmd "colorscheme tokyonight-day"
   else
     vim.cmd "colorscheme ciapre"
   end
@@ -207,11 +207,6 @@ return {
         "<leader>vd",
         "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
         desc = "Buffer Diagnostics (Trouble)",
-      },
-      {
-        "<leader>go",
-        "<cmd>Trouble symbols toggle<cr>",
-        desc = "Symbols (Trouble)",
       },
       {
         "<leader>vt",

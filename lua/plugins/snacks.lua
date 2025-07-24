@@ -16,6 +16,13 @@ return {
       end,
       desc = "Colorschemes",
     },
+    {
+      "<leader>go",
+      function()
+        Snacks.picker.lsp_symbols()
+      end,
+      desc = "LSP Symbols",
+    },
   },
   opts = {
     image = {},

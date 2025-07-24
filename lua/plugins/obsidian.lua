@@ -45,6 +45,8 @@ local note_status = {
   blocked = "blocked",
 }
 
+local pr_link_frontmatter = "pr_link"
+
 local function get_notes_by_tags(tags)
   local search_client = require "obsidian.search"
   local found_notes = {}
@@ -85,7 +87,6 @@ local function display_note_picker(note_table, prompt, opts)
       sorter = conf.generic_sorter(opts),
       attach_mappings = function(prompt_bufnr, _)
         actions.select_default:replace(function()
-          local client = require("obsidian").get_client()
           actions.close(prompt_bufnr)
           local selected_note = action_state.get_selected_entry().value
           selected_note:open {}
@@ -426,6 +427,11 @@ return {
       "<leader>omr",
       function()
         modify_note_status(note_status.in_review)
+        vim.ui.input({
+          prompt = "What is the PR Link (if available)",
+        }, function(response)
+          update_current_note_field(pr_link_frontmatter, response)
+        end)
       end,
       desc = "Mark document as in-review",
     },
@@ -500,9 +506,8 @@ return {
       enable = false,
     },
     callbacks = {
-      ---@param client obsidian.Client
       ---@param note obsidian.Note
-      enter_note = function(client, note)
+      enter_note = function(_, note)
         local aliases = note.aliases
         if aliases and #aliases > 0 then
           local shortest = aliases[1]
@@ -511,14 +516,11 @@ return {
               shortest = alias
             end
           end
-          vim.b.obsidian_alias = note.bufnr .. "  " .. shortest
+          vim.b.obsidian_alias = note.bufnr .. " 󱓟 " .. shortest
         end
       end,
     },
     open_notes_in = "vsplit",
-    open = {
-      use_advanced_uri = true,
-    },
     suppress_missing_scope = {
       projects_v2 = true,
     },
