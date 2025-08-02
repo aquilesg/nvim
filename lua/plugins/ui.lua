@@ -63,7 +63,6 @@ local set_plugin_theme = function(background_option)
   local ui_plugins = {
     "tiny-inline-diagnostic.nvim",
     "markdown.nvim",
-    "drop.nvim",
   }
 
   for _, plugin in ipairs(ui_plugins) do
@@ -332,11 +331,6 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
     },
-  },
-  {
-    "folke/drop.nvim",
-    event = "UIEnter",
-    opts = {},
   },
   {
     "akinsho/bufferline.nvim",

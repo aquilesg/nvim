@@ -72,12 +72,30 @@ return {
       {
         "<leader>ts",
         "<cmd> TermSelect <CR>",
-        { desc = "Open terminal select" },
+        desc = "Open terminal select",
       },
       {
         "<leader>tS",
         "<cmd> ToggleTermSetName <CR>",
-        { desc = "Open terminal select" },
+        desc = "Open terminal select",
+      },
+      -- Sending stuff to terminal
+      {
+        "<leader>tl",
+        "<cmd> ToggleTermSendCurrentLine <CR>",
+        desc = "Send current line at cursor",
+      },
+      {
+        "<leader>tvl",
+        "<cmd> ToggleTermSendVisualLines <CR>",
+        desc = "Send current lines in visual selection",
+        mode = "v",
+      },
+      {
+        "<leader>tvL",
+        "<cmd> ToggleTermSendVisualSelection <CR>",
+        desc = "Send currently selected visual section",
+        mode = "v",
       },
       -- Backup for obsidian
       {
@@ -85,11 +103,13 @@ return {
         function()
           local Terminal = require("toggleterm.terminal").Terminal
           local git = Terminal:new {
-            cmd = "git add . && git commit -m 'Back up $(date +\"%Y-%d-%m:%H-%M-%S\")'",
+            display_name = "Obsidian Vault Backup",
+            cmd = "git add . && git commit -m 'Back up $(date +\"%Y-%d-%m:%H-%M-%S\")' && git push",
             dir = "~/Repos/brain/",
           }
+          git:toggle()
         end,
-        { desc = "Backup Obsidian Repository" },
+        desc = "Backup Obsidian Repository",
       },
       -- Work Specific things
       {

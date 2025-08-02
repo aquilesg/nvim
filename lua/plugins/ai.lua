@@ -1,25 +1,26 @@
-vim.keymap.set(
-  { "n", "v" },
-  "<C-a>",
-  "<cmd>CodeCompanionActions<cr>",
-  { noremap = true, silent = true }
-)
-vim.keymap.set(
-  { "n", "v" },
-  "<leader>a",
-  "<cmd>CodeCompanionChat Toggle<cr>",
-  { noremap = true, silent = true }
-)
-vim.keymap.set(
-  "v",
-  "ga",
-  "<cmd>CodeCompanionChat Add<cr>",
-  { noremap = true, silent = true }
-)
-
 vim.cmd [[cab cc CodeCompanion]]
 return {
   {
+    keys = {
+      {
+        "<leader>a",
+        "<cmd>CodeCompanionChat Toggle<cr>",
+        desc = "Toggle CodeCompanion",
+        mode = { "n", "v" },
+      },
+      {
+        "<C-a>",
+        "<cmd>CodeCompanionActions<cr>",
+        desc = "Open CodeCompanion Actions",
+        mode = { "n", "v" },
+      },
+      {
+        "ga",
+        "<cmd>CodeCompanionChat Add<cr>",
+        desc = "Open CodeCompanion Actions",
+        mode = { "v" },
+      },
+    },
     "olimorris/codecompanion.nvim",
     opts = {
       strategies = {

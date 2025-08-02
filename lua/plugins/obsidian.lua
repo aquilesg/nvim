@@ -98,37 +98,28 @@ local function display_note_picker(note_table, prompt, opts)
 end
 
 local function camelCaseTitle(title)
-  return (
-    title
-      :gsub("(%a)([%w_']*)", function(first, rest)
-        return first:upper() .. rest:lower()
-      end)
-      :gsub("%s+", "")
-  )
+  local result = title
+    :gsub("(%a)([%w_']*)", function(first, rest)
+      return first:upper() .. rest:lower()
+    end)
+    :gsub("%s+", "")
+  result = result:gsub('[/\\%*%?%:"<>|]', "")
+  return result
 end
 
 local function create_obsidian_note(note_dir, template_name, should_not_open)
   local user_title = vim.fn.input { prompt = template_name .. " title: " }
   local Note = require "obsidian.Note"
-  local note
-  -- For recipes we don't want to generate the weird name
-  if note_dir == directories.Recipe then
-    local userId = camelCaseTitle(user_title)
-    note = Note.create {
-      title = user_title,
-      id = userId,
-      dir = note_dir,
-      should_write = true,
-      template = template_name,
-    }
-  else
-    note = Note.create {
-      title = user_title,
-      dir = note_dir,
-      should_write = true,
-      template = template_name,
-    }
-  end
+
+  local userId = camelCaseTitle(user_title)
+  local note = Note.create {
+    title = user_title,
+    id = userId,
+    dir = note_dir,
+    should_write = true,
+    template = template_name,
+  }
+
   if should_not_open then
     return note
   end
@@ -158,9 +149,9 @@ local function get_incomplete_notes_by_document_type(document_type)
 end
 
 local function update_current_note_field(field, value, note)
-  local client = require "obsidian.note"
+  local Note = require "obsidian.note"
   if note == nil then
-    note = client.from_buffer(vim.api.nvim_get_current_buf(), {
+    note = Note.from_buffer(vim.api.nvim_get_current_buf(), {
       load_contents = false,
       collect_anchor_links = false,
       collect_blocks = false,
@@ -247,6 +238,11 @@ return {
       "<leader>oip",
       "<cmd> Obsidian paste_img <CR>",
       desc = "Paste image into Obsidian note",
+    },
+    {
+      "<leader>obl",
+      "<cmd> Obsidian backlinks <CR>",
+      desc = "Open backlinks of current note",
     },
     {
       "<leader>onwt",
@@ -496,6 +492,27 @@ return {
                 return vim.fn.input {
                   prompt = "Research Topic: ",
                 }
+              end,
+              project = function()
+                local client = require "obsidian"
+                local Note = require "obsidian.note"
+
+                local note = Note.from_buffer(vim.api.nvim_get_current_buf(), {
+                  load_contents = false,
+                  collect_anchor_links = false,
+                  collect_blocks = false,
+                })
+                local backlinks = client.get_client():find_backlinks(note)
+                if not backlinks or #backlinks == 0 then
+                  return ""
+                end
+
+                -- For every backlink found create a new entry
+                local link = {}
+                for _, val in pairs(backlinks) do
+                  table.insert(link, '    - "[[' .. val.note.id .. ']]"')
+                end
+                return table.concat(link, "\n")
               end,
             },
           },

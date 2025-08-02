@@ -158,10 +158,6 @@ return {
     opts = {
       enable_builtin = true,
       default_to_projects_v2 = false,
-      ui = {
-        use_signcolumn = true,
-        use_signstatus = true,
-      },
     },
   },
   {

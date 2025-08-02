@@ -10,9 +10,18 @@ vim.api.nvim_create_autocmd("FileType", {
     })
   end,
 })
-
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "neotest-output",
+  callback = function(ev)
+    vim.keymap.set("n", "q", ":bdelete!<CR>", {
+      buffer = ev.buf,
+      silent = true,
+      desc = "Close neotest output",
+    })
+  end,
+})
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "neotest-output-panel",
   callback = function(ev)
     vim.keymap.set("n", "q", ":bdelete!<CR>", {
       buffer = ev.buf,
