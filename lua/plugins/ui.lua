@@ -44,7 +44,7 @@ local set_plugin_theme = function(background_option)
   if background_option == "light" then
     vim.cmd "colorscheme tokyonight-day"
   else
-    vim.cmd "colorscheme ciapre"
+    vim.cmd "colorscheme tokyonight-night"
   end
 
   -- Close unnamed buffers

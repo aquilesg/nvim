@@ -45,7 +45,10 @@ local note_status = {
   blocked = "blocked",
 }
 
-local pr_link_frontmatter = "pr_link"
+local front_matter = {
+  pr_link = "pr_link",
+  projects = "projects",
+}
 
 local function get_notes_by_tags(tags)
   local search_client = require "obsidian.search"
@@ -107,25 +110,6 @@ local function camelCaseTitle(title)
   return result
 end
 
-local function create_obsidian_note(note_dir, template_name, should_not_open)
-  local user_title = vim.fn.input { prompt = template_name .. " title: " }
-  local Note = require "obsidian.Note"
-
-  local userId = camelCaseTitle(user_title)
-  local note = Note.create {
-    title = user_title,
-    id = userId,
-    dir = note_dir,
-    should_write = true,
-    template = template_name,
-  }
-
-  if should_not_open then
-    return note
-  end
-  note:open()
-end
-
 local function get_incomplete_notes_by_document_type(document_type)
   local incomplete_delimiter =
     { note_status.in_progress, note_status.in_review, note_status.blocked }
@@ -159,10 +143,10 @@ local function update_current_note_field(field, value, note)
   end
 
   if note ~= nil then
-    local front_matter = note:frontmatter()
-    front_matter[field] = value
+    local note_front_matter = note:frontmatter()
+    note_front_matter[field] = value
     note:save_to_buffer {
-      frontmatter = front_matter,
+      frontmatter = note_front_matter,
       insert_frontmatter = true,
     }
   end
@@ -193,13 +177,27 @@ local function modify_note_status(status, note)
     })
   end
   if note ~= nil then
-    local front_matter = note:frontmatter()
-    front_matter["status"] = status
+    local local_front_matter = note:frontmatter()
+    local_front_matter["status"] = status
     note:save_to_buffer {
       frontmatter = front_matter,
       insert_frontmatter = true,
     }
   end
+end
+
+local function create_obsidian_note(note_dir, template_name)
+  local user_title = vim.fn.input { prompt = template_name .. " title: " }
+  local Note = require "obsidian.Note"
+  local userId = camelCaseTitle(user_title)
+  local note = Note.create {
+    title = user_title,
+    id = userId,
+    dir = note_dir,
+    should_write = true,
+    template = template_name,
+  }
+  note:open()
 end
 
 return {
@@ -329,7 +327,7 @@ return {
     {
       "<leader>ocwt",
       function()
-        local notes = get_incomplete_notes_by_tags { "Work/task" }
+        local notes = get_incomplete_notes_by_tags { "Work/IH/task" }
         display_note_picker(notes, "Chose the Work Task to open")
       end,
       desc = "Open current Work tasks",
@@ -426,7 +424,7 @@ return {
         vim.ui.input({
           prompt = "What is the PR Link (if available)",
         }, function(response)
-          update_current_note_field(pr_link_frontmatter, response)
+          update_current_note_field(front_matter.pr_link, response)
         end)
       end,
       desc = "Mark document as in-review",
@@ -448,12 +446,26 @@ return {
         vim.ui.select(template_keys, {
           prompt = "Document Type",
         }, function(choice)
-          local note = create_obsidian_note(
-            directories[choice],
-            template_names[choice],
-            true
-          )
-          local text = "[[" .. note.id .. "|" .. note.title .. "]]"
+          if not choice then
+            return
+          end
+
+          local Note = require "obsidian.note"
+          local user_title = vim.fn.input { prompt = choice .. " title: " }
+          if not user_title then
+            return
+          end
+          local userID = camelCaseTitle(user_title)
+          ---@type obsidian.Note
+          local new_note = Note.create {
+            title = user_title,
+            id = userID,
+            dir = directories[choice],
+            template = template_names[choice],
+            should_write = true,
+          }
+
+          local text = " [[" .. userID .. "|" .. user_title .. "]]"
           local row, col = unpack(vim.api.nvim_win_get_cursor(0))
           local current_line = vim.api.nvim_get_current_line()
           local new_line = string.sub(current_line, 1, col)
@@ -461,7 +473,8 @@ return {
             .. string.sub(current_line, col + 1)
           vim.api.nvim_set_current_line(new_line)
           vim.api.nvim_win_set_cursor(0, { row, col + #text })
-          note:open()
+
+          new_note:open {}
         end)
       end,
       mode = { "n" },
@@ -493,27 +506,6 @@ return {
                   prompt = "Research Topic: ",
                 }
               end,
-              project = function()
-                local client = require "obsidian"
-                local Note = require "obsidian.note"
-
-                local note = Note.from_buffer(vim.api.nvim_get_current_buf(), {
-                  load_contents = false,
-                  collect_anchor_links = false,
-                  collect_blocks = false,
-                })
-                local backlinks = client.get_client():find_backlinks(note)
-                if not backlinks or #backlinks == 0 then
-                  return ""
-                end
-
-                -- For every backlink found create a new entry
-                local link = {}
-                for _, val in pairs(backlinks) do
-                  table.insert(link, '    - "[[' .. val.note.id .. ']]"')
-                end
-                return table.concat(link, "\n")
-              end,
             },
           },
         },
@@ -525,6 +517,7 @@ return {
     callbacks = {
       ---@param note obsidian.Note
       enter_note = function(_, note)
+        -- Name the buffer so I can find it easily
         local aliases = note.aliases
         if aliases and #aliases > 0 then
           local shortest = aliases[1]
@@ -533,7 +526,8 @@ return {
               shortest = alias
             end
           end
-          vim.b.obsidian_alias = note.bufnr .. " 󱓟 " .. shortest
+          local bufnr = note.bufnr or vim.api.nvim_get_current_buf()
+          vim.b.obsidian_alias = bufnr .. " 󱓟 " .. shortest
         end
       end,
     },

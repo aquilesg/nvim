@@ -130,6 +130,7 @@ return {
         end)
       end,
     },
+    event = "VeryLazy",
   },
   {
     "pwntester/octo.nvim",

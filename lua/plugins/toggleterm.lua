@@ -104,7 +104,7 @@ return {
           local Terminal = require("toggleterm.terminal").Terminal
           local git = Terminal:new {
             display_name = "Obsidian Vault Backup",
-            cmd = "git add . && git commit -m 'Back up $(date +\"%Y-%d-%m:%H-%M-%S\")' && git push",
+            cmd = "git add . && git commit -m \"Back up $(date +'%Y-%d-%m:%H-%M-%S')\" && git push",
             dir = "~/Repos/brain/",
           }
           git:toggle()

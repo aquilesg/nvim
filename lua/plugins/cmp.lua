@@ -9,7 +9,7 @@ return {
     "saghen/blink.cmp",
     dependencies = {
       "rafamadriz/friendly-snippets",
-      "obsidian.nvim/obsidian.nvim",
+      "obsidian-nvim/obsidian.nvim",
       "mikavilpas/blink-ripgrep.nvim",
       "fang2hou/blink-copilot",
       "Kaiser-Yang/blink-cmp-git",
