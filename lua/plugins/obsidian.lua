@@ -48,6 +48,7 @@ local note_status = {
 local front_matter_fields = {
   pr_link = "pr_link",
   projects = "projects",
+  status = "status",
 }
 
 local function get_notes_by_tags(tags)
@@ -124,7 +125,7 @@ local function get_incomplete_notes_by_document_type(document_type)
 
   for _, delimiter in ipairs(incomplete_delimiter) do
     for _, note in ipairs(all_notes) do
-      if note:get_field "status" == delimiter then
+      if note:get_field(front_matter_fields.status) == delimiter then
         table.insert(found_notes, note)
       end
     end
@@ -165,25 +166,6 @@ local function get_incomplete_notes_by_tags(tags)
     end
   end
   return found_notes
-end
-
-local function modify_note_status(status, note)
-  local Note = require "obsidian.note"
-  if note == nil then
-    note = Note.from_buffer(vim.api.nvim_get_current_buf(), {
-      load_contents = false,
-      collect_anchor_links = false,
-      collect_blocks = false,
-    })
-  end
-  if note ~= nil then
-    local local_front_matter = note:frontmatter()
-    local_front_matter["status"] = status
-    note:save_to_buffer {
-      frontmatter = local_front_matter,
-      insert_frontmatter = true,
-    }
-  end
 end
 
 local function create_obsidian_note(note_dir, template_name)
@@ -327,7 +309,8 @@ return {
     {
       "<leader>ocwt",
       function()
-        local notes = get_incomplete_notes_by_tags { "Work/IH/task" }
+        local notes =
+          get_incomplete_notes_by_tags { "Work/IH/task", "Work/IH/project" }
         display_note_picker(notes, "Chose the Work Task to open")
       end,
       desc = "Open current Work tasks",
@@ -381,15 +364,21 @@ return {
     {
       "<leader>omc",
       function()
-        modify_note_status(note_status.complete)
         update_note_frontmatter("completedDate", os.date "%Y-%m-%d")
+        update_note_frontmatter(
+          front_matter_fields.status,
+          note_status.complete
+        )
       end,
       desc = "Mark complete",
     },
     {
       "<leader>omi",
       function()
-        modify_note_status(note_status.in_progress)
+        update_note_frontmatter(
+          front_matter_fields.status,
+          note_status.in_progress
+        )
       end,
       desc = "Mark document in progress",
     },
@@ -399,7 +388,10 @@ return {
         vim.ui.input({
           prompt = "Why was this abandoned?",
         }, function(response)
-          modify_note_status(note_status.abandoned)
+          update_note_frontmatter(
+            front_matter_fields.status,
+            note_status.abandoned
+          )
           update_note_frontmatter("abandon_reason", response)
         end)
       end,
@@ -412,7 +404,10 @@ return {
         vim.ui.input({
           prompt = "Why is this blocked? (Link ticket if available)",
         }, function(response)
-          modify_note_status(note_status.blocked)
+          update_note_frontmatter(
+            front_matter_fields.status,
+            note_status.blocked
+          )
           update_note_frontmatter("blocked-reason", response)
         end)
       end,
@@ -420,7 +415,10 @@ return {
     {
       "<leader>omr",
       function()
-        modify_note_status(note_status.in_review)
+        update_note_frontmatter(
+          front_matter_fields.status,
+          note_status.in_review
+        )
         vim.ui.input({
           prompt = "What is the PR Link (if available)",
         }, function(response)
@@ -432,7 +430,10 @@ return {
     {
       "<leader>omR",
       function()
-        modify_note_status(note_status.review_complete)
+        update_note_frontmatter(
+          front_matter_fields.status,
+          note_status.review_complete
+        )
       end,
       desc = "Mark review complete",
     },
