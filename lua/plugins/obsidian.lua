@@ -45,7 +45,7 @@ local note_status = {
   blocked = "blocked",
 }
 
-local front_matter = {
+local front_matter_fields = {
   pr_link = "pr_link",
   projects = "projects",
 }
@@ -132,7 +132,7 @@ local function get_incomplete_notes_by_document_type(document_type)
   return found_notes
 end
 
-local function update_current_note_field(field, value, note)
+local function update_note_frontmatter(field, value, note)
   local Note = require "obsidian.note"
   if note == nil then
     note = Note.from_buffer(vim.api.nvim_get_current_buf(), {
@@ -168,9 +168,9 @@ local function get_incomplete_notes_by_tags(tags)
 end
 
 local function modify_note_status(status, note)
-  local client = require "obsidian.note"
+  local Note = require "obsidian.note"
   if note == nil then
-    note = client.from_buffer(vim.api.nvim_get_current_buf(), {
+    note = Note.from_buffer(vim.api.nvim_get_current_buf(), {
       load_contents = false,
       collect_anchor_links = false,
       collect_blocks = false,
@@ -180,7 +180,7 @@ local function modify_note_status(status, note)
     local local_front_matter = note:frontmatter()
     local_front_matter["status"] = status
     note:save_to_buffer {
-      frontmatter = front_matter,
+      frontmatter = local_front_matter,
       insert_frontmatter = true,
     }
   end
@@ -382,7 +382,7 @@ return {
       "<leader>omc",
       function()
         modify_note_status(note_status.complete)
-        update_current_note_field("completedDate", os.date "%Y-%m-%d")
+        update_note_frontmatter("completedDate", os.date "%Y-%m-%d")
       end,
       desc = "Mark complete",
     },
@@ -400,7 +400,7 @@ return {
           prompt = "Why was this abandoned?",
         }, function(response)
           modify_note_status(note_status.abandoned)
-          update_current_note_field("abandon_reason", response)
+          update_note_frontmatter("abandon_reason", response)
         end)
       end,
       desc = "Mark document abandoned",
@@ -413,7 +413,7 @@ return {
           prompt = "Why is this blocked? (Link ticket if available)",
         }, function(response)
           modify_note_status(note_status.blocked)
-          update_current_note_field("blocked-reason", response)
+          update_note_frontmatter("blocked-reason", response)
         end)
       end,
     },
@@ -424,7 +424,7 @@ return {
         vim.ui.input({
           prompt = "What is the PR Link (if available)",
         }, function(response)
-          update_current_note_field(front_matter.pr_link, response)
+          update_note_frontmatter(front_matter_fields.pr_link, response)
         end)
       end,
       desc = "Mark document as in-review",
