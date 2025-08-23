@@ -9,12 +9,6 @@ return {
         mode = { "n", "v" },
       },
       {
-        "<C-a>",
-        "<cmd>CodeCompanionActions<cr>",
-        desc = "Open CodeCompanion Actions",
-        mode = { "n", "v" },
-      },
-      {
         "ga",
         "<cmd>CodeCompanionChat Add<cr>",
         desc = "Open CodeCompanion Actions",

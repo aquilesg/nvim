@@ -37,16 +37,6 @@ vim.diagnostic.config {
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- Folding method (use autocmd group for easier management)
-local fold_group = vim.api.nvim_create_augroup("FoldManual", { clear = true })
-vim.api.nvim_create_autocmd("BufWinEnter", {
-  group = fold_group,
-  pattern = "*",
-  callback = function()
-    vim.opt.foldmethod = "manual"
-  end,
-})
-
 -- Adjust padding on enter and load (use autocmd group)
 local ui_group = vim.api.nvim_create_augroup("UIPadding", { clear = true })
 vim.api.nvim_create_autocmd({ "UIEnter", "ColorScheme" }, {
