@@ -105,8 +105,7 @@ local treesitter_parsers = {
 return {
   {
     "f-person/auto-dark-mode.nvim",
-    priority = 1000,
-    lazy = false,
+    event = "VeryLazy",
     opts = {
       set_dark_mode = function()
         set_plugin_theme "dark"
@@ -505,7 +504,6 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
-    event = "UIEnter",
     config = function()
       require("nvim-treesitter.configs").setup {
         auto_install = true,

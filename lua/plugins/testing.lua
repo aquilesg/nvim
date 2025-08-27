@@ -33,7 +33,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 return {
   {
-    "rcarriga/nvim-dap-ui",
+    "miroshQa/debugmaster.nvim",
     dependencies = {
       "mfussenegger/nvim-dap",
       "nvim-neotest/nvim-nio",
@@ -66,109 +66,23 @@ return {
       },
       "mfussenegger/nvim-dap-python",
     },
-    config = function()
-      require("dapui").setup()
-    end,
     keys = {
       {
-        "<leader>dc",
+        "<leader>d",
         function()
-          require("dap").continue()
+          require("debugmaster").mode.toggle()
         end,
-        desc = "Dap Continue / Start",
-      },
-      {
-        "<leader>dt",
-        function()
-          require("dap").terminate()
-        end,
-        desc = "Dap Terminate",
-      },
-      {
-        "<leader>db",
-        function()
-          require("dap").toggle_breakpoint()
-        end,
-        desc = "Dap toggle breakpoint",
-      },
-      {
-        "<leader>dB",
-        function()
-          vim.ui.input(
-            { prompt = "Breakpoint condition: " },
-            function(condition)
-              vim.ui.input({ prompt = "Hit count: " }, function(hit_condition)
-                vim.ui.input({ prompt = "Log message: " }, function(log_message)
-                  require("dap").set_breakpoint(
-                    condition ~= "" and condition or nil,
-                    hit_condition ~= "" and hit_condition or nil,
-                    log_message ~= "" and log_message or nil
-                  )
-                end)
-              end)
-            end
-          )
-        end,
-        desc = "Dap Set Conditional breakpoint",
-      },
-      {
-        "<leader>dso",
-        function()
-          require("dap").step_over()
-        end,
-        desc = "Dap Step Over",
-      },
-      {
-        "<leader>dsi",
-        function()
-          require("dap").step_into()
-        end,
-        desc = "dap step into",
-      },
-      {
-        "<leader>dsO",
-        function()
-          require("dap").step_out()
-        end,
-        desc = "Dap Step Out",
-      },
-      {
-        "<leader>dr",
-        function()
-          require("dap").restart()
-        end,
-        desc = "Dap Restart",
-      },
-      {
-        "<leader>dl",
-        function()
-          require("dap").run_last()
-        end,
-        desc = "Dap run last",
-      },
-      {
-        "<leader>dK",
-        function()
-          require("dap.ui.widgets").hover(nil, { border = "rounded" })
-        end,
-        desc = "Evaluate Value under cursor",
-      },
-      {
-        "<leader>dP",
-        function()
-          local widgets = require "dap.ui.widgets"
-          widgets.centered_float(widgets.scopes, { border = "rounded" })
-        end,
-        desc = "View Scopes",
-      },
-      {
-        "<leader>du",
-        function()
-          require("dapui").toggle()
-        end,
-        desc = "View Scopes",
+        desc = "Start Debug mode",
       },
     },
+    on_attach = function()
+      vim.keymap.set(
+        "t",
+        "<C-\\>",
+        "<C-\\><C-n>",
+        { desc = "Exit terminal mode" }
+      )
+    end,
   },
   {
     lazy = true,
