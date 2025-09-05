@@ -157,12 +157,18 @@ local function get_incomplete_notes_by_tags(tags)
   local incomplete_delimiter =
     { note_status.in_progress, note_status.in_review, note_status.blocked }
   local found_notes = {}
+  local seen_ids = {}
 
   local tagged_notes = get_notes_by_tags(tags)
   for _, note in ipairs(tagged_notes) do
     local current_status = note:get_field "status"
-    if vim.tbl_contains(incomplete_delimiter, current_status) then
+    local note_id = note.id
+    if
+      vim.tbl_contains(incomplete_delimiter, current_status)
+      and not seen_ids[note_id]
+    then
       table.insert(found_notes, note)
+      seen_ids[note_id] = true
     end
   end
   return found_notes
@@ -484,6 +490,11 @@ return {
   },
   opts = {
     legacy_commands = false,
+    completion = {
+      nvim_cmp = true,
+      blink = false,
+      min_chars = 2,
+    },
     statusline = {
       enabled = false,
     },

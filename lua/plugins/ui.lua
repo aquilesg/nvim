@@ -16,7 +16,7 @@ map(
 )
 map("n", "<leader>x", "<cmd> bd <CR>", { desc = "Close current buffer" })
 
-local set_plugin_theme = function(background_option)
+local reload_ui = function(_)
   -- Check for modified buffers
   local modified_buffers = {}
   for _, buf in ipairs(vim.fn.getbufinfo()) do
@@ -38,15 +38,6 @@ local set_plugin_theme = function(background_option)
     end
   end
 
-  vim.api.nvim_set_option_value("background", background_option, {})
-
-  -- Reload the color theme
-  if background_option == "light" then
-    vim.cmd "colorscheme tokyonight-day"
-  else
-    vim.cmd "colorscheme tokyonight-night"
-  end
-
   -- Close unnamed buffers
   local buffers = vim.api.nvim_list_bufs()
 
@@ -61,7 +52,6 @@ local set_plugin_theme = function(background_option)
   -- Reload UI Plugins
   local lazy = require "lazy"
   local ui_plugins = {
-    "tiny-inline-diagnostic.nvim",
     "markdown.nvim",
   }
 
@@ -108,12 +98,19 @@ return {
     event = "VeryLazy",
     opts = {
       set_dark_mode = function()
-        set_plugin_theme "dark"
+        reload_ui()
       end,
       set_light_mode = function()
-        set_plugin_theme "light"
+        reload_ui()
       end,
     },
+  },
+  {
+    "rose-pine/neovim",
+    name = "rosepine",
+    config = function()
+      vim.cmd.colorscheme "rose-pine"
+    end,
   },
   {
     "zenbones-theme/zenbones.nvim",
@@ -226,6 +223,7 @@ return {
   },
   {
     "folke/todo-comments.nvim",
+    event = "BufReadPost",
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
       keywords = {
