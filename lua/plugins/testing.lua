@@ -1,36 +1,3 @@
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "neotest-summary",
-  callback = function(ev)
-    vim.keymap.set("n", "q", function()
-      require("neotest").summary.toggle()
-    end, {
-      buffer = ev.buf,
-      silent = true,
-      desc = "Close neotest summary",
-    })
-  end,
-})
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "neotest-output",
-  callback = function(ev)
-    vim.keymap.set("n", "q", ":bdelete!<CR>", {
-      buffer = ev.buf,
-      silent = true,
-      desc = "Close neotest output",
-    })
-  end,
-})
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "neotest-output-panel",
-  callback = function(ev)
-    vim.keymap.set("n", "q", ":bdelete!<CR>", {
-      buffer = ev.buf,
-      silent = true,
-      desc = "Close neotest output",
-    })
-  end,
-})
-
 return {
   {
     "miroshQa/debugmaster.nvim",
@@ -110,6 +77,40 @@ return {
           },
         },
       }
+
+      -- Setup commands to make quitting easier
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "neotest-summary",
+        callback = function(ev)
+          vim.keymap.set("n", "q", function()
+            require("neotest").summary.toggle()
+          end, {
+            buffer = ev.buf,
+            silent = true,
+            desc = "Close neotest summary",
+          })
+        end,
+      })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "neotest-output",
+        callback = function(ev)
+          vim.keymap.set("n", "q", ":bdelete!<CR>", {
+            buffer = ev.buf,
+            silent = true,
+            desc = "Close neotest output",
+          })
+        end,
+      })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "neotest-output-panel",
+        callback = function(ev)
+          vim.keymap.set("n", "q", ":bdelete!<CR>", {
+            buffer = ev.buf,
+            silent = true,
+            desc = "Close neotest output",
+          })
+        end,
+      })
     end,
     keys = {
       {

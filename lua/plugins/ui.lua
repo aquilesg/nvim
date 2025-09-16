@@ -53,6 +53,7 @@ local reload_ui = function(_)
   local lazy = require "lazy"
   local ui_plugins = {
     "markdown.nvim",
+    "bufferline.nvim",
   }
 
   for _, plugin in ipairs(ui_plugins) do
@@ -64,33 +65,6 @@ local reload_ui = function(_)
 
   vim.cmd "bufdo e"
 end
-local treesitter_parsers = {
-  "bash",
-  "c",
-  "cpp",
-  "dockerfile",
-  "go",
-  "hcl",
-  "html",
-  "graphql",
-  "java",
-  "javascript",
-  "json",
-  "lua",
-  "markdown",
-  "markdown_inline",
-  "mermaid",
-  "python",
-  "proto",
-  "ruby",
-  "scala",
-  "sql",
-  "terraform",
-  "vim",
-  "vimdoc",
-  "xml",
-  "yaml",
-}
 
 return {
   {
@@ -98,28 +72,29 @@ return {
     event = "VeryLazy",
     opts = {
       set_dark_mode = function()
+        vim.api.nvim_set_option_value("background", "dark", {})
         reload_ui()
       end,
       set_light_mode = function()
+        vim.api.nvim_set_option_value("background", "light", {})
         reload_ui()
       end,
     },
   },
   {
-    "rose-pine/neovim",
-    name = "rosepine",
-    config = function()
-      vim.cmd.colorscheme "rose-pine"
-    end,
-  },
-  {
-    "zenbones-theme/zenbones.nvim",
-  },
-  {
-    "nyoom-engineering/oxocarbon.nvim",
-  },
-  {
     "folke/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+  },
+  {
+    "cdmill/neomodern.nvim",
+    config = function()
+      require("neomodern").setup {
+        theme = "roseprime",
+        show_eob = false,
+      }
+      require("neomodern").load()
+    end,
   },
   {
     "rktjmp/lush.nvim",
@@ -505,7 +480,6 @@ return {
     config = function()
       require("nvim-treesitter.configs").setup {
         auto_install = true,
-        ensure_installed = treesitter_parsers,
         highlight = {
           enable = true,
         },
