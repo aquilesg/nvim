@@ -190,6 +190,7 @@ end
 
 return {
   "obsidian-nvim/obsidian.nvim",
+  commit = "1fe447897213357af9e56c97e31f6f696429deaa",
   dependencies = {
     "nvim-lua/plenary.nvim",
   },
@@ -528,7 +529,7 @@ return {
     },
     callbacks = {
       ---@param note obsidian.Note
-      enter_note = function(_, note)
+      enter_note = function(note)
         -- Name the buffer so I can find it easily
         local aliases = note.aliases
         if aliases and #aliases > 0 then
