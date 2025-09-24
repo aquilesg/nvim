@@ -178,14 +178,27 @@ local function create_obsidian_note(note_dir, template_name)
   local user_title = vim.fn.input { prompt = template_name .. " title: " }
   local Note = require "obsidian.Note"
   local userId = camelCaseTitle(user_title)
-  local note = Note.create {
-    title = user_title,
-    id = userId,
-    dir = note_dir,
-    should_write = true,
-    template = template_name,
-  }
-  note:open()
+
+  -- For events, we prefix it with the creation date then camel case the name
+  if template_name == template_names.WorkEvents then
+    local note = Note.create {
+      title = user_title,
+      id = os.date "%Y-%m-%d-" .. userId,
+      dir = note_dir,
+      should_write = true,
+      template = template_name,
+    }
+    note:open()
+  else
+    local note = Note.create {
+      title = user_title,
+      id = userId,
+      dir = note_dir,
+      should_write = true,
+      template = template_name,
+    }
+    note:open()
+  end
 end
 
 return {

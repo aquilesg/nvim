@@ -142,6 +142,7 @@ return {
   },
   {
     "pwntester/octo.nvim",
+    commit = "5a2b3f462bf7d4ebb83819e6f265c6c8ae9c9b42",
     keys = {
       {
         "<leader>1",
@@ -165,8 +166,7 @@ return {
       "nvim-tree/nvim-web-devicons",
     },
     opts = {
-      enable_builtin = true,
-      default_to_projects_v2 = false,
+      users = "assignable",
     },
   },
   {

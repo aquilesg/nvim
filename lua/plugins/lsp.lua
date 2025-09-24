@@ -172,6 +172,9 @@ return {
               url = "https://platform-api.us-east-1.uat.grnds.com/api/json/catalog.json",
               enable = os.getenv "AWS_USERNAME" ~= nil,
             },
+            ghDash = {
+              url = "https://dlvhdr.github.io/gh-dash/configuration/gh-dash/schema.json",
+            },
           },
         },
       })
