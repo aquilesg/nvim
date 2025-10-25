@@ -232,6 +232,9 @@ return {
     opts = function()
       local metals_config = require("metals").bare_config()
       metals_config.init_options.statusBarProvider = "off"
+      metals_config.settings = {
+        serverVersion = "0.11.12",
+      }
       return metals_config
     end,
     config = function(self, metals_config)

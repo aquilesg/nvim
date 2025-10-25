@@ -179,6 +179,8 @@ return {
   },
   {
     "mrjones2014/smart-splits.nvim",
+    build = "./kitty/install-kittens.bash",
+    lazy = false,
     keys = {
       {
         "<A-h>",

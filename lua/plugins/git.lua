@@ -2,14 +2,6 @@ vim.treesitter.language.register("markdown", "octo")
 
 return {
   {
-    "oribarilan/lensline.nvim",
-    tag = "1.0.0", -- or: branch = 'release/1.x' for latest non-breaking updates
-    event = "LspAttach",
-    config = function()
-      require("lensline").setup()
-    end,
-  },
-  {
     "lewis6991/gitsigns.nvim",
     keys = {
       {
@@ -142,7 +134,6 @@ return {
   },
   {
     "pwntester/octo.nvim",
-    commit = "5a2b3f462bf7d4ebb83819e6f265c6c8ae9c9b42",
     keys = {
       {
         "<leader>1",

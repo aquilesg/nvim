@@ -7,6 +7,7 @@ local directories = {
   PersonalDocument = "Personal/Docs/",
   PersonalResearchDocument = "Personal/Research/",
   Recipe = "Personal/Recipes/",
+  WorkOncallShift = "Work/OnCallShifts/",
 }
 
 local template_names = {
@@ -16,6 +17,8 @@ local template_names = {
   WorkInitiative = "WorkInitiative",
   WorkEvents = "WorkEvent",
   WorkProjectScoping = "WorkProjectScoping",
+  WorkOncallShift = "WorkOncallShift",
+  WorkOncallTask = "WorkOncallTask",
   PersonalDocument = "PersonalDocument",
   PersonalResearchDocument = "PersonalResearchDocument",
   Recipe = "Recipes",
@@ -32,6 +35,8 @@ local document_types = {
   note = "note",
   plan = "plan",
   project_scoping = "project_scoping",
+  on_call_shift = "on-call-shift",
+  on_call_task = "on-call-task",
 }
 
 local note_status = {
@@ -81,10 +86,19 @@ local function display_note_picker(note_table, prompt, opts)
       finder = finders.new_table {
         results = note_table,
         entry_maker = function(note)
+          local doc_type = note:get_field "document_type"
+          if type(doc_type) == "table" then
+            doc_type = vim.inspect(doc_type)
+          end
+          doc_type = doc_type or ""
+          local display = note:display_name()
+          if doc_type ~= "" then
+            display = display .. " (" .. doc_type .. ")"
+          end
           return {
             value = note,
-            display = note:display_name(),
-            ordinal = note:display_name(),
+            display = display,
+            ordinal = display,
           }
         end,
       },
@@ -102,35 +116,14 @@ local function display_note_picker(note_table, prompt, opts)
 end
 
 local function camelCaseTitle(title)
-  local result = title
+  local result = title:gsub("^%s*(.-)%s*$", "%1"):gsub("%s+", " ")
+  result = result:gsub('[/\\%*%?%:"<>|]', "")
+  result = result
     :gsub("(%a)([%w_']*)", function(first, rest)
       return first:upper() .. rest:lower()
     end)
     :gsub("%s+", "")
-  result = result:gsub('[/\\%*%?%:"<>|]', "")
   return result
-end
-
-local function get_incomplete_notes_by_document_type(document_type)
-  local incomplete_delimiter =
-    { note_status.in_progress, note_status.in_review, note_status.blocked }
-  local search_client = require "obsidian.search"
-  local found_notes = {}
-  local search_term = "document_type: " .. document_type
-  local all_notes = search_client.find_notes(search_term, {
-    sort = false,
-    include_templates = false,
-    ignore_case = true,
-  })
-
-  for _, delimiter in ipairs(incomplete_delimiter) do
-    for _, note in ipairs(all_notes) do
-      if note:get_field(front_matter_fields.status) == delimiter then
-        table.insert(found_notes, note)
-      end
-    end
-  end
-  return found_notes
 end
 
 local function update_note_frontmatter(field, value, note)
@@ -144,12 +137,8 @@ local function update_note_frontmatter(field, value, note)
   end
 
   if note ~= nil then
-    local note_front_matter = note:frontmatter()
-    note_front_matter[field] = value
-    note:save_to_buffer {
-      frontmatter = note_front_matter,
-      insert_frontmatter = true,
-    }
+    note:add_field(field, value)
+    note:save_to_buffer { insert_frontmatter = true }
   end
 end
 
@@ -175,60 +164,53 @@ local function get_incomplete_notes_by_tags(tags)
 end
 
 local function create_obsidian_note(note_dir, template_name)
-  local user_title = vim.fn.input { prompt = template_name .. " title: " }
   local Note = require "obsidian.Note"
-  local userId = camelCaseTitle(user_title)
-
-  -- For events, we prefix it with the creation date then camel case the name
-  if template_name == template_names.WorkEvents then
-    local note = Note.create {
-      title = user_title,
-      id = os.date "%Y-%m-%d-" .. userId,
-      dir = note_dir,
-      should_write = true,
-      template = template_name,
-    }
-    note:open()
+  local title
+  if template_name == template_names.WorkOncallShift then
+    title = vim.fn.input { prompt = template_name .. " Oncall rotation name: " }
   else
-    local note = Note.create {
-      title = user_title,
-      id = userId,
-      dir = note_dir,
-      should_write = true,
-      template = template_name,
-    }
-    note:open()
+    title = vim.fn.input { prompt = template_name .. " title: " }
   end
+  if not title or title == "" then
+    vim.notify("Note title cannot be empty", vim.log.levels.WARN)
+    return
+  end
+
+  local camel_case_title = camelCaseTitle(title)
+  local new_note_id
+
+  if template_name == template_names.WorkEvents then
+    new_note_id = os.date "%Y-%m-%d-" .. camel_case_title
+  elseif template_name == template_names.WorkOncallShift then
+    new_note_id =
+      camelCaseTitle("on-call-" .. camel_case_title .. os.date "%Y-%m-%d-")
+  else
+    new_note_id = camel_case_title
+  end
+
+  local note = Note.create {
+    title = title,
+    id = new_note_id,
+    dir = note_dir,
+    should_write = true,
+    template = template_name,
+  }
+
+  note:open()
 end
 
 return {
   "obsidian-nvim/obsidian.nvim",
-  commit = "1fe447897213357af9e56c97e31f6f696429deaa",
   dependencies = {
     "nvim-lua/plenary.nvim",
   },
   keys = {
-    {
-      "<leader>ot",
-      "<cmd> Obsidian today <CR>",
-      desc = "Open today's note",
-    },
-    {
-      "<leader>oy",
-      "<cmd> Obsidian yesterday <CR>",
-      desc = "Open yesterday's note",
-    },
     {
       "<leader>osn",
       "<cmd> Obsidian search <CR>",
       desc = "Obsidian search notes",
     },
     { "<leader>ost", "<cmd> Obsidian tags <CR>", desc = "Search for tags" },
-    {
-      "<leader>oq",
-      "<cmd> Obsidian quick_switch <CR>",
-      desc = "Quick switch to different note",
-    },
     {
       "<leader>oo",
       "<cmd> Obsidian open <CR>",
@@ -243,6 +225,26 @@ return {
       "<leader>obl",
       "<cmd> Obsidian backlinks <CR>",
       desc = "Open backlinks of current note",
+    },
+    {
+      "<leader>ot",
+      function()
+        create_obsidian_note(
+          directories.WorkTask,
+          template_names.WorkOncallTask
+        )
+      end,
+      desc = "Create new OnCall Work Task",
+    },
+    {
+      "<leader>onws",
+      function()
+        create_obsidian_note(
+          directories.WorkOncallShift,
+          template_names.WorkOncallShift
+        )
+      end,
+      desc = "Create new OnCall Work Shift",
     },
     {
       "<leader>onwt",
@@ -289,16 +291,6 @@ return {
       desc = "Create new Work Event",
     },
     {
-      "<leader>onws",
-      function()
-        create_obsidian_note(
-          directories.WorkResearch,
-          template_names.WorkProjectScoping
-        )
-      end,
-      desc = "Create new Work Project Scope",
-    },
-    {
       "<leader>onpd",
       function()
         create_obsidian_note(
@@ -329,40 +321,16 @@ return {
     {
       "<leader>ocwt",
       function()
-        local notes =
-          get_incomplete_notes_by_tags { "Work/IH/task", "Work/IH/project" }
+        local notes = get_incomplete_notes_by_tags {
+          "Work/IH/task",
+          "Work/IH/project",
+          "Work/IH/initiative",
+          "Work/platform-research",
+          "Work/categorize",
+        }
         display_note_picker(notes, "Chose the Work Task to open")
       end,
       desc = "Open current Work tasks",
-    },
-    {
-      "<leader>ocwi",
-      function()
-        local initiatives =
-          get_incomplete_notes_by_document_type(document_types.initiative)
-        display_note_picker(initiatives, "Pick initiative to open")
-      end,
-      desc = "Open current Work initiatives",
-    },
-    {
-      "<leader>ocws",
-      function()
-        local stale_notes = get_notes_by_tags { "Work/categorize" }
-        display_note_picker(stale_notes, "Pick stale note")
-      end,
-      desc = "Open current Work items that are stale",
-    },
-    {
-      "<leader>ocwr",
-      function()
-        local research_documents =
-          get_incomplete_notes_by_document_type(document_types.research)
-        display_note_picker(
-          research_documents,
-          "Pick research document to open"
-        )
-      end,
-      desc = "Open current Work Research",
     },
     {
       "<leader>ocps",
@@ -531,6 +499,13 @@ return {
                 return vim.fn.input {
                   prompt = "Research Topic: ",
                 }
+              end,
+              week = function()
+                local now = os.time()
+                local future = now + (7 * 24 * 60 * 60)
+                local current_str = os.date("%Y-%m-%d", now)
+                local future_str = os.date("%Y-%m-%d", future)
+                return current_str .. " - " .. future_str
               end,
             },
           },

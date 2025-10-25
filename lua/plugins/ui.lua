@@ -83,18 +83,22 @@ return {
   },
   {
     "folke/tokyonight.nvim",
-    lazy = false,
     priority = 1000,
+    config = function()
+      vim.cmd.colorscheme "tokyonight"
+    end,
   },
   {
+    lazy = true,
+    "neanias/everforest-nvim",
+  },
+  {
+    lazy = true,
+    "e-ink-colorscheme/e-ink.nvim",
+  },
+  {
+    lazy = true,
     "cdmill/neomodern.nvim",
-    config = function()
-      require("neomodern").setup {
-        theme = "roseprime",
-        show_eob = false,
-      }
-      require("neomodern").load()
-    end,
   },
   {
     "rktjmp/lush.nvim",
@@ -103,7 +107,7 @@ return {
   },
   {
     "folke/noice.nvim",
-    event = "UIEnter",
+    event = "VeryLazy",
     opts = {
       lsp = {
         signature = { enabled = false },
