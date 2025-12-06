@@ -330,8 +330,15 @@ return {
       bufferline.setup {
         options = {
           name_formatter = function(buf)
-            return vim.b[buf.bufnr] and vim.b[buf.bufnr].obsidian_alias
+            local name = vim.b[buf.bufnr] and vim.b[buf.bufnr].obsidian_alias
               or buf.name
+            local devicons = require "nvim-web-devicons"
+            local icon, _ =
+              devicons.get_icon(buf.name, buf.extension, { default = true })
+            if icon then
+              name = name .. " " .. icon
+            end
+            return name
           end,
           style_preset = bufferline.style_preset.default,
           themable = false,

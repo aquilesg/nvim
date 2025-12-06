@@ -1,6 +1,5 @@
 local ensure_installed_local = {
   "bash-language-server",
-  "basedpyright",
   "black",
   "buf",
   "clangd",
@@ -21,6 +20,7 @@ local ensure_installed_local = {
   "marksman",
   "prettier",
   "proselint",
+  "pyright",
   "ruff",
   "shellcheck",
   "shfmt",
@@ -159,7 +159,6 @@ return {
 
       local opts = {
         on_attach = on_attach,
-        capabilities = require("blink.cmp").get_lsp_capabilities({}, true),
       }
 
       require("mason").setup()
@@ -171,9 +170,6 @@ return {
             schemaStore = {
               url = "https://platform-api.us-east-1.uat.grnds.com/api/json/catalog.json",
               enable = os.getenv "AWS_USERNAME" ~= nil,
-            },
-            ghDash = {
-              url = "https://dlvhdr.github.io/gh-dash/configuration/gh-dash/schema.json",
             },
           },
         },

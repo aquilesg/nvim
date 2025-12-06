@@ -23,6 +23,20 @@ return {
       end,
       desc = "LSP Symbols",
     },
+    {
+      "<leader>gp",
+      function()
+        Snacks.picker.gh_pr()
+      end,
+      desc = "GitHub Pull Requests (open)",
+    },
+    {
+      "<leader>gP",
+      function()
+        Snacks.picker.gh_pr { state = "all" }
+      end,
+      desc = "GitHub Pull Requests (all)",
+    },
   },
   opts = {
     image = {},
@@ -30,6 +44,7 @@ return {
       only_scope = true,
     },
     scroll = {},
+    gh = {},
     quickfile = { enabled = true },
     dashboard = {
       enabled = true,

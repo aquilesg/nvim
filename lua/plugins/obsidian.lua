@@ -87,13 +87,14 @@ local function display_note_picker(note_table, prompt, opts)
         results = note_table,
         entry_maker = function(note)
           local doc_type = note:get_field "document_type"
+          local note_status = note:get_field(front_matter_fields.status)
           if type(doc_type) == "table" then
             doc_type = vim.inspect(doc_type)
           end
           doc_type = doc_type or ""
           local display = note:display_name()
           if doc_type ~= "" then
-            display = display .. " (" .. doc_type .. ")"
+            display = display .. " (" .. doc_type .. ") -> " .. note_status
           end
           return {
             value = note,
@@ -539,6 +540,8 @@ return {
     follow_url_func = function(url)
       vim.fn.jobstart { "open", url }
     end,
-    disable_frontmatter = true,
+    frontmatter = {
+      enabled = false,
+    },
   },
 }

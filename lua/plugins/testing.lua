@@ -31,7 +31,6 @@ return {
           },
         },
       },
-      "mfussenegger/nvim-dap-python",
     },
     keys = {
       {
@@ -52,7 +51,6 @@ return {
     end,
   },
   {
-    lazy = true,
     "nvim-neotest/neotest",
     dependencies = {
       "nvim-neotest/nvim-nio",
@@ -63,18 +61,25 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "jbyuki/one-small-step-for-vimkind",
     },
+    ft = { "python", "go" },
     version = "*",
     config = function()
       require("neotest").setup {
+        log_level = vim.log.levels.DEBUG,
         adapters = {
-          require "neotest-python" {
+          require("neotest-python")({
             dap = { justMyCode = false },
-          },
-          require "neotest-go" {
+            args = { "--log-level", "DEBUG", "-vv" },
+          }),
+          require("neotest-go")({
             dap = {
               args = { "-gcflags=all=-N -l" },
             },
-          },
+            experimental = {
+              test_table = true,
+            },
+            args = { "-v", "-race", "-count=1" },
+          }),
         },
       }
 
@@ -116,9 +121,43 @@ return {
       {
         "<leader>nr",
         function()
-          require("neotest").run.run()
+          local neotest = require("neotest")
+          local pos = neotest.run.get_tree_from_args()
+          if pos then
+            neotest.run.run()
+          else
+            vim.notify("No test found at cursor position", vim.log.levels.WARN)
+          end
         end,
         desc = "Neotest Run nearest test",
+      },
+      {
+        "<leader>nF",
+        function()
+          require("neotest").run.run(vim.fn.expand "%")
+        end,
+        desc = "Neotest Run all tests in file",
+      },
+      {
+        "<leader>nf",
+        function()
+          -- Get the function name under cursor and run it
+          local neotest = require("neotest")
+          local tree = neotest.run.get_tree_from_args()
+          if tree then
+            local pos = tree:data()
+            -- If we're at a namespace/file, run the whole file
+            if pos.type == "file" or pos.type == "dir" then
+              neotest.run.run(vim.fn.expand "%")
+            else
+              -- Run the nearest test (function)
+              neotest.run.run()
+            end
+          else
+            vim.notify("No test found", vim.log.levels.WARN)
+          end
+        end,
+        desc = "Neotest Run nearest test/file intelligently",
       },
       {
         "<leader>nd",
@@ -147,6 +186,13 @@ return {
           require("neotest").summary.toggle()
         end,
         desc = "Neotest open summary",
+      },
+      {
+        "<leader>nl",
+        function()
+          vim.cmd("edit " .. vim.fn.stdpath("log") .. "/neotest.log")
+        end,
+        desc = "Open neotest log",
       },
     },
   },

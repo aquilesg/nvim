@@ -122,8 +122,10 @@ return {
         python = { "black", "ruff" },
         bash = { "shfmt" },
         java = { "google-java-format" },
+        javascript = { "prettier" },
         json = { "jq" },
         markdown = { "doctoc", "markdownlint" },
+        typescript = { "ts-standard" },
         yaml = { "yamlfmt" },
       },
       formatters = {
@@ -180,7 +182,7 @@ return {
   {
     "mrjones2014/smart-splits.nvim",
     build = "./kitty/install-kittens.bash",
-    lazy = false,
+    event = "VeryLazy",
     keys = {
       {
         "<A-h>",

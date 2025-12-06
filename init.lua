@@ -24,6 +24,7 @@ vim.opt.list = true
 
 -- Window options
 vim.wo.number = true
+vim.wo.relativenumber = true
 
 -- Clipboard (set globally)
 vim.opt.clipboard = "unnamed"
