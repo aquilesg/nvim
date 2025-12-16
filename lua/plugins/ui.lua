@@ -72,10 +72,12 @@ return {
     event = "VeryLazy",
     opts = {
       set_dark_mode = function()
+        vim.cmd.colorscheme "ciapre"
         vim.api.nvim_set_option_value("background", "dark", {})
         reload_ui()
       end,
       set_light_mode = function()
+        vim.cmd.colorscheme "lighty"
         vim.api.nvim_set_option_value("background", "light", {})
         reload_ui()
       end,
@@ -83,10 +85,7 @@ return {
   },
   {
     "folke/tokyonight.nvim",
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme "tokyonight"
-    end,
+    lazy = true,
   },
   {
     lazy = true,
@@ -101,6 +100,7 @@ return {
     "cdmill/neomodern.nvim",
   },
   {
+    lazy = false,
     "rktjmp/lush.nvim",
     { dir = "~/Repos/ciapre/", lazy = true },
     { dir = "~/Repos/lighty/", lazy = true },
@@ -496,16 +496,6 @@ return {
         },
       }
     end,
-  },
-  {
-    "3rd/image.nvim",
-    ft = "markdown",
-    build = false,
-    opts = {
-      processor = "magick_cli",
-      integrations = {
-        markdown = { enabled = false },
-      },
-    },
+    branch = "master",
   },
 }
