@@ -55,3 +55,22 @@ vim.api.nvim_create_autocmd("UILeave", {
     io.write "\027]111\027\\"
   end,
 })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {
+    "go",
+    "lua",
+    "python",
+    "bash",
+    "markdown",
+    "yaml",
+    "json",
+    "terraform",
+    "hcl",
+    "rust",
+    "javascript",
+  },
+  callback = function()
+    vim.treesitter.start()
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  end,
+})

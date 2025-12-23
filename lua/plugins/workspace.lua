@@ -164,11 +164,6 @@ return {
     opts = {},
   },
   {
-    "windwp/nvim-autopairs",
-    event = "VeryLazy",
-    opts = {},
-  },
-  {
     "mistricky/codesnap.nvim",
     build = "make",
     cmd = { "CodeSnap", "CodeSnapSave", "CodeSnapASCII" },
@@ -262,7 +257,7 @@ return {
     "shortcuts/no-neck-pain.nvim",
     keys = {
       {
-        "<leader>nn",
+        "<leader>4",
         function()
           require("no-neck-pain").toggle()
         end,

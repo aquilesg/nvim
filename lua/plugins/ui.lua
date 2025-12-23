@@ -488,14 +488,24 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
+    lazy = false,
     config = function()
-      require("nvim-treesitter.configs").setup {
-        auto_install = true,
-        highlight = {
-          enable = true,
-        },
-      }
+      require("nvim-treesitter")
+        .install({
+          "go",
+          "lua",
+          "python",
+          "bash",
+          "markdown",
+          "yaml",
+          "json",
+          "terraform",
+          "hcl",
+          "rust",
+          "javascript",
+        })
+        :wait(300000)
     end,
-    branch = "master",
+    build = ":TSUpdate",
   },
 }

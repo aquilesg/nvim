@@ -1,3 +1,10 @@
+-- Autocommand to close test windows
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "neotest*",
+  callback = function()
+    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = true, silent = true })
+  end,
+})
 return {
   {
     "miroshQa/debugmaster.nvim",
@@ -52,147 +59,153 @@ return {
   },
   {
     "nvim-neotest/neotest",
+    event = "VeryLazy",
     dependencies = {
       "nvim-neotest/nvim-nio",
-      "nvim-neotest/neotest-python",
-      "nvim-neotest/neotest-go",
       "nvim-lua/plenary.nvim",
       "antoinemadec/FixCursorHold.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "jbyuki/one-small-step-for-vimkind",
+      { "nvim-treesitter/nvim-treesitter", branch = "main" },
+
+      "nvim-neotest/neotest-plenary",
+      "nvim-neotest/neotest-vim-test",
+
+      {
+        "fredrikaverpil/neotest-golang",
+        version = "*",
+        dependencies = {
+          {
+            "leoluz/nvim-dap-go",
+            opts = {},
+          },
+        },
+      },
     },
-    ft = { "python", "go" },
-    version = "*",
-    config = function()
-      require("neotest").setup {
-        log_level = vim.log.levels.DEBUG,
-        adapters = {
-          require("neotest-python")({
-            dap = { justMyCode = false },
-            args = { "--log-level", "DEBUG", "-vv" },
-          }),
-          require("neotest-go")({
-            dap = {
-              args = { "-gcflags=all=-N -l" },
-            },
-            experimental = {
-              test_table = true,
-            },
-            args = { "-v", "-race", "-count=1" },
-          }),
+    opts = function(_, opts)
+      opts.adapters = opts.adapters or {}
+      opts.adapters["neotest-golang"] = {
+        go_test_args = {
+          "-v",
+          "-race",
+          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
         },
       }
+    end,
+    config = function(_, opts)
+      if opts.adapters then
+        local adapters = {}
+        for name, config in pairs(opts.adapters or {}) do
+          if type(name) == "number" then
+            if type(config) == "string" then
+              config = require(config)
+            end
+            adapters[#adapters + 1] = config
+          elseif config ~= false then
+            local adapter = require(name)
+            if type(config) == "table" and not vim.tbl_isempty(config) then
+              local meta = getmetatable(adapter)
+              if adapter.setup then
+                adapter.setup(config)
+              elseif adapter.adapter then
+                adapter.adapter(config)
+                adapter = adapter.adapter
+              elseif meta and meta.__call then
+                adapter(config)
+              else
+                error("Adapter " .. name .. " does not support setup")
+              end
+            end
+            adapters[#adapters + 1] = adapter
+          end
+        end
+        opts.adapters = adapters
+      end
 
-      -- Setup commands to make quitting easier
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "neotest-summary",
-        callback = function(ev)
-          vim.keymap.set("n", "q", function()
-            require("neotest").summary.toggle()
-          end, {
-            buffer = ev.buf,
-            silent = true,
-            desc = "Close neotest summary",
-          })
-        end,
-      })
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "neotest-output",
-        callback = function(ev)
-          vim.keymap.set("n", "q", ":bdelete!<CR>", {
-            buffer = ev.buf,
-            silent = true,
-            desc = "Close neotest output",
-          })
-        end,
-      })
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "neotest-output-panel",
-        callback = function(ev)
-          vim.keymap.set("n", "q", ":bdelete!<CR>", {
-            buffer = ev.buf,
-            silent = true,
-            desc = "Close neotest output",
-          })
-        end,
-      })
+      require("neotest").setup(opts)
     end,
     keys = {
       {
-        "<leader>nr",
+        "<leader>na",
         function()
-          local neotest = require("neotest")
-          local pos = neotest.run.get_tree_from_args()
-          if pos then
-            neotest.run.run()
-          else
-            vim.notify("No test found at cursor position", vim.log.levels.WARN)
-          end
+          require("neotest").run.attach()
         end,
-        desc = "Neotest Run nearest test",
-      },
-      {
-        "<leader>nF",
-        function()
-          require("neotest").run.run(vim.fn.expand "%")
-        end,
-        desc = "Neotest Run all tests in file",
+        desc = "[n]eotest [a]ttach",
       },
       {
         "<leader>nf",
         function()
-          -- Get the function name under cursor and run it
-          local neotest = require("neotest")
-          local tree = neotest.run.get_tree_from_args()
-          if tree then
-            local pos = tree:data()
-            -- If we're at a namespace/file, run the whole file
-            if pos.type == "file" or pos.type == "dir" then
-              neotest.run.run(vim.fn.expand "%")
-            else
-              -- Run the nearest test (function)
-              neotest.run.run()
-            end
-          else
-            vim.notify("No test found", vim.log.levels.WARN)
-          end
+          require("neotest").run.run(vim.fn.expand "%")
         end,
-        desc = "Neotest Run nearest test/file intelligently",
+        desc = "[n]eotest run [f]ile",
       },
       {
-        "<leader>nd",
+        "<leader>nA",
         function()
-          require("neotest").run.run { strategy = "dap" }
+          require("neotest").run.run(vim.uv.cwd())
         end,
-        desc = "Neotest Debug nearest test",
+        desc = "[n]eotest [A]ll files",
       },
       {
-        "<leader>nw",
+        "<leader>nS",
         function()
-          require("neotest").watch.watch()
+          require("neotest").run.run { suite = true }
         end,
-        desc = "Neotest watch test",
+        desc = "[n]eotest [S]uite",
       },
       {
-        "<leader>no",
+        "<leader>nn",
         function()
-          require("neotest").output.open { enter = true }
+          require("neotest").run.run()
         end,
-        desc = "Neotest open oputput",
+        desc = "[n]eotest [n]earest",
+      },
+      {
+        "<leader>nl",
+        function()
+          require("neotest").run.run_last()
+        end,
+        desc = "[n]eotest [l]ast",
       },
       {
         "<leader>ns",
         function()
           require("neotest").summary.toggle()
         end,
-        desc = "Neotest open summary",
+        desc = "[n]eotest [s]ummary",
       },
       {
-        "<leader>nl",
+        "<leader>no",
         function()
-          vim.cmd("edit " .. vim.fn.stdpath("log") .. "/neotest.log")
+          require("neotest").output.open { enter = true, auto_close = true }
         end,
-        desc = "Open neotest log",
+        desc = "[n]eotest [o]utput",
+      },
+      {
+        "<leader>nO",
+        function()
+          require("neotest").output_panel.toggle()
+        end,
+        desc = "[n]eotest [O]utput panel",
+      },
+      {
+        "<leader>nt",
+        function()
+          require("neotest").run.stop()
+        end,
+        desc = "[n]eotest [t]erminate",
+      },
+      {
+        "<leader>nd",
+        function()
+          require("neotest").run.run { suite = false, strategy = "dap" }
+        end,
+        desc = "[n]eotest debug nearest test",
+      },
+      {
+        "<leader>nD",
+        function()
+          require("neotest").run.run { vim.fn.expand "%", strategy = "dap" }
+        end,
+        desc = "[n]eotest debug current file",
       },
     },
   },
