@@ -168,40 +168,66 @@ local function get_incomplete_notes_by_tags(tags)
   return found_notes
 end
 
-local function create_obsidian_note(note_dir, template_name)
-  local Note = require "obsidian.Note"
-  local title
-  if template_name == template_names.WorkOncallShift then
-    title = vim.fn.input { prompt = template_name .. " Oncall rotation name: " }
+local function create_obsidian_note_with_options(opts)
+  local Note = require "obsidian.note"
+  local template_keys = {}
+  for k, _ in pairs(template_names) do
+    table.insert(template_keys, k)
+  end
+
+  local function create_for_choice(choice)
+    if not choice then
+      return
+    end
+    local user_title = vim.fn.input { prompt = choice .. " title: " }
+    if not user_title or user_title == "" then
+      vim.notify("Note title cannot be empty", vim.log.levels.WARN)
+      return
+    end
+    local userID = camelCaseTitle(user_title)
+    local new_note = Note.create {
+      verbatim = true,
+      id = userID,
+      dir = directories[choice],
+      template = template_names[choice],
+      should_write = true,
+    }
+    if opts and opts.insert_link then
+      local text = " [[" .. userID .. "|" .. user_title .. "]]"
+      local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+      local current_line = vim.api.nvim_get_current_line()
+      local new_line = string.sub(current_line, 1, col)
+        .. text
+        .. string.sub(current_line, col + 1)
+      vim.api.nvim_set_current_line(new_line)
+      vim.api.nvim_win_set_cursor(0, { row, col + #text })
+    end
+    new_note:open {}
+  end
+
+  if opts and opts.prompt_for_type then
+    vim.ui.select(template_keys, {
+      prompt = "Document Type",
+    }, create_for_choice)
   else
-    title = vim.fn.input { prompt = template_name .. " title: " }
+    -- If type is provided directly
+    create_for_choice(opts.template_type)
   end
-  if not title or title == "" then
-    vim.notify("Note title cannot be empty", vim.log.levels.WARN)
-    return
+end
+
+local function create_obsidian_note(_, template_name)
+  -- Find the key for the template_name
+  local template_type
+  for k, v in pairs(template_names) do
+    if v == template_name then
+      template_type = k
+      break
+    end
   end
-
-  local camel_case_title = camelCaseTitle(title)
-  local new_note_id
-
-  if template_name == template_names.WorkEvents then
-    new_note_id = os.date "%Y-%m-%d-" .. camel_case_title
-  elseif template_name == template_names.WorkOncallShift then
-    new_note_id =
-      camelCaseTitle("on-call-" .. camel_case_title .. os.date "%Y-%m-%d-")
-  else
-    new_note_id = camel_case_title
-  end
-
-  local note = Note.create {
-    title = title,
-    id = new_note_id,
-    dir = note_dir,
-    should_write = true,
-    template = template_name,
+  create_obsidian_note_with_options {
+    template_type = template_type,
+    prompt_for_type = false,
   }
-
-  note:open()
 end
 
 return {
@@ -433,43 +459,10 @@ return {
     {
       "<leader>oid",
       function()
-        local template_keys = {}
-        for k, _ in pairs(template_names) do
-          table.insert(template_keys, k)
-        end
-        vim.ui.select(template_keys, {
-          prompt = "Document Type",
-        }, function(choice)
-          if not choice then
-            return
-          end
-
-          local Note = require "obsidian.note"
-          local user_title = vim.fn.input { prompt = choice .. " title: " }
-          if not user_title then
-            return
-          end
-          local userID = camelCaseTitle(user_title)
-          ---@type obsidian.Note
-          local new_note = Note.create {
-            title = user_title,
-            id = userID,
-            dir = directories[choice],
-            template = template_names[choice],
-            should_write = true,
-          }
-
-          local text = " [[" .. userID .. "|" .. user_title .. "]]"
-          local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-          local current_line = vim.api.nvim_get_current_line()
-          local new_line = string.sub(current_line, 1, col)
-            .. text
-            .. string.sub(current_line, col + 1)
-          vim.api.nvim_set_current_line(new_line)
-          vim.api.nvim_win_set_cursor(0, { row, col + #text })
-
-          new_note:open {}
-        end)
+        create_obsidian_note_with_options {
+          insert_link = true,
+          prompt_for_type = true,
+        }
       end,
       mode = { "n" },
       desc = "Insert Link to Document",
@@ -523,7 +516,6 @@ return {
     callbacks = {
       ---@param note obsidian.Note
       enter_note = function(note)
-        -- Name the buffer so I can find it easily
         local aliases = note.aliases
         if aliases and #aliases > 0 then
           local shortest = aliases[1]
@@ -535,15 +527,24 @@ return {
           local bufnr = note.bufnr or vim.api.nvim_get_current_buf()
           vim.b.obsidian_alias = bufnr .. " 󱓟 " .. shortest
         end
+
+        vim.ui.open = (function(overridden)
+          return function(uri, opt)
+            if vim.endswith(uri, ".png") then
+              vim.cmd("edit " .. uri)
+              return
+            elseif vim.endswith(uri, ".pdf") then
+              opt = { cmd = { "zathura" } }
+            end
+            return overridden(uri, opt)
+          end
+        end)(vim.ui.open)
       end,
     },
     open_notes_in = "vsplit",
     suppress_missing_scope = {
       projects_v2 = true,
     },
-    follow_url_func = function(url)
-      vim.fn.jobstart { "open", url }
-    end,
     frontmatter = {
       enabled = false,
     },
