@@ -91,9 +91,9 @@ autocmd({ "BufRead", "BufNewFile" }, {
 autocmd({ "BufRead", "BufNewFile" }, {
   pattern = {
     "*.yaml.ansible",
-    "*/playbooks/*.yml",
-    "*/roles/*.yml",
-    "*/inventory/*.yml",
+    "**/playbooks/**/*.yaml",
+    "*/roles/*.yaml",
+    "*/inventory/*.yaml",
   },
   group = ansible_group,
   callback = function()
