@@ -272,32 +272,19 @@ return {
     opts = {},
     config = function()
       require("jira").setup {
-        -- Jira connection settings
         jira = {
-          base = "https://includedhealth.atlassian.net", -- Base URL of your Jira instance
-          email = "aquiles.gomez@includedhealth.com", -- Your Jira email (Optional for PAT)
-          token = os.getenv "JIRA_API_TOKEN" or "", -- Fallback to empty string if not set
-          type = "basic", -- Authentication type: "basic" (default) or "pat"
-          limit = 200, -- Global limit of tasks per view (default: 200)
+          base = "https://includedhealth.atlassian.net",
+          email = "aquiles.gomez@includedhealth.com",
+          token = os.getenv "JIRA_API_TOKEN" or "",
+          type = "basic",
+          limit = 200,
         },
-
-        -- Saved JQL queries for the JQL tab
-        -- Use %s as a placeholder for the project key
         queries = {
-          ["Next sprint"] = "project = '%s' AND sprint in futureSprints() ORDER BY Rank ASC",
-          ["Backlog"] = "project = '%s' AND (issuetype IN standardIssueTypes() OR issuetype = Sub-task) AND (sprint IS EMPTY OR sprint NOT IN openSprints()) AND statusCategory != Done ORDER BY Rank ASC",
-          ["My Tasks"] = "assignee = currentUser() AND statusCategory != Done ORDER BY updated DESC",
+          ["My Tasks"] = "assignee = currentUser() AND resolution = Unresolved order by updated DESC",
         },
 
-        -- Project-specific overrides
-        -- Still think about this config, maybe not good enough
         projects = {
-          ["DEV"] = {
-            story_point_field = "customfield_10035", -- Custom field ID for story points
-            custom_fields = { -- Custom field to display in markdown view
-              { key = "customfield_10016", label = "Acceptance Criteria" },
-            },
-          },
+          ["CLOUD"] = {},
         },
       }
     end,

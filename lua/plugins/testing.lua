@@ -38,6 +38,28 @@ return {
           },
         },
       },
+      {
+        "mfussenegger/nvim-dap-python",
+        config = function()
+          local cwd = vim.fn.getcwd()
+          local venv_paths =
+            { cwd .. "/venv/bin/python", cwd .. "/.venv/bin/python" }
+          local python_path = nil
+
+          for _, path in ipairs(venv_paths) do
+            if vim.fn.filereadable(path) == 1 then
+              python_path = path
+              break
+            end
+          end
+
+          if python_path then
+            require("dap-python").setup(python_path)
+          else
+            require("dap-python").setup "python"
+          end
+        end,
+      },
     },
     keys = {
       {
@@ -59,25 +81,27 @@ return {
   },
   {
     "nvim-neotest/neotest",
-    event = "VeryLazy",
     dependencies = {
       "nvim-neotest/nvim-nio",
       "nvim-lua/plenary.nvim",
       "antoinemadec/FixCursorHold.nvim",
-      { "nvim-treesitter/nvim-treesitter", branch = "main" },
-
       "nvim-neotest/neotest-plenary",
       "nvim-neotest/neotest-vim-test",
-
+      {
+        "nvim-treesitter/nvim-treesitter",
+        branch = "main",
+      },
       {
         "fredrikaverpil/neotest-golang",
         version = "*",
         dependencies = {
           {
             "leoluz/nvim-dap-go",
-            opts = {},
           },
         },
+      },
+      {
+        "nvim-neotest/neotest-python",
       },
     },
     opts = function(_, opts)
@@ -89,6 +113,7 @@ return {
           "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
         },
       }
+      opts.adapters["neotest-python"] = {}
     end,
     config = function(_, opts)
       if opts.adapters then
