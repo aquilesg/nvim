@@ -269,6 +269,7 @@ return {
   },
   {
     "letieu/jira.nvim",
+    enabled = (os.getenv "JIRA_API_TOKEN" or "") ~= "",
     opts = {},
     config = function()
       require("jira").setup {
