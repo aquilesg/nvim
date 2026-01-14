@@ -42,6 +42,10 @@ return {
     image = {},
     indent = {
       only_scope = true,
+      chunk = {
+        enabled = true,
+        only_current = true,
+      },
     },
     scroll = {},
     gh = {},
