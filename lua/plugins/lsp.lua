@@ -1,6 +1,5 @@
 local ensure_installed_local = {
   "bash-language-server",
-  "black",
   "buf",
   "clangd",
   "docker-compose-language-service",
@@ -12,6 +11,7 @@ local ensure_installed_local = {
   "graphql-language-service-cli",
   "harper-ls",
   "html-lsp",
+  "jedi-language-server",
   "jdtls",
   "jq",
   "json-lsp",
@@ -20,7 +20,6 @@ local ensure_installed_local = {
   "marksman",
   "prettier",
   "proselint",
-  "pyright",
   "ruff",
   "shellcheck",
   "shfmt",
