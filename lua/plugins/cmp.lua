@@ -126,7 +126,7 @@ return {
             name = "Ripgrep",
             score_offset = -10,
             opts = {
-              prefix_min_len = 5,
+              prefix_min_len = 2,
             },
             transform_items = function(_, items)
               local CompletionItemKind =

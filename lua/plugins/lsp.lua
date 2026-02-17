@@ -111,49 +111,34 @@ return {
     opts = {},
     config = function()
       local on_attach = function(_, _)
+        local trouble = require "trouble"
         local map = vim.keymap.set
-        map(
-          "n",
-          "K",
-          "<cmd> Lspsaga hover_doc <CR>",
-          { desc = "Show hover doc" }
-        )
-        map(
-          "n",
-          "gr",
-          "<cmd> Lspsaga finder <CR>",
-          { desc = "Find references" }
-        )
-        map(
-          "n",
-          "gd",
-          "<cmd> Lspsaga goto_definition <CR>",
-          { desc = "Go to definition" }
-        )
-        map(
-          "n",
-          "<leader>pd",
-          "<cmd> Lspsaga peek_definition <CR>",
-          { desc = "Peek definition" }
-        )
-        map(
-          "n",
-          "<leader>pD",
-          "<cmd> Lspsaga peek_type_definition <CR>",
-          { desc = "Peek type definition" }
-        )
-        map(
-          "n",
-          "<leader>ra",
-          "<cmd> Lspsaga rename <CR>",
-          { desc = "Lsp outline" }
-        )
+        map("n", "K", vim.lsp.buf.hover, { desc = "Show hover doc" })
+        map("n", "go", function()
+          trouble.toggle "lsp_document_symbols"
+        end, { desc = "Find references" })
+        map("n", "gr", function()
+          trouble.toggle "lsp_references"
+        end, { desc = "Find references" })
+        map("n", "gd", function()
+          trouble.toggle "lsp_definitions"
+        end, { desc = "Go to definition" })
+        map("n", "<leader>pd", function()
+          trouble.toggle "lsp_definitions"
+        end, { desc = "Peek definition" })
+        map("n", "<leader>pD", function()
+          trouble.toggle "lsp_type_definitions"
+        end, { desc = "Peek type definition" })
+        map("n", "<leader>ra", vim.lsp.buf.rename, { desc = "Rename symbol" })
         map(
           "n",
           "ca",
           require("actions-preview").code_actions,
           { desc = "Show code actions" }
         )
+        map("n", "cd", function()
+          trouble.toggle "diagnostics"
+        end, { desc = "Show diagnostics" })
       end
 
       local opts = {
@@ -181,19 +166,6 @@ return {
     opts = {
       { path = "snacks.nvim", words = { "Snacks" } },
       { path = "lazy.nvim", words = { "LazyVim" } },
-    },
-  },
-  {
-    "nvimdev/lspsaga.nvim",
-    event = "LspAttach",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-tree/nvim-web-devicons",
-    },
-    opts = {
-      lightbulb = {
-        sign = false,
-      },
     },
   },
   {
@@ -243,5 +215,13 @@ return {
         group = nvim_metals_group,
       })
     end,
+  },
+  {
+    "Bekaboo/dropbar.nvim",
+    dependencies = {
+      "nvim-telescope/telescope-fzf-native.nvim",
+      build = "make",
+    },
+    opts = {},
   },
 }

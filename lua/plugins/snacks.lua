@@ -16,27 +16,6 @@ return {
       end,
       desc = "Colorschemes",
     },
-    {
-      "<leader>go",
-      function()
-        require("snacks").picker.lsp_symbols()
-      end,
-      desc = "LSP Symbols",
-    },
-    {
-      "<leader>gp",
-      function()
-        Snacks.picker.gh_pr()
-      end,
-      desc = "GitHub Pull Requests (open)",
-    },
-    {
-      "<leader>gP",
-      function()
-        Snacks.picker.gh_pr { state = "all" }
-      end,
-      desc = "GitHub Pull Requests (all)",
-    },
   },
   opts = {
     image = {},

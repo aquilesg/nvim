@@ -261,6 +261,7 @@ return {
         function()
           require("no-neck-pain").toggle()
         end,
+        desc = "Trigger No Neck Pain",
       },
     },
     opts = {
@@ -280,8 +281,11 @@ return {
           type = "basic",
           limit = 200,
         },
+        active_sprint_query = "assignee = currentUser() AND resolution = Unresolved order by updated DESC",
         queries = {
-          ["My Tasks"] = "assignee = currentUser() AND resolution = Unresolved order by updated DESC",
+          ["On Call Tickets"] = "labels IN (cloud-platform-triage-need-sort, cloud-platform-triage-documentation, cloud-platform-triage-ongoing-issue, cloud-platform-triage-bug, cloud-platform-triage-feature-request, cloud-platform-triage-other) AND project = CLOUD AND created >= -1w ORDER BY created DESC",
+          ["Created By Me Within Last Week"] = "reporter = currentUser() AND created >= -1w ORDER BY created DESC",
+          ["Created By Me Unresolved"] = "reporter = currentUser() AND resolution = Unresolved ORDER BY created DESC",
         },
 
         projects = {
@@ -289,5 +293,12 @@ return {
         },
       }
     end,
+    keys = {
+      {
+        "<leader>jt",
+        "<cmd> Jira Cloud <CR>",
+        desc = "Open Jira Tickets",
+      },
+    },
   },
 }
