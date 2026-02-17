@@ -171,31 +171,21 @@ return {
   },
   {
     "folke/trouble.nvim",
-    keys = {
-      {
-        "<leader>vD",
-        "<cmd>Trouble diagnostics toggle<cr>",
-        desc = "Diagnostics (Trouble)",
-      },
-      {
-        "<leader>vd",
-        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-        desc = "Buffer Diagnostics (Trouble)",
-      },
-      {
-        "<leader>vt",
-        "<cmd>Trouble todo<cr>",
-        desc = "View todos",
-      },
-    },
+    event = "LspAttach",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
+      auto_close = true,
+      focus = true,
+      win = {
+        type = "float",
+        border = "rounded",
+      },
       modes = {
+        lsp_base = {
+          focus = true,
+        },
         symbols = {
           focus = true,
-          win = {
-            type = "float",
-          },
         },
       },
     },
@@ -467,6 +457,20 @@ return {
               return require("noice").api.status.mode.has()
             end,
             color = { gui = "bold" },
+          },
+          {
+            function()
+              local ft = vim.bo.filetype
+              if ft == "toggleterm" then
+                local num = vim.b.toggle_number or ""
+                return "terminal (" .. num .. ")"
+              end
+              return ""
+            end,
+            cond = function()
+              return vim.bo.filetype == "toggleterm"
+            end,
+            icon = "",
           },
         },
       },

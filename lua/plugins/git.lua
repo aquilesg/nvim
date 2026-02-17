@@ -1,5 +1,17 @@
 vim.treesitter.language.register("markdown", "octo")
 
+-- Autocommands to close DiffView if I press q
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "DiffviewFiles", "DiffviewFileHistory" },
+  callback = function()
+    if next(require("diffview.lib").views) == nil then
+      vim.cmd "DiffviewOpen"
+    else
+      vim.cmd "DiffviewClose"
+    end
+  end,
+})
+
 return {
   {
     "lewis6991/gitsigns.nvim",
@@ -156,9 +168,7 @@ return {
       "nvim-telescope/telescope.nvim",
       "nvim-tree/nvim-web-devicons",
     },
-    opts = {
-      users = "assignable",
-    },
+    opts = {},
   },
   {
     {
@@ -177,19 +187,6 @@ return {
       "DiffviewRefresh",
       "DiffviewFileHistory",
     },
-    keys = {
-      {
-        "<leader>dvv",
-        function()
-          if next(require("diffview.lib").views) == nil then
-            vim.cmd "DiffviewOpen"
-          else
-            vim.cmd "DiffviewClose"
-          end
-        end,
-        desc = "Toggle Diffview",
-      },
-    },
     opts = {
       view = {
         merge_tool = {
@@ -202,7 +199,7 @@ return {
     "FabijanZulj/blame.nvim",
     keys = {
       {
-        "<leader>ge",
+        "<leader>bt",
         "<cmd> BlameToggle <CR>",
         desc = "Toggle git blame",
       },
@@ -226,13 +223,13 @@ return {
     opts = {},
     keys = {
       {
-        "<leader>gy",
+        "<leader>y",
         "<cmd>GitLink<cr>",
         mode = { "n", "v" },
         desc = "Yank git link",
       },
       {
-        "<leader>gY",
+        "<leader>Y",
         "<cmd>GitLink!<cr>",
         mode = { "n", "v" },
         desc = "Open git link",
