@@ -1,43 +1,50 @@
-# export STARSHIP_CONFIG=~/.config/nvim/starship_config.toml
-command_timeout=1000
+command_timeout = 1000
+
+"$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[░▒▓](#a3aed2)\
-[  ](bg:#a3aed2 fg:#090c0c)\
-[](bg:#769ff0 fg:#a3aed2)\
+[](#9A348E)\
+$os\
+$username\
+[](bg:#DA627D fg:#9A348E)\
 $directory\
-[](fg:#769ff0 bg:#394260)\
+[](fg:#DA627D bg:#FCA17D)\
 $git_branch\
 $git_status\
-[](fg:#394260 bg:#212736)\
-$nodejs\
-$rust\
-$golang\
-$php\
-$aws\
+[](fg:#FCA17D bg:#86BBD8)\
 $env_var\
-[](fg:#212736 bg:#1d2230)\
+$c\
+$elixir\
+$elm\
+$golang\
+$gradle\
+$haskell\
+$java\
+$julia\
+$nodejs\
+$nim\
+$rust\
+$scala\
+[](fg:#86BBD8 bg:#06969A)\
+$docker_context\
+[](fg:#06969A bg:#33658A)\
 $time\
-[ ](fg:#1d2230)\
-\n$character"""
+[](fg:#33658A)\
+"""
 
-[aws]
-symbol = "󰸏"
-style = "fg:#769ff0 bg:#212736"
-format = '[ $symbol ($profile)(\($region\))]($style)'
+[username]
+show_always = true
+style_user = "bg:#9A348E"
+style_root = "bg:#9A348E"
+format = '[$user ]($style)'
+disabled = false
 
-[env_var.AWS_ENVIRONMENT]
-variable = "AWS_ENVIRONMENT"
-style = "fg:#769ff0 bg:#212736"
-format = "[$symbol $env_value]($style)"
-
-[env_var.AWS_ENVIRONMENT_ROLE_NAME]
-variable = "AWS_ROLE_NAME"
-style = "fg:#769ff0 bg:#212736"
-format = "[$symbol $env_value]($style)"
+[os]
+style = "bg:#9A348E"
+disabled = true
 
 [directory]
-style = "fg:#e3e5e5 bg:#769ff0"
+style = "bg:#DA627D"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -48,37 +55,108 @@ truncation_symbol = "…/"
 "Music" = " "
 "Pictures" = " "
 
+[aws]
+symbol = "󰸏"
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($profile)(\($region\))]($style)'
+
+[env_var.AWS_ENVIRONMENT]
+variable = "AWS_ENVIRONMENT"
+symbol = "󰸏 "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = "[ $symbol $env_value ]($style)"
+
+[env_var.AWS_ENVIRONMENT_ROLE_NAME]
+variable = "AWS_ROLE_NAME"
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = "[ $symbol $env_value ]($style)"
+
+[c]
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[cpp]
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[docker_context]
+symbol = " "
+style = "fg:#ffffff bg:#06969A"
+format = '[ $symbol $context ]($style)'
+
+[elixir]
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[elm]
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
 [git_branch]
 symbol = ""
-style = "bg:#394260"
-format = '[[ $symbol $branch ](fg:#769ff0 bg:#394260)]($style)'
+style = "fg:#1a1a2e bg:#FCA17D"
+format = '[ $symbol $branch ]($style)'
 
 [git_status]
-style = "bg:#394260"
-format = '[[($all_status$ahead_behind )](fg:#769ff0 bg:#394260)]($style)'
+style = "fg:#1a1a2e bg:#FCA17D"
+format = '[$all_status$ahead_behind ]($style)'
+
+[golang]
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[gradle]
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[haskell]
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[java]
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[julia]
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
 
 [nodejs]
 symbol = ""
-style = "bg:#212736"
-format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
 
-[rust]
-symbol = ""
-style = "bg:#212736"
-format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
-
-[golang]
-symbol = ""
-style = "bg:#212736"
-format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+[nim]
+symbol = "󰆥 "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
 
 [php]
 symbol = ""
-style = "bg:#212736"
-format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[scala]
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
 
 [time]
 disabled = false
-time_format = "%R" # Hour:Minute Format
-style = "bg:#1d2230"
-format = '[[  $time ](fg:#a0a9cb bg:#1d2230)]($style)'
+time_format = "%R"
+style = "fg:#ffffff bg:#33658A"
+format = '[  $time ]($style)'
