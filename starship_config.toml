@@ -29,7 +29,8 @@ $scala\
 $docker_context\
 [](fg:#06969A bg:#33658A)\
 $time\
-[](fg:#33658A)\
+[](fg:#33658A)
+$character
 """
 
 [username]
