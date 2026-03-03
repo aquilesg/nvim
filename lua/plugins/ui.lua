@@ -177,8 +177,15 @@ return {
       auto_close = true,
       focus = true,
       win = {
-        type = "float",
-        border = "rounded",
+        type = "split",
+        position = "left",
+        size = 0.35,
+      },
+      preview = {
+        type = "split",
+        relative = "win",
+        position = "right",
+        size = 0.6,
       },
       modes = {
         lsp_base = {

@@ -1,17 +1,5 @@
 vim.treesitter.language.register("markdown", "octo")
 
--- Autocommands to close DiffView if I press q
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "DiffviewFiles", "DiffviewFileHistory" },
-  callback = function()
-    if next(require("diffview.lib").views) == nil then
-      vim.cmd "DiffviewOpen"
-    else
-      vim.cmd "DiffviewClose"
-    end
-  end,
-})
-
 return {
   {
     "lewis6991/gitsigns.nvim",

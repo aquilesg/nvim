@@ -191,6 +191,7 @@ local function create_obsidian_note_with_options(opts)
       dir = directories[choice],
       template = template_names[choice],
       should_write = true,
+      aliases = { user_title },
     }
     if opts and opts.insert_link then
       local text = " [[" .. userID .. "|" .. user_title .. "]]"

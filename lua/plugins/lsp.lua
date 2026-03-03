@@ -32,6 +32,37 @@ local ensure_installed_local = {
   "yamlfmt",
 }
 
+local function on_attach(_, _)
+  local trouble = require "trouble"
+  local map = vim.keymap.set
+  map("n", "K", vim.lsp.buf.hover, { desc = "Show hover doc" })
+  map("n", "go", function()
+    trouble.toggle "lsp_document_symbols"
+  end, { desc = "Find references" })
+  map("n", "gr", function()
+    trouble.toggle "lsp_references"
+  end, { desc = "Find references" })
+  map("n", "gd", function()
+    trouble.toggle "lsp_definitions"
+  end, { desc = "Go to definition" })
+  map("n", "<leader>pd", function()
+    trouble.toggle "lsp_definitions"
+  end, { desc = "Peek definition" })
+  map("n", "<leader>pD", function()
+    trouble.toggle "lsp_type_definitions"
+  end, { desc = "Peek type definition" })
+  map("n", "<leader>ra", vim.lsp.buf.rename, { desc = "Rename symbol" })
+  map(
+    "n",
+    "ca",
+    require("actions-preview").code_actions,
+    { desc = "Show code actions" }
+  )
+  map("n", "cd", function()
+    trouble.toggle "diagnostics"
+  end, { desc = "Show diagnostics" })
+end
+
 vim.api.nvim_create_user_command("MasonInstallAll", function()
   local registry = require "mason-registry"
   for _, pkg in ipairs(ensure_installed_local) do
@@ -230,6 +261,8 @@ return {
       metals_config.settings = {
         serverVersion = "0.11.12",
       }
+
+      metals_config.on_attach = on_attach
       return metals_config
     end,
     config = function(self, metals_config)
