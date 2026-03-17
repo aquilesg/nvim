@@ -100,6 +100,11 @@ return {
     "cdmill/neomodern.nvim",
   },
   {
+    lazy = true,
+    "catppuccin/nvim",
+    name = "catppuccin",
+  },
+  {
     lazy = false,
     "rktjmp/lush.nvim",
     { dir = "~/Repos/ciapre/", lazy = true },

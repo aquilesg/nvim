@@ -97,9 +97,9 @@ return {
         desc = "Send currently selected visual section",
         mode = "v",
       },
-      -- Backup for obsidian
+      -- Backup for Obsidian
       {
-        "<leader>tB",
+        "<leader>tb",
         function()
           local Terminal = require("toggleterm.terminal").Terminal
           local git = Terminal:new {
@@ -146,6 +146,74 @@ return {
         "<leader>tP",
         '<cmd> TermExec cmd="aws-environment production platform --region us-west-2" name="Production West Terminal" <CR>',
         desc = "Toggle Production terminal in West Region",
+      },
+      -- Diff files with git-diff
+      {
+        "<leader>tD",
+        function()
+          vim.ui.input({
+            prompt = "Enter first file path: ",
+            completion = "file",
+          }, function(input1)
+            if not input1 then
+              print "No first file selected."
+              return
+            end
+            vim.ui.input({
+              prompt = "Enter second file path: ",
+              completion = "file",
+            }, function(input2)
+              if not input2 then
+                print "No second file selected."
+                return
+              end
+              local Terminal = require("toggleterm.terminal").Terminal
+              local diff_command = Terminal:new {
+                cmd = "bash -c "
+                  .. vim.fn.shellescape(
+                    "delta --side-by-side "
+                      .. vim.fn.shellescape(input1)
+                      .. " "
+                      .. vim.fn.shellescape(input2)
+                      .. "; read -n 1 -s -r -p 'Press any key to close...'"
+                  ),
+                display_name = "Diff View Terminal",
+                direction = "float",
+                close_on_exit = true,
+              }
+              diff_command:toggle()
+            end)
+          end)
+        end,
+        desc = "Diff two files with git-diff",
+      },
+      {
+        "<leader>tS",
+        function()
+          local Terminal = require("toggleterm.terminal").Terminal
+          local aquariam = Terminal:new {
+            cmd = "asciiquarium",
+            display_name = "Screensaver",
+            direction = "float",
+            close_on_exit = true,
+          }
+          aquariam:toggle()
+        end,
+        desc = "Screensaver",
+      },
+      {
+        "<leader>tB",
+        function()
+          local Terminal = require("toggleterm.terminal").Terminal
+          local resources = Terminal:new {
+            cmd = "btop",
+            display_name = "Resource Usage",
+            direction = "float",
+            close_on_exit = true,
+          }
+          resources:toggle()
+        end,
+        desc = "Resource Usage",
       },
     },
   },

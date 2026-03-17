@@ -13,6 +13,7 @@ $git_branch\
 $git_status\
 [](fg:#FCA17D bg:#86BBD8)\
 $env_var\
+$python\
 $c\
 $elixir\
 $elm\
@@ -145,6 +146,11 @@ format = '[ $symbol ($version) ]($style)'
 symbol = ""
 style = "fg:#1a1a2e bg:#86BBD8"
 format = '[ $symbol ($version) ]($style)'
+
+[python]
+symbol = " "
+style = "fg:#1a1a2e bg:#86BBD8"
+format = '[ $symbol ($version) venv: ($virtualenv) ]($style)'
 
 [rust]
 symbol = ""

@@ -110,10 +110,24 @@ return {
         go_test_args = {
           "-v",
           "-race",
-          "-coverprofile=" .. vim.fn.getcwd() .. "/coverage.out",
         },
       }
-      opts.adapters["neotest-python"] = {}
+      opts.adapters["neotest-python"] = {
+        python = function()
+          local cwd = vim.fn.getcwd()
+          local venv_paths =
+            { cwd .. "/venv/bin/python", cwd .. "/.venv/bin/python" }
+          local python_path = nil
+
+          for _, path in ipairs(venv_paths) do
+            if vim.fn.filereadable(path) == 1 then
+              python_path = path
+              break
+            end
+          end
+          return python_path
+        end,
+      }
     end,
     config = function(_, opts)
       if opts.adapters then

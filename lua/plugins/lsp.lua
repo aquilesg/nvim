@@ -33,34 +33,34 @@ local ensure_installed_local = {
 }
 
 local function on_attach(_, _)
-  local trouble = require "trouble"
   local map = vim.keymap.set
-  map("n", "K", vim.lsp.buf.hover, { desc = "Show hover doc" })
-  map("n", "go", function()
-    trouble.toggle "lsp_document_symbols"
-  end, { desc = "Find references" })
-  map("n", "gr", function()
-    trouble.toggle "lsp_references"
-  end, { desc = "Find references" })
-  map("n", "gd", function()
-    trouble.toggle "lsp_definitions"
-  end, { desc = "Go to definition" })
-  map("n", "<leader>pd", function()
-    trouble.toggle "lsp_definitions"
-  end, { desc = "Peek definition" })
-  map("n", "<leader>pD", function()
-    trouble.toggle "lsp_type_definitions"
-  end, { desc = "Peek type definition" })
-  map("n", "<leader>ra", vim.lsp.buf.rename, { desc = "Rename symbol" })
+  map("n", "K", "<cmd> Lspsaga hover_doc <CR>", { desc = "Show hover doc" })
+  map("n", "gr", "<cmd> Lspsaga finder <CR>", { desc = "Find references" })
+  map(
+    "n",
+    "gd",
+    "<cmd> Lspsaga goto_definition <CR>",
+    { desc = "Go to definition" }
+  )
+  map(
+    "n",
+    "<leader>pd",
+    "<cmd> Lspsaga peek_definition <CR>",
+    { desc = "Peek definition" }
+  )
+  map(
+    "n",
+    "<leader>pD",
+    "<cmd> Lspsaga peek_type_definition <CR>",
+    { desc = "Peek type definition" }
+  )
+  map("n", "<leader>ra", "<cmd> Lspsaga rename <CR>", { desc = "Lsp outline" })
   map(
     "n",
     "ca",
     require("actions-preview").code_actions,
     { desc = "Show code actions" }
   )
-  map("n", "cd", function()
-    trouble.toggle "diagnostics"
-  end, { desc = "Show diagnostics" })
 end
 
 vim.api.nvim_create_user_command("MasonInstallAll", function()
@@ -141,52 +141,6 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     opts = {},
     config = function()
-      local on_attach = function(_, _)
-        local map = vim.keymap.set
-        map(
-          "n",
-          "K",
-          "<cmd> Lspsaga hover_doc <CR>",
-          { desc = "Show hover doc" }
-        )
-        map(
-          "n",
-          "gr",
-          "<cmd> Lspsaga finder <CR>",
-          { desc = "Find references" }
-        )
-        map(
-          "n",
-          "gd",
-          "<cmd> Lspsaga goto_definition <CR>",
-          { desc = "Go to definition" }
-        )
-        map(
-          "n",
-          "<leader>pd",
-          "<cmd> Lspsaga peek_definition <CR>",
-          { desc = "Peek definition" }
-        )
-        map(
-          "n",
-          "<leader>pD",
-          "<cmd> Lspsaga peek_type_definition <CR>",
-          { desc = "Peek type definition" }
-        )
-        map(
-          "n",
-          "<leader>ra",
-          "<cmd> Lspsaga rename <CR>",
-          { desc = "Lsp outline" }
-        )
-        map(
-          "n",
-          "ca",
-          require("actions-preview").code_actions,
-          { desc = "Show code actions" }
-        )
-      end
-
       local opts = {
         on_attach = on_attach,
       }
@@ -203,6 +157,12 @@ return {
             },
           },
         },
+      })
+      vim.lsp.config("dockerls", {
+        on_attach = function(client, bufnr)
+          client.server_capabilities.documentFormattingProvider = false
+          on_attach()
+        end,
       })
     end,
   },
@@ -247,12 +207,6 @@ return {
     },
   },
   {
-    "zeioth/garbage-day.nvim",
-    dependencies = "neovim/nvim-lspconfig",
-    event = "LspAttach",
-    opts = {},
-  },
-  {
     "scalameta/nvim-metals",
     ft = { "scala", "sbt" },
     opts = function()
@@ -262,7 +216,36 @@ return {
         serverVersion = "0.11.12",
       }
 
-      metals_config.on_attach = on_attach
+      metals_config.on_attach = function()
+        require("metals").setup_dap()
+        require("dap").configurations.scala = {
+          {
+            type = "scala",
+            request = "launch",
+            name = "Run or Test Target",
+            metals = {
+              runType = "runOrTestFile",
+            },
+          },
+          {
+            type = "scala",
+            request = "launch",
+            name = "Test Target",
+            metals = {
+              runType = "testTarget",
+            },
+          },
+          {
+            type = "scala",
+            request = "attach",
+            name = "Attach to Localhost",
+            hostName = "localhost",
+            port = 5005,
+            buildTarget = "root",
+          },
+        }
+        on_attach()
+      end
       return metals_config
     end,
     config = function(self, metals_config)

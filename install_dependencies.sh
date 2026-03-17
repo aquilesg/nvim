@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Brew dependencies
-dependencies=(pngpaste neovim lazygit gh imagemagick node coursier/formulas/coursier)
+dependencies=(pngpaste neovim lazygit gh imagemagick node coursier/formulas/coursier git-delta asciiquarium btop)
 
 # Iterate through list and then brew install each one
 for i in "${dependencies[@]}"; do
