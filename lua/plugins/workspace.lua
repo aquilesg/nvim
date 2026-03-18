@@ -1,4 +1,3 @@
--- Confrom Autocommands
 vim.api.nvim_create_user_command("Format", function(args)
   local range = nil
   if args.count ~= -1 then
@@ -11,7 +10,7 @@ vim.api.nvim_create_user_command("Format", function(args)
   end
   require("conform").format {
     async = true,
-    lsp_format = "fallback",
+    lsp_fallback = true,
     range = range,
   }
 end, { range = true })
@@ -164,17 +163,6 @@ return {
     opts = {},
   },
   {
-    "mistricky/codesnap.nvim",
-    build = "make",
-    cmd = { "CodeSnap", "CodeSnapSave", "CodeSnapASCII" },
-    opts = {
-      has_breadcrumbs = true,
-      has_line_number = true,
-      bg_theme = "peach",
-      watermark = "",
-    },
-  },
-  {
     "mrjones2014/smart-splits.nvim",
     build = "./kitty/install-kittens.bash",
     event = "VeryLazy",
@@ -281,7 +269,7 @@ return {
           type = "basic",
           limit = 200,
         },
-        active_sprint_query = "assignee = currentUser() AND resolution = Unresolved order by updated DESC",
+        active_sprint_query = 'project = CLOUD AND status NOT IN ("Won\'t Do", Done, Completed) AND sprint != empty AND "eng pod[labels]" = cloud-resiliency ORDER BY created DESC',
         queries = {
           ["On Call Tickets"] = "labels IN (cloud-platform-triage-need-sort, cloud-platform-triage-documentation, cloud-platform-triage-ongoing-issue, cloud-platform-triage-bug, cloud-platform-triage-feature-request, cloud-platform-triage-other) AND project = CLOUD AND created >= -1w ORDER BY created DESC",
           ["Created By Me Within Last Week"] = "reporter = currentUser() AND created >= -1w ORDER BY created DESC",
@@ -298,6 +286,37 @@ return {
         "<leader>jt",
         "<cmd> Jira Cloud <CR>",
         desc = "Open Jira Tickets",
+      },
+    },
+  },
+  {
+    event = "VeryLazy",
+    "stevearc/resession.nvim",
+    opts = {},
+    keys = {
+      {
+        "<leader>ss",
+        function()
+          local resession = require "resession"
+          resession.save_tab()
+        end,
+        desc = "Save Session",
+      },
+      {
+        "<leader>sl",
+        function()
+          local resession = require "resession"
+          resession.load()
+        end,
+        desc = "Load Session",
+      },
+      {
+        "<leader>sd",
+        function()
+          local resession = require "resession"
+          resession.delete()
+        end,
+        desc = "Delete Session",
       },
     },
   },

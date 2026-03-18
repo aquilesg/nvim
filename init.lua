@@ -31,7 +31,7 @@ vim.opt.clipboard = "unnamed"
 
 -- Diagnostics
 vim.diagnostic.config {
-  virtual_lines = true,
+  virtual_lines = false,
 }
 
 -- Disable netrw (for nvim-tree)

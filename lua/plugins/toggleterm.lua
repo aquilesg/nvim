@@ -151,6 +151,37 @@ return {
       {
         "<leader>tD",
         function()
+          local wins = vim.api.nvim_tabpage_list_wins(0)
+          local filepaths = {}
+
+          for _, win in ipairs(wins) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            local path = vim.api.nvim_buf_get_name(buf)
+            if path ~= "" then
+              table.insert(filepaths, path)
+            end
+          end
+
+          if #filepaths == 2 then
+            local Terminal = require("toggleterm.terminal").Terminal
+            local diff_command = Terminal:new {
+              cmd = "bash -c "
+                .. vim.fn.shellescape(
+                  "delta --side-by-side "
+                    .. vim.fn.shellescape(filepaths[1])
+                    .. " "
+                    .. vim.fn.shellescape(filepaths[2])
+                    .. "; read -n 1 -s -r -p 'Press any key to close...'"
+                ),
+              display_name = "Diff View Terminal",
+              direction = "float",
+              close_on_exit = true,
+            }
+            diff_command:toggle()
+            return
+          end
+
+          -- Fallback to manual input if not exactly two buffers
           vim.ui.input({
             prompt = "Enter first file path: ",
             completion = "file",

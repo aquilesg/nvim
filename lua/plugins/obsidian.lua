@@ -1,5 +1,6 @@
 local directories = {
   WorkTask = "Work/Tasks/",
+  WorkOncallTask = "Work/Tasks/",
   WorkDocument = "Work/Docs/",
   WorkResearch = "Work/Research/",
   WorkInitiative = "Work/Initiatives/",

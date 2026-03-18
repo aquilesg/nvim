@@ -58,7 +58,7 @@ local function on_attach(_, _)
   map(
     "n",
     "ca",
-    require("actions-preview").code_actions,
+    "<cmd> Lspsaga code_action <CR>",
     { desc = "Show code actions" }
   )
 end
@@ -188,25 +188,6 @@ return {
     },
   },
   {
-    "aznhe21/actions-preview.nvim",
-    event = "LspAttach",
-    opts = {
-      telescope = {
-        sorting_strategy = "ascending",
-        layout_strategy = "vertical",
-        layout_config = {
-          width = 0.8,
-          height = 0.9,
-          prompt_position = "top",
-          preview_cutoff = 20,
-          preview_height = function(_, _, max_lines)
-            return max_lines - 15
-          end,
-        },
-      },
-    },
-  },
-  {
     "scalameta/nvim-metals",
     ft = { "scala", "sbt" },
     opts = function()
@@ -259,5 +240,10 @@ return {
         group = nvim_metals_group,
       })
     end,
+  },
+  {
+    "dgagn/diagflow.nvim",
+    event = "LspAttach",
+    opts = {},
   },
 }
