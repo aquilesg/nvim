@@ -267,13 +267,28 @@ return {
           email = "aquiles.gomez@includedhealth.com",
           token = os.getenv "JIRA_API_TOKEN" or "",
           type = "basic",
-          limit = 200,
+          limit = 20,
         },
-        active_sprint_query = 'project = CLOUD AND status NOT IN ("Won\'t Do", Done, Completed) AND sprint != empty AND "eng pod[labels]" = cloud-resiliency ORDER BY created DESC',
+        active_sprint_query = [[
+          project = CLOUD
+          AND status NOT IN (Completed, Done, "Won't Do", Backlog, "In Sprint/Up Next")
+          AND sprint != empty
+          AND "eng pod[labels]" IN (cloud-observability, cloud-platform-infrastructure-risk-pod, cloud-data, cloud-resiliency, cloud-containerization, cloud-platform-operational-risk-pod) ORDER BY created DESC
+        ]],
         queries = {
-          ["On Call Tickets"] = "labels IN (cloud-platform-triage-need-sort, cloud-platform-triage-documentation, cloud-platform-triage-ongoing-issue, cloud-platform-triage-bug, cloud-platform-triage-feature-request, cloud-platform-triage-other) AND project = CLOUD AND created >= -1w ORDER BY created DESC",
-          ["Created By Me Within Last Week"] = "reporter = currentUser() AND created >= -1w ORDER BY created DESC",
-          ["Created By Me Unresolved"] = "reporter = currentUser() AND resolution = Unresolved ORDER BY created DESC",
+          ["On Call Tickets"] = [[ 
+            labels IN (cloud-platform-triage-need-sort, cloud-platform-triage-documentation, cloud-platform-triage-ongoing-issue, cloud-platform-triage-bug, cloud-platform-triage-feature-request, cloud-platform-triage-other)
+            AND project = CLOUD 
+            AND created >= -1w ORDER BY created DESC 
+          ]],
+          ["Created By Me Within Last Week"] = [[
+            reporter = currentUser() 
+            AND created >= -1w ORDER BY created DESC 
+          ]],
+          ["Created By Me Unresolved"] = [[
+            reporter = currentUser() 
+            AND resolution = Unresolved ORDER BY created DESC 
+            ]],
         },
 
         projects = {
