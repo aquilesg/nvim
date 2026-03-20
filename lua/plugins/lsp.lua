@@ -36,6 +36,7 @@ local function on_attach(_, _)
   local map = vim.keymap.set
   map("n", "K", "<cmd> Lspsaga hover_doc <CR>", { desc = "Show hover doc" })
   map("n", "gr", "<cmd> Lspsaga finder <CR>", { desc = "Find references" })
+  map("n", "gR", "<cmd> Lspsaga rename <CR>", { desc = "Lsp outline" })
   map(
     "n",
     "gd",
@@ -54,7 +55,6 @@ local function on_attach(_, _)
     "<cmd> Lspsaga peek_type_definition <CR>",
     { desc = "Peek type definition" }
   )
-  map("n", "<leader>ra", "<cmd> Lspsaga rename <CR>", { desc = "Lsp outline" })
   map(
     "n",
     "ca",
@@ -242,8 +242,9 @@ return {
     end,
   },
   {
-    "dgagn/diagflow.nvim",
-    event = "LspAttach",
+    "rachartier/tiny-inline-diagnostic.nvim",
+    event = "VeryLazy",
+    priority = 1000,
     opts = {},
   },
 }
