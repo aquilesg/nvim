@@ -9,10 +9,9 @@ return {
     "saghen/blink.cmp",
     dependencies = {
       "rafamadriz/friendly-snippets",
-      "obsidian-nvim/obsidian.nvim",
       "mikavilpas/blink-ripgrep.nvim",
-      "fang2hou/blink-copilot",
       "Kaiser-Yang/blink-cmp-git",
+      "aquilesg/obsidian",
     },
     event = "LspAttach",
     version = "*",
@@ -21,9 +20,6 @@ return {
     opts = {
       appearance = {
         kind_icons = {
-          Obsidian = " ",
-          Obsidian_tags = "󰜢 ",
-          Obsidian_new = "󰈔 ",
           RipGrep = "󱉶 ",
           Git = "󰊢 ",
           Text = "󰗧",
@@ -63,7 +59,7 @@ return {
         default = function()
           local success, node = pcall(vim.treesitter.get_node)
           if vim.bo.filetype == "lua" then
-            return { "lsp", "path", "lazydev", "copilot" }
+            return { "lsp", "path", "lazydev" }
           elseif
             success
             and node
@@ -88,16 +84,14 @@ return {
                 "path",
                 "ripgrep",
                 "path",
-                "copilot",
               }
             else
               return {
                 "buffer",
                 "path",
                 "ripgrep",
-                "obsidian",
-                "obsidian_new",
-                "obsidian_tags",
+                "obsidian_tags_body",
+                "obsidian_tags_frontmatter",
               }
             end
           elseif
@@ -111,7 +105,6 @@ return {
               "snippets",
               "buffer",
               "path",
-              "copilot",
             }
           end
         end,
@@ -142,76 +135,6 @@ return {
               return items
             end,
           },
-          obsidian = {
-            name = "obsidian",
-            module = "blink.compat.source",
-            score_offset = 10,
-            transform_items = function(_, items)
-              local CompletionItemKind =
-                require("blink.cmp.types").CompletionItemKind
-              local kind_idx = #CompletionItemKind + 1
-              CompletionItemKind[kind_idx] = "Obsidian"
-              for _, item in ipairs(items) do
-                item.kind = kind_idx
-                item.labelDetails = {
-                  description = "Obsidan",
-                }
-              end
-              return items
-            end,
-          },
-          obsidian_new = {
-            name = "obsidian_new",
-            module = "blink.compat.source",
-            score_offset = 10,
-            transform_items = function(_, items)
-              local CompletionItemKind =
-                require("blink.cmp.types").CompletionItemKind
-              local kind_idx = #CompletionItemKind + 1
-              CompletionItemKind[kind_idx] = "Obsidian_new"
-              for _, item in ipairs(items) do
-                item.kind = kind_idx
-                item.labelDetails = {
-                  description = "Obsidian",
-                }
-              end
-              return items
-            end,
-          },
-          obsidian_tags = {
-            name = "obsidian_tags",
-            module = "blink.compat.source",
-            score_offset = 10,
-            transform_items = function(_, items)
-              local CompletionItemKind =
-                require("blink.cmp.types").CompletionItemKind
-              local kind_idx = #CompletionItemKind + 1
-              CompletionItemKind[kind_idx] = "Obsidian_tags"
-              for _, item in ipairs(items) do
-                item.kind = kind_idx
-                item.labelDetails = {
-                  description = "VaultTag",
-                }
-              end
-              return items
-            end,
-          },
-          copilot = {
-            name = "copilot",
-            module = "blink-copilot",
-            score_offset = -10,
-            async = true,
-            transform_items = function(_, items)
-              local CompletionItemKind =
-                require("blink.cmp.types").CompletionItemKind
-              local kind_idx = #CompletionItemKind + 1
-              CompletionItemKind[kind_idx] = "Copilot"
-              for _, item in ipairs(items) do
-                item.kind = kind_idx
-              end
-              return items
-            end,
-          },
           git = {
             module = "blink-cmp-git",
             async = true,
@@ -230,6 +153,18 @@ return {
               end
               return items
             end,
+          },
+          -- Vault path from `require("obsidian").setup({ ... })` in `obsidian.lua`.
+          -- Two sources: body vs YAML frontmatter (shared tag cache in the plugin).
+          obsidian_tags_body = {
+            name = "Obsidian (body)",
+            module = "obsidian.cmp.tags_body",
+            opts = {},
+          },
+          obsidian_tags_frontmatter = {
+            name = "Obsidian (FM)",
+            module = "obsidian.cmp.tags_frontmatter",
+            opts = {},
           },
         },
       },

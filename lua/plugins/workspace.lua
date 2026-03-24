@@ -141,18 +141,6 @@ return {
     opts = {},
   },
   {
-    "MagicDuck/grug-far.nvim",
-    keys = {
-      {
-        "<leader>fr",
-        "<cmd> GrugFar <CR>",
-        desc = "Find and Replace",
-      },
-    },
-
-    opts = {},
-  },
-  {
     "Myzel394/easytables.nvim",
     cmd = { "EasyTablesCreateNew", "EasyTablesImportThisTable" },
     opts = {},
@@ -313,7 +301,7 @@ return {
         "<leader>ss",
         function()
           local resession = require "resession"
-          resession.save_tab()
+          resession.save()
         end,
         desc = "Save Session",
       },
