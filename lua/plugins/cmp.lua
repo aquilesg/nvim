@@ -90,6 +90,7 @@ return {
                 "buffer",
                 "path",
                 "ripgrep",
+                "obsidian_wiki_links",
                 "obsidian_tags_body",
                 "obsidian_tags_frontmatter",
               }
@@ -164,6 +165,12 @@ return {
           obsidian_tags_frontmatter = {
             name = "Obsidian (FM)",
             module = "obsidian.cmp.tags_frontmatter",
+            opts = {},
+          },
+          obsidian_wiki_links = {
+            name = "Obsidian (wiki)",
+            module = "obsidian.cmp.wiki_links",
+            score_offset = 4,
             opts = {},
           },
         },
