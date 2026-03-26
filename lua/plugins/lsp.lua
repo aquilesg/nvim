@@ -57,7 +57,7 @@ local function on_attach(_, _)
   )
   map(
     "n",
-    "ca",
+    "<leader>ca",
     "<cmd> Lspsaga code_action <CR>",
     { desc = "Show code actions" }
   )
@@ -161,6 +161,11 @@ return {
       vim.lsp.config("dockerls", {
         on_attach = function(client, bufnr)
           client.server_capabilities.documentFormattingProvider = false
+          on_attach()
+        end,
+      })
+      vim.lsp.config("marksman", {
+        on_attach = function(client, bufnr)
           on_attach()
         end,
       })

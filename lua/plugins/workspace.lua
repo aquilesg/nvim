@@ -301,6 +301,13 @@ return {
         "<leader>ss",
         function()
           local resession = require "resession"
+          local bufnr = vim.api.nvim_get_current_buf()
+          local clients = vim.lsp.get_clients { bufnr = bufnr }
+
+          for _, client in ipairs(clients) do
+            vim.lsp.stop_client(client.id, true)
+          end
+
           resession.save()
         end,
         desc = "Save Session",
@@ -310,6 +317,13 @@ return {
         function()
           local resession = require "resession"
           resession.load()
+          for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+            if
+              vim.api.nvim_buf_is_loaded(bufnr) and vim.bo[bufnr].buflisted
+            then
+              vim.api.nvim_exec_autocmds("FileType", { buffer = bufnr })
+            end
+          end
         end,
         desc = "Load Session",
       },

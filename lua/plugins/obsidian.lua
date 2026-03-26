@@ -232,7 +232,7 @@ return {
     dependencies = { "MagicDuck/grug-far.nvim" },
     keys = {
       {
-        "<leader>osn",
+        "<leader>osv",
         function()
           require("grug-far").open {
             prefills = { paths = obsidian_vault },
@@ -262,7 +262,7 @@ return {
         desc = "Open links of current note",
       },
       {
-        "<leader>obl",
+        "<leader>ob",
         function()
           require("obsidian.search").FindBacklinks()
         end,
@@ -346,6 +346,13 @@ return {
         end,
         desc = "Open currently active tasks",
       },
+      {
+        "<leader>oct",
+        function()
+          require("obsidian.note").UpdateNoteTask()
+        end,
+        desc = "Open current note tasks",
+      },
       -- Status change
       {
         "<leader>omc",
@@ -387,20 +394,37 @@ return {
             },
           }
           update_note_properties(props)
-          require("obsidian.note").UpdateListProperty(note_properties.tags, {
-            exclude = note_status.active_tag,
-          })
         end,
         desc = "Mark complete",
       },
       {
         "<leader>omi",
         function()
+          local rel = require("obsidian.util").get_relative_path(
+            vim.api.nvim_buf_get_name(0),
+            obsidian_vault
+          )
+          local note_tags = require("obsidian.note").GetNoteProperties(rel, {
+            note_properties.tags,
+          })
+          local tag_list = note_tags[note_properties.tags] or {}
+          if type(tag_list) == "string" then
+            tag_list = { tag_list }
+          end
+          local tags_new = vim.list_extend({}, tag_list)
+          if not vim.tbl_contains(tags_new, note_status.active_tag) then
+            table.insert(tags_new, note_status.active_tag)
+          end
           local props = {
             {
               name = note_properties.status,
               value = note_status.in_progress,
               type = "text",
+            },
+            {
+              name = note_properties.tags,
+              value = tags_new,
+              type = "list",
             },
           }
           update_note_properties(props)
@@ -532,6 +556,8 @@ return {
       obsidian_vault_dir = obsidian_vault,
       template_dir = template_dir_name,
       obsidian_cli = "/opt/homebrew/bin/obsidian",
+      -- Normal mode [[wiki]] follow (see `obsidian.wiki_follow` in the plugin)
+      wiki_follow = true,
     },
   },
 }
