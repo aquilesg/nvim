@@ -50,17 +50,6 @@ local note_status = {
   blocked = "blocked",
 }
 
-local function camelCaseTitle(title)
-  local result = title:gsub("^%s*(.-)%s*$", "%1"):gsub("%s+", " ")
-  result = result:gsub('[/\\%*%?%:"<>|]', "")
-  result = result
-    :gsub("(%a)([%w_']*)", function(first, rest)
-      return first:upper() .. rest:lower()
-    end)
-    :gsub("%s+", "")
-  return result
-end
-
 local function update_note_properties(properties)
   vim.api.nvim_buf_call(vim.api.nvim_get_current_buf(), function()
     vim.api.nvim_command "write"
@@ -75,69 +64,6 @@ local function update_note_properties(properties)
 
   require("obsidian.note").UpdateNoteProperties(properties, rel_filepath)
   vim.api.nvim_command "edit!"
-end
-
-local function create_obsidian_note_with_options(opts)
-  local Note = require "obsidian.note"
-  local template_keys = {}
-  for k, _ in pairs(template_names) do
-    table.insert(template_keys, k)
-  end
-
-  local function create_for_choice(choice)
-    if not choice then
-      return
-    end
-    local user_title = vim.fn.input { prompt = choice .. " title: " }
-    if not user_title or user_title == "" then
-      vim.notify("Note title cannot be empty", vim.log.levels.WARN)
-      return
-    end
-    local userID = camelCaseTitle(user_title)
-    if opts and opts.insert_link then
-      local text = " [[" .. userID .. "|" .. user_title .. "]]"
-      local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-      local current_line = vim.api.nvim_get_current_line()
-      local new_line = string.sub(current_line, 1, col)
-        .. text
-        .. string.sub(current_line, col + 1)
-      vim.api.nvim_set_current_line(new_line)
-      vim.api.nvim_win_set_cursor(0, { row, col + #text })
-    end
-    local _, _ = Note.createNoteFromTemplate {
-      fileName = userID,
-      path = directories[choice],
-      templateName = template_names[choice],
-      templateVariables = {
-        id = userID,
-        title = user_title,
-      },
-    }
-  end
-
-  if opts and opts.prompt_for_type then
-    vim.ui.select(template_keys, {
-      prompt = "Document Type",
-    }, create_for_choice)
-  else
-    -- If type is provided directly
-    create_for_choice(opts.template_type)
-  end
-end
-
-local function create_obsidian_note(template_name)
-  -- Find the key for the template_name
-  local template_type
-  for k, v in pairs(template_names) do
-    if v == template_name then
-      template_type = k
-      break
-    end
-  end
-  create_obsidian_note_with_options {
-    template_type = template_type,
-    prompt_for_type = false,
-  }
 end
 
 return {
@@ -196,70 +122,70 @@ return {
       {
         "<leader>ot",
         function()
-          create_obsidian_note(template_names.WorkOncallTask)
+          require("obsidian.note_creation").create_for_type("WorkOncallTask")
         end,
         desc = "Create new OnCall Work Task",
       },
       {
         "<leader>onws",
         function()
-          create_obsidian_note(template_names.WorkOncallShift)
+          require("obsidian.note_creation").create_for_type("WorkOncallShift")
         end,
         desc = "Create new OnCall Work Shift",
       },
       {
         "<leader>onwt",
         function()
-          create_obsidian_note(template_names.WorkTask)
+          require("obsidian.note_creation").create_for_type("WorkTask")
         end,
         desc = "Create new Work Task",
       },
       {
         "<leader>onwd",
         function()
-          create_obsidian_note(template_names.WorkDocument)
+          require("obsidian.note_creation").create_for_type("WorkDocument")
         end,
         desc = "Create new Work Document",
       },
       {
         "<leader>onwr",
         function()
-          create_obsidian_note(template_names.WorkResearch)
+          require("obsidian.note_creation").create_for_type("WorkResearch")
         end,
         desc = "Create new Work Research Document",
       },
       {
         "<leader>onwi",
         function()
-          create_obsidian_note(template_names.WorkInitiative)
+          require("obsidian.note_creation").create_for_type("WorkInitiative")
         end,
         desc = "Create new Work Initiative",
       },
       {
         "<leader>onwe",
         function()
-          create_obsidian_note(template_names.WorkEvents)
+          require("obsidian.note_creation").create_for_type("WorkEvents")
         end,
         desc = "Create new Work Event",
       },
       {
         "<leader>onpd",
         function()
-          create_obsidian_note(template_names.PersonalDocument)
+          require("obsidian.note_creation").create_for_type("PersonalDocument")
         end,
         desc = "Create New Personal Document",
       },
       {
         "<leader>onpr",
         function()
-          create_obsidian_note(template_names.PersonalResearchDocument)
+          require("obsidian.note_creation").create_for_type("PersonalResearchDocument")
         end,
         desc = "Create New Personal ResearchDocument",
       },
       {
         "<leader>onr",
         function()
-          create_obsidian_note(template_names.Recipe)
+          require("obsidian.note_creation").create_for_type("Recipe")
         end,
         desc = "Create New Recipe Document",
       },
@@ -443,7 +369,7 @@ return {
       {
         "<leader>oid",
         function()
-          create_obsidian_note_with_options {
+          require("obsidian.note_creation").create_with_options {
             insert_link = true,
             prompt_for_type = true,
           }
@@ -458,6 +384,9 @@ return {
       obsidian_cli = "/opt/homebrew/bin/obsidian",
       -- Normal mode [[wiki]] follow (see `obsidian.wiki_follow` in the plugin)
       wiki_follow = true,
+      directories = directories,
+      template_names = template_names,
+      note_properties = note_properties,
     },
   },
 }
