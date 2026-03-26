@@ -4,10 +4,12 @@ local template_dir_name = "Templates"
 local note_properties = {
   pr_link = "pr_link",
   projects = "projects",
+  contexts = "contexts",
   status = "status",
   tags = "tags",
   document_type = "document_type",
   id = "id",
+  blocked_reason = "blockedBy",
 }
 
 local directories = {
@@ -404,14 +406,11 @@ return {
             vim.api.nvim_buf_get_name(0),
             obsidian_vault
           )
-          local note_tags = require("obsidian.note").GetNoteProperties(rel, {
-            note_properties.tags,
-          })
-          local tag_list = note_tags[note_properties.tags] or {}
-          if type(tag_list) == "string" then
-            tag_list = { tag_list }
-          end
-          local tags_new = vim.list_extend({}, tag_list)
+          local NP = require("obsidian.note_properties")
+          local tags_new = vim.list_extend(
+            {},
+            NP.get_string_list_property(rel, note_properties.tags)
+          )
           if not vim.tbl_contains(tags_new, note_status.active_tag) then
             table.insert(tags_new, note_status.active_tag)
           end
@@ -455,27 +454,30 @@ return {
         desc = "Mark document abandoned",
       },
       {
-        -- TODO: it'd be nice if this automatically backlinked
         "<leader>omb",
         function()
           vim.ui.input({
             prompt = "Why is this blocked? (Link ticket if available)",
           }, function(response)
-            local props = {
+            local rel = require("obsidian.util").get_relative_path(
+              vim.api.nvim_buf_get_name(0),
+              obsidian_vault
+            )
+            local props = require("obsidian.note_properties").properties_for_mark_blocked(
+              rel,
+              response,
               {
-                name = note_properties.status,
-                value = note_status.blocked,
-                type = "text",
-              },
-              {
-                name = "blocked_reason",
-                value = response,
-                type = "text",
-              },
-            }
-            update_note_properties(props)
+                blocked_property = note_properties.blocked_reason,
+                status_property = note_properties.status,
+                status_value = note_status.blocked,
+              }
+            )
+            if props then
+              update_note_properties(props)
+            end
           end)
         end,
+        desc = "Mark document blocked",
       },
       {
         "<leader>omr",
@@ -495,18 +497,17 @@ return {
               return
             end
 
-            local existing = require("obsidian.note").GetNoteProperties(
-              require("obsidian.util").get_relative_path(
-                vim.api.nvim_buf_get_name(0),
-                obsidian_vault
-              ),
-              { note_properties.pr_link }
+            local rel = require("obsidian.util").get_relative_path(
+              vim.api.nvim_buf_get_name(0),
+              obsidian_vault
             )
-
-            local pr_links = existing[note_properties.pr_link] or {}
-            if type(pr_links) == "string" then
-              pr_links = { pr_links }
-            end
+            local pr_links = vim.list_extend(
+              {},
+              require("obsidian.note_properties").get_string_list_property(
+                rel,
+                note_properties.pr_link
+              )
+            )
             table.insert(pr_links, response)
 
             local props = {
