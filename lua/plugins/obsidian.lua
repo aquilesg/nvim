@@ -50,16 +50,6 @@ local note_status = {
   blocked = "blocked",
 }
 
-local function to_str(val)
-  if type(val) == "table" then
-    return vim.inspect(val)
-  elseif val == nil then
-    return "N/A"
-  else
-    return tostring(val)
-  end
-end
-
 local function camelCaseTitle(title)
   local result = title:gsub("^%s*(.-)%s*$", "%1"):gsub("%s+", " ")
   result = result:gsub('[/\\%*%?%:"<>|]', "")
@@ -148,73 +138,6 @@ local function create_obsidian_note(template_name)
     template_type = template_type,
     prompt_for_type = false,
   }
-end
-
---- Finds active notes then displays picker with prompt
-local function find_active_notes_with_tags_picker()
-  local search = require "obsidian.search"
-  local noteAPI = require "obsidian.note"
-  local pickers = require "telescope.pickers"
-  local finders = require "telescope.finders"
-  local actions = require "telescope.actions"
-  local action_state = require "telescope.actions.state"
-  local conf = require("telescope.config").values
-
-  local active_notes = search.FindByTags { "active" }
-  if not active_notes or vim.tbl_isempty(active_notes) then
-    vim.notify("No active notes found", vim.log.levels.INFO)
-    return
-  end
-
-  local display_notes = {}
-
-  for _, note_path in ipairs(active_notes) do
-    if not string.find(note_path, template_dir_name) then
-      local properties = noteAPI.GetNoteProperties(note_path, {
-        note_properties.status,
-        note_properties.document_type,
-        note_properties.id,
-      })
-
-      local id = to_str(properties[note_properties.id])
-      local doc_type = to_str(properties[note_properties.document_type])
-      local status = to_str(properties[note_properties.status])
-
-      table.insert(display_notes, {
-        display = string.format("%s -> %s -> %s", id, doc_type, status),
-        ordinal = id .. " " .. doc_type .. " " .. status,
-        path = obsidian_vault .. "/" .. note_path,
-      })
-    end
-  end
-
-  pickers
-    .new({}, {
-      prompt_title = "Active Notes",
-      finder = finders.new_table {
-        results = display_notes,
-        entry_maker = function(entry)
-          return {
-            value = entry,
-            display = entry.display,
-            ordinal = entry.ordinal,
-            path = entry.path,
-          }
-        end,
-      },
-      sorter = conf.generic_sorter {},
-      attach_mappings = function(prompt_bufnr, map)
-        actions.select_default:replace(function()
-          actions.close(prompt_bufnr)
-          local selection = action_state.get_selected_entry()
-          if selection and selection.path then
-            vim.cmd("edit " .. vim.fn.fnameescape(selection.path))
-          end
-        end)
-        return true
-      end,
-    })
-    :find()
 end
 
 return {
@@ -344,7 +267,16 @@ return {
       {
         "<leader>ocn",
         function()
-          find_active_notes_with_tags_picker()
+          require("obsidian.active_notes").open_picker {
+            vault = obsidian_vault,
+            template_dir_name = template_dir_name,
+            tag = "active",
+            property_keys = {
+              status = note_properties.status,
+              document_type = note_properties.document_type,
+              id = note_properties.id,
+            },
+          }
         end,
         desc = "Open currently active tasks",
       },
@@ -359,42 +291,19 @@ return {
       {
         "<leader>omc",
         function()
-          local note_tags = require("obsidian.note").GetNoteProperties(
-            require("obsidian.util").get_relative_path(
-              vim.api.nvim_buf_get_name(0),
-              obsidian_vault
-            ),
-            { note_properties.tags }
+          local rel = require("obsidian.util").get_relative_path(
+            vim.api.nvim_buf_get_name(0),
+            obsidian_vault
           )
-
-          local filtered_tags = {}
-          local tag_list = note_tags[note_properties.tags] or {}
-          for _, tag in ipairs(tag_list) do
-            if tag ~= "active" then
-              table.insert(filtered_tags, tag)
-            end
-          end
-
-          -- Join the remaining tags with a comma
-          local tags_string = table.concat(filtered_tags, ",")
-          vim.notify(tags_string, vim.log.levels.INFO)
-          local props = {
+          local props = require("obsidian.note_properties").properties_for_mark_complete(
+            rel,
             {
-              name = "completedDate",
-              value = os.date "%Y-%m-%d",
-              type = "date",
-            },
-            {
-              name = note_properties.status,
-              value = note_status.complete,
-              type = "text",
-            },
-            {
-              name = note_properties.tags,
-              value = filtered_tags,
-              type = "list",
-            },
-          }
+              tags_key = note_properties.tags,
+              status_key = note_properties.status,
+              status_complete = note_status.complete,
+              exclude_tag = note_status.active_tag,
+            }
+          )
           update_note_properties(props)
         end,
         desc = "Mark complete",
@@ -406,26 +315,16 @@ return {
             vim.api.nvim_buf_get_name(0),
             obsidian_vault
           )
-          local NP = require("obsidian.note_properties")
-          local tags_new = vim.list_extend(
-            {},
-            NP.get_string_list_property(rel, note_properties.tags)
-          )
-          if not vim.tbl_contains(tags_new, note_status.active_tag) then
-            table.insert(tags_new, note_status.active_tag)
-          end
-          local props = {
-            {
-              name = note_properties.status,
-              value = note_status.in_progress,
-              type = "text",
-            },
-            {
-              name = note_properties.tags,
-              value = tags_new,
-              type = "list",
-            },
-          }
+          local props =
+            require("obsidian.note_properties").properties_for_mark_in_progress(
+              rel,
+              {
+                tags_key = note_properties.tags,
+                status_key = note_properties.status,
+                status_in_progress = note_status.in_progress,
+                active_tag = note_status.active_tag,
+              }
+            )
           update_note_properties(props)
         end,
         desc = "Mark document in progress",
