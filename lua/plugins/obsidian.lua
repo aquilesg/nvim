@@ -50,21 +50,7 @@ local note_status = {
   blocked = "blocked",
 }
 
-local function update_note_properties(properties)
-  vim.api.nvim_buf_call(vim.api.nvim_get_current_buf(), function()
-    vim.api.nvim_command "write"
-  end)
-  local filepath = vim.api.nvim_buf_get_name(0)
-
-  local obsidian_vault_ex = vim.fn.expand "~/Repos/brain"
-  local rel_filepath = filepath
-  if vim.startswith(filepath, obsidian_vault_ex) then
-    rel_filepath = filepath:sub(#obsidian_vault_ex + 2) -- +2 to remove trailing slash
-  end
-
-  require("obsidian.note").UpdateNoteProperties(properties, rel_filepath)
-  vim.api.nvim_command "edit!"
-end
+local update_note_properties = require("obsidian.note_properties").update_note_properties
 
 return {
   {
