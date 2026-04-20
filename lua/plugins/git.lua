@@ -134,6 +134,7 @@ return {
   },
   {
     "pwntester/octo.nvim",
+    commit = "79673221faf322e13fc88c73e70ead58ddad6001",
     keys = {
       {
         "<leader>1",

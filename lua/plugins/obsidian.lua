@@ -50,7 +50,8 @@ local note_status = {
   blocked = "blocked",
 }
 
-local update_note_properties = require("obsidian.note_properties").update_note_properties
+local update_note_properties =
+  require("obsidian.note_properties").update_note_properties
 
 return {
   {
@@ -108,70 +109,70 @@ return {
       {
         "<leader>ot",
         function()
-          require("obsidian.note_creation").create_for_type("WorkOncallTask")
+          require("obsidian.note_creation").create_for_type "WorkOncallTask"
         end,
         desc = "Create new OnCall Work Task",
       },
       {
         "<leader>onws",
         function()
-          require("obsidian.note_creation").create_for_type("WorkOncallShift")
+          require("obsidian.note_creation").create_for_type "WorkOncallShift"
         end,
         desc = "Create new OnCall Work Shift",
       },
       {
         "<leader>onwt",
         function()
-          require("obsidian.note_creation").create_for_type("WorkTask")
+          require("obsidian.note_creation").create_for_type "WorkTask"
         end,
         desc = "Create new Work Task",
       },
       {
         "<leader>onwd",
         function()
-          require("obsidian.note_creation").create_for_type("WorkDocument")
+          require("obsidian.note_creation").create_for_type "WorkDocument"
         end,
         desc = "Create new Work Document",
       },
       {
         "<leader>onwr",
         function()
-          require("obsidian.note_creation").create_for_type("WorkResearch")
+          require("obsidian.note_creation").create_for_type "WorkResearch"
         end,
         desc = "Create new Work Research Document",
       },
       {
         "<leader>onwi",
         function()
-          require("obsidian.note_creation").create_for_type("WorkInitiative")
+          require("obsidian.note_creation").create_for_type "WorkInitiative"
         end,
         desc = "Create new Work Initiative",
       },
       {
         "<leader>onwe",
         function()
-          require("obsidian.note_creation").create_for_type("WorkEvents")
+          require("obsidian.note_creation").create_for_type "WorkEvents"
         end,
         desc = "Create new Work Event",
       },
       {
         "<leader>onpd",
         function()
-          require("obsidian.note_creation").create_for_type("PersonalDocument")
+          require("obsidian.note_creation").create_for_type "PersonalDocument"
         end,
         desc = "Create New Personal Document",
       },
       {
         "<leader>onpr",
         function()
-          require("obsidian.note_creation").create_for_type("PersonalResearchDocument")
+          require("obsidian.note_creation").create_for_type "PersonalResearchDocument"
         end,
         desc = "Create New Personal ResearchDocument",
       },
       {
         "<leader>onr",
         function()
-          require("obsidian.note_creation").create_for_type("Recipe")
+          require("obsidian.note_creation").create_for_type "Recipe"
         end,
         desc = "Create New Recipe Document",
       },
@@ -207,15 +208,16 @@ return {
             vim.api.nvim_buf_get_name(0),
             obsidian_vault
           )
-          local props = require("obsidian.note_properties").properties_for_mark_complete(
-            rel,
-            {
-              tags_key = note_properties.tags,
-              status_key = note_properties.status,
-              status_complete = note_status.complete,
-              exclude_tag = note_status.active_tag,
-            }
-          )
+          local props =
+            require("obsidian.note_properties").properties_for_mark_complete(
+              rel,
+              {
+                tags_key = note_properties.tags,
+                status_key = note_properties.status,
+                status_complete = note_status.complete,
+                exclude_tag = note_status.active_tag,
+              }
+            )
           update_note_properties(props)
         end,
         desc = "Mark complete",
@@ -274,15 +276,16 @@ return {
               vim.api.nvim_buf_get_name(0),
               obsidian_vault
             )
-            local props = require("obsidian.note_properties").properties_for_mark_blocked(
-              rel,
-              response,
-              {
-                blocked_property = note_properties.blocked_reason,
-                status_property = note_properties.status,
-                status_value = note_status.blocked,
-              }
-            )
+            local props =
+              require("obsidian.note_properties").properties_for_mark_blocked(
+                rel,
+                response,
+                {
+                  blocked_property = note_properties.blocked_reason,
+                  status_property = note_properties.status,
+                  status_value = note_status.blocked,
+                }
+              )
             if props then
               update_note_properties(props)
             end

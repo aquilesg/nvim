@@ -22,31 +22,6 @@ return {
         kind_icons = {
           RipGrep = "󱉶 ",
           Git = "󰊢 ",
-          Text = "󰗧",
-          Method = "",
-          Function = "󰊕",
-          Constructor = "󰒓 ",
-          Field = "",
-          Variable = "󱃻 ",
-          Property = "󰖷",
-          Class = "󱡠",
-          Interface = "󱡠",
-          Struct = "󱡠",
-          Module = "󰅩",
-          Unit = "󰪚",
-          Value = "󰦨",
-          Enum = "󰦨",
-          EnumMember = "󰦨",
-          Keyword = "󰻾",
-          Constant = "󰏿",
-          Snippet = "",
-          Color = "󰏘",
-          File = "󰈔",
-          Reference = "󰬲",
-          Folder = "󰉋",
-          Event = "󱐋",
-          Operator = "󰪚",
-          TypeParameter = "󰬛",
         },
       },
       keymap = {
@@ -54,7 +29,7 @@ return {
         ["<Tab>"] = {},
       },
       signature = { enabled = true },
-      cmdline = { enabled = false },
+      cmdline = { enabled = true },
       sources = {
         default = function()
           local success, node = pcall(vim.treesitter.get_node)
@@ -79,14 +54,15 @@ return {
             local success, node = pcall(vim.treesitter.get_node)
             if success and node and node:type() == "code_fence_content" then
               return {
+                "lsp",
                 "buffer",
                 "snippets",
-                "path",
                 "ripgrep",
                 "path",
               }
             else
               return {
+                "lsp",
                 "buffer",
                 "path",
                 "ripgrep",
@@ -155,8 +131,6 @@ return {
               return items
             end,
           },
-          -- Vault path from `require("obsidian").setup({ ... })` in `obsidian.lua`.
-          -- Two sources: body vs YAML frontmatter (shared tag cache in the plugin).
           obsidian_tags_body = {
             name = "Obsidian (body)",
             module = "obsidian.cmp.tags_body",
