@@ -246,23 +246,22 @@ return {
       {
         "<leader>oma",
         function()
-          vim.ui.input({
-            prompt = "Why was this abandoned?",
-          }, function(response)
-            local props = {
+          local rel = require("obsidian.util").get_relative_path(
+            vim.api.nvim_buf_get_name(0),
+            obsidian_vault
+          )
+
+          local props =
+            require("obsidian.note_properties").properties_for_mark_complete(
+              rel,
               {
-                name = note_properties.status,
-                value = note_status.abandoned,
-                type = "text",
-              },
-              {
-                name = "abandon_reason",
-                value = response,
-                type = "text",
-              },
-            }
-            update_note_properties(props)
-          end)
+                tags_key = note_properties.tags,
+                status_key = note_properties.status,
+                status_complete = note_status.abandoned,
+                exclude_tag = note_status.active_tag,
+              }
+            )
+          update_note_properties(props)
         end,
         desc = "Mark document abandoned",
       },

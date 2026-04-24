@@ -1,7 +1,11 @@
 #!/bin/bash
 
 # Brew dependencies
-dependencies=(pngpaste neovim lazygit gh imagemagick node coursier/formulas/coursier git-delta asciiquarium btop)
+dependencies=(pngpaste neovim
+  lazygit gh imagemagick node
+  coursier/formulas/coursier git-delta
+  asciiquarium btop rg
+  gleanwork/tap/glean-cli)
 
 # Iterate through list and then brew install each one
 for i in "${dependencies[@]}"; do

@@ -113,11 +113,6 @@ return {
       },
       -- Work Specific things
       {
-        "<leader>tT",
-        '<cmd> TermExec cmd="make test" name="Testing" <CR>',
-        desc = "Run Make test",
-      },
-      {
         "<leader>ti",
         '<cmd> TermExec cmd="aws-environment integration3 platform" name="Integration3 East Terminal" <CR>',
         desc = "Toggle Integration3 terminal in East Region",
@@ -219,20 +214,6 @@ return {
         desc = "Diff two files with git-diff",
       },
       {
-        "<leader>tS",
-        function()
-          local Terminal = require("toggleterm.terminal").Terminal
-          local aquariam = Terminal:new {
-            cmd = "asciiquarium",
-            display_name = "Screensaver",
-            direction = "float",
-            close_on_exit = true,
-          }
-          aquariam:toggle()
-        end,
-        desc = "Screensaver",
-      },
-      {
         "<leader>tB",
         function()
           local Terminal = require("toggleterm.terminal").Terminal
@@ -245,6 +226,19 @@ return {
           resources:toggle()
         end,
         desc = "Resource Usage",
+      },
+      {
+        "<leader>tg",
+        function()
+          local Terminal = require("toggleterm.terminal").Terminal
+          local Glean = Terminal:new {
+            cmd = "glean",
+            display_name = "Glean Chat",
+            close_on_exit = true,
+          }
+          Glean:toggle()
+        end,
+        desc = "Open Glean Chat",
       },
     },
   },
