@@ -53,6 +53,11 @@ local note_status = {
 local update_note_properties =
   require("obsidian.note_properties").update_note_properties
 
+--- Fuzzy-find vault notes by path/name; Telescope + markdown treesitter preview (`obsidian.search`).
+local function open_obsidian_find_file_picker()
+  require("obsidian.search").open_find_file_picker()
+end
+
 return {
   {
     "MagicDuck/grug-far.nvim",
@@ -84,6 +89,11 @@ return {
           require("obsidian.search").findWithinTags()
         end,
         desc = "Search for tags",
+      },
+      {
+        "<leader>osf",
+        open_obsidian_find_file_picker,
+        desc = "Find Obsidian note by name (Telescope)",
       },
       {
         "<leader>oo",
