@@ -228,6 +228,20 @@ return {
         desc = "Resource Usage",
       },
       {
+        "<leader>tm",
+        function()
+          local Terminal = require("toggleterm.terminal").Terminal
+          local music = Terminal:new {
+            cmd = "yatoro",
+            display_name = "Music",
+            direction = "float",
+            close_on_exit = false,
+          }
+          music:toggle()
+        end,
+        desc = "Open Apple Music",
+      },
+      {
         "<leader>tg",
         function()
           local Terminal = require("toggleterm.terminal").Terminal

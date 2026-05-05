@@ -19,25 +19,20 @@ return {
     opts = {
       strategies = {
         chat = {
-          adapter = "copilot",
-        },
-        inline = {
-          adapter = "copilot",
+          adapter = "cursor_cli",
         },
       },
-    },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      {
-        "ravitemer/mcphub.nvim",
-        dependencies = {
-          "nvim-lua/plenary.nvim",
+      display = {
+        action_palette = {
+          width = 95,
+          height = 10,
+          provider = "telescope",
+          opts = {
+            show_preset_actions = true,
+            show_preset_prompts = true,
+            title = "CodeCompanion actions",
+          },
         },
-        build = "npm install -g mcp-hub@latest",
-        config = function()
-          require("mcphub").setup()
-        end,
       },
     },
   },
