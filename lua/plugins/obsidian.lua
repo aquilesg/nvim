@@ -17,8 +17,8 @@ local directories = {
   WorkOncallTask = "Work/Tasks/",
   WorkDocument = "Work/Docs/",
   WorkResearch = "Work/Research/",
-  WorkInitiative = "Work/Initiatives/",
-  WorkEvents = "Work/Events/",
+  WorkProject = "Work/Projects/",
+  WorkEvent = "Work/Events/",
   PersonalDocument = "Personal/Docs/",
   PersonalResearchDocument = "Personal/Research/",
   Recipe = "Personal/Recipes/",
@@ -29,9 +29,8 @@ local template_names = {
   WorkTask = "WorkTask",
   WorkDocument = "WorkDocument",
   WorkResearch = "WorkResearch",
-  WorkInitiative = "WorkInitiative",
-  WorkEvents = "WorkEvent",
-  WorkProjectScoping = "WorkProjectScoping",
+  WorkEvent = "WorkEvent",
+  WorkProject = "WorkProject",
   WorkOncallShift = "WorkOncallShift",
   WorkOncallTask = "WorkOncallTask",
   PersonalDocument = "PersonalDocument",
@@ -53,7 +52,6 @@ local note_status = {
 local update_note_properties =
   require("obsidian.note_properties").update_note_properties
 
---- Fuzzy-find vault notes by path/name; Telescope + markdown treesitter preview (`obsidian.search`).
 local function open_obsidian_find_file_picker()
   require("obsidian.search").open_find_file_picker()
 end
@@ -119,70 +117,90 @@ return {
       {
         "<leader>ot",
         function()
-          require("obsidian.note_creation").create_for_type "WorkOncallTask"
+          require("obsidian.note_creation").create_for_type(
+            template_names.WorkOncallTask
+          )
         end,
         desc = "Create new OnCall Work Task",
       },
       {
         "<leader>onws",
         function()
-          require("obsidian.note_creation").create_for_type "WorkOncallShift"
+          require("obsidian.note_creation").create_for_type(
+            template_names.WorkOncallShift
+          )
         end,
         desc = "Create new OnCall Work Shift",
       },
       {
         "<leader>onwt",
         function()
-          require("obsidian.note_creation").create_for_type "WorkTask"
+          require("obsidian.note_creation").create_for_type(
+            template_names.WorkTask
+          )
         end,
         desc = "Create new Work Task",
       },
       {
         "<leader>onwd",
         function()
-          require("obsidian.note_creation").create_for_type "WorkDocument"
+          require("obsidian.note_creation").create_for_type(
+            template_names.WorkDocument
+          )
         end,
         desc = "Create new Work Document",
       },
       {
         "<leader>onwr",
         function()
-          require("obsidian.note_creation").create_for_type "WorkResearch"
+          require("obsidian.note_creation").create_for_type(
+            template_names.WorkResearch
+          )
         end,
         desc = "Create new Work Research Document",
       },
       {
-        "<leader>onwi",
+        "<leader>onwp",
         function()
-          require("obsidian.note_creation").create_for_type "WorkInitiative"
+          require("obsidian.note_creation").create_for_type(
+            template_names.WorkProject
+          )
         end,
-        desc = "Create new Work Initiative",
+        desc = "Create new Work Project",
       },
       {
         "<leader>onwe",
         function()
-          require("obsidian.note_creation").create_for_type "WorkEvents"
+          require("obsidian.note_creation").create_for_type(
+            template_names.WorkEvent
+          )
         end,
         desc = "Create new Work Event",
       },
       {
         "<leader>onpd",
         function()
-          require("obsidian.note_creation").create_for_type "PersonalDocument"
+          require("obsidian.note_creation").create_for_type(
+            template_names.PersonalDocument
+          )
         end,
         desc = "Create New Personal Document",
       },
       {
         "<leader>onpr",
         function()
-          require("obsidian.note_creation").create_for_type "PersonalResearchDocument"
+          require("obsidian.note_creation").create_for_type(
+            template_names.PersonalResearchDocument
+          )
         end,
         desc = "Create New Personal ResearchDocument",
       },
       {
         "<leader>onr",
         function()
-          require("obsidian.note_creation").create_for_type "Recipe"
+          require("obsidian.note_creation").create_for_type(
+            template_names.Recipe
+          )
         end,
         desc = "Create New Recipe Document",
       },
