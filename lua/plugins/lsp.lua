@@ -13,6 +13,8 @@ local ensure_installed_local = {
   "html-lsp",
   "jedi-language-server",
   "jdtls",
+  "kotlin-language-server",
+  "ktlint",
   "jq",
   "json-lsp",
   "lua-language-server",
@@ -26,6 +28,7 @@ local ensure_installed_local = {
   "terraform-ls",
   "tflint",
   "stylua",
+  "swiftformat",
   "sqlls",
   "typescript-language-server",
   "yaml-language-server",
@@ -169,6 +172,10 @@ return {
           on_attach()
         end,
       })
+      vim.lsp.config("sourcekit", {
+        cmd = { vim.trim(vim.fn.system({ "xcrun", "-f", "sourcekit-lsp" })) },
+      })
+      vim.lsp.enable "sourcekit"
     end,
   },
   {

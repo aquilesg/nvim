@@ -1,26 +1,3 @@
-vim.api.nvim_create_user_command("Format", function(args)
-  local range = nil
-  if args.count ~= -1 then
-    local end_line =
-      vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
-    range = {
-      start = { args.line1, 0 },
-      ["end"] = { args.line2, end_line:len() },
-    }
-  end
-  require("conform").format {
-    async = true,
-    lsp_fallback = true,
-    range = range,
-  }
-end, { range = true })
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-  callback = function()
-    require("conform").format { async = true, lsp_fallback = true }
-  end,
-})
-
 -- Close Filetypes of a Buffer
 vim.api.nvim_create_user_command("CloseFiletypeBuffers", function()
   local filetypes = {}
@@ -68,10 +45,6 @@ vim.api.nvim_create_user_command("CloseFiletypeBuffers", function()
 end, {})
 
 local map = vim.keymap.set
-map("n", "<leader>fm", function()
-  require("conform").format { async = true }
-end, { desc = "Format document" })
-
 map("n", "<leader>is", function()
   local timestamp = tostring(os.date "- `%Y-%m-%d %H:%M:%S`")
   local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
@@ -86,16 +59,40 @@ map("n", "<leader>im", function()
 end, { desc = "Create disabled markdown lint section" })
 
 local slow_format_filetypes = {
-  "python",
-  "json",
-  "markdown",
+  python = true,
+  json = true,
+  markdown = true,
 }
+
+local function autoformat_disabled(bufnr)
+  return vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat
+end
+
 return {
   {
     "stevearc/conform.nvim",
-    event = "LspAttach",
+    event = { "BufWritePre" },
+    cmd = { "ConformInfo" },
+    keys = {
+      {
+        "<leader>fm",
+        function()
+          require("conform").format { async = true, bufnr = 0 }
+        end,
+        desc = "Format document",
+      },
+    },
+    ---@module "conform"
+    ---@type conform.setupOpts
     opts = {
+      default_format_opts = {
+        lsp_format = "fallback",
+        timeout_ms = 1000,
+      },
       format_on_save = function(bufnr)
+        if autoformat_disabled(bufnr) then
+          return
+        end
         if slow_format_filetypes[vim.bo[bufnr].filetype] then
           return
         end
@@ -109,6 +106,9 @@ return {
       end,
 
       format_after_save = function(bufnr)
+        if autoformat_disabled(bufnr) then
+          return
+        end
         if not slow_format_filetypes[vim.bo[bufnr].filetype] then
           return
         end
@@ -118,14 +118,19 @@ return {
       formatters_by_ft = {
         lua = { "stylua" },
         go = { "gofumpt" },
-        python = { "black", "ruff" },
+        python = { "ruff_organize_imports", "ruff_format" },
         bash = { "shfmt" },
         java = { "google-java-format" },
+        kotlin = { "ktlint" },
+        swift = { "swiftformat" },
         javascript = { "prettier" },
         json = { "jq" },
         markdown = { "doctoc", "markdownlint" },
         typescript = { "ts-standard" },
         yaml = { "yamlfmt" },
+        terraform = { "terraform_fmt" },
+        hcl = { "terraform_fmt" },
+        rust = { "rustfmt", lsp_format = "fallback" },
       },
       formatters = {
         doctoc = {
@@ -133,6 +138,41 @@ return {
         },
       },
     },
+    config = function(_, opts)
+      require("conform").setup(opts)
+
+      vim.api.nvim_create_user_command("Format", function(args)
+        local range = nil
+        if args.count ~= -1 then
+          local end_line =
+            vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+          range = {
+            start = { args.line1, 0 },
+            ["end"] = { args.line2, end_line:len() },
+          }
+        end
+        require("conform").format {
+          async = true,
+          bufnr = 0,
+          lsp_format = "fallback",
+          range = range,
+        }
+      end, { range = true })
+
+      vim.api.nvim_create_user_command("FormatDisable", function()
+        vim.b.disable_autoformat = true
+      end, {
+        desc = "Disable autoformat-on-save for buffer",
+        bang = true,
+      })
+
+      vim.api.nvim_create_user_command("FormatEnable", function()
+        vim.b.disable_autoformat = false
+        vim.g.disable_autoformat = false
+      end, {
+        desc = "Re-enable autoformat-on-save",
+      })
+    end,
   },
   {
     "kylechui/nvim-surround",
