@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm view *)",
+      "Read(//Users/aquiles.gomez/.claude/**)",
+      "Bash(security find-generic-password *)",
+      "Bash(npm root *)",
+      "Bash(git checkout *)",
+      "Bash(mmdc --version)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(asdf which *)",
+      "Bash(asdf current *)",
+      "Bash(npm ls *)",
+      "Bash(npm install *)",
+      "Bash(asdf reshim *)"
+    ]
+  }
+}

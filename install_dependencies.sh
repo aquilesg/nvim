@@ -17,6 +17,12 @@ done
 # Install mermaid via npm
 npm install -g @mermaid-js/mermaid-cli
 
+# On the work computer (node managed by asdf) the global npm binary needs a
+# reshim so `mmdc` resolves for the current node version.
+if [ -n "$AWS_ENVIRONMENT" ]; then
+  asdf reshim nodejs
+fi
+
 # Setup coursier
 cs setup
 

@@ -32,6 +32,11 @@ function _G.set_terminal_keymaps()
     [[<C-\><C-n><C-w>]],
     { buffer = 0, desc = "Move to buffer" }
   )
+  map("t", "<C-a>", function()
+    if _G.claude_terminal then
+      _G.claude_terminal:toggle()
+    end
+  end, { buffer = 0, desc = "Toggle Claude Code" })
   map(
     "t",
     "<F13>",
@@ -253,6 +258,22 @@ return {
           Glean:toggle()
         end,
         desc = "Open Glean Chat",
+      },
+      {
+        "<leader>a",
+        function()
+          local Terminal = require("toggleterm.terminal").Terminal
+          _G.claude_terminal = _G.claude_terminal
+            or Terminal:new {
+              cmd = "claude",
+              display_name = "Claude Code",
+              direction = "float",
+              close_on_exit = false,
+            }
+          _G.claude_terminal:toggle()
+        end,
+        desc = "Toggle Claude Code",
+        mode = { "n", "v" },
       },
     },
   },

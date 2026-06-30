@@ -435,7 +435,11 @@ return {
   },
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons", "folke/noice.nvim" },
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+      "folke/noice.nvim",
+      "franco-ruggeri/codecompanion-lualine.nvim",
+    },
     event = "UIEnter",
     opts = {
       options = {
@@ -443,6 +447,7 @@ return {
       },
       sections = {
         lualine_x = {
+          "codecompanion",
           {
             function()
               local buf_clients = vim.lsp.get_clients { bufnr = 0 }
