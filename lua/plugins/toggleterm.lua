@@ -267,8 +267,7 @@ return {
             or Terminal:new {
               cmd = "claude",
               display_name = "Claude Code",
-              direction = "float",
-              close_on_exit = false,
+              close_on_exit = true,
             }
           _G.claude_terminal:toggle()
         end,
