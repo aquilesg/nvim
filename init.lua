@@ -9,6 +9,7 @@ if vim.env.PROF then
 end
 
 require "config.lazy"
+require("config.obsidian.pomodoro").setup()
 
 -- Editor options (grouped for clarity)
 vim.opt.wrap = false

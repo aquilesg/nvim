@@ -1,4 +1,4 @@
-local is_brain = require("config.custom_func").is_in_brain
+local is_brain = require("config.obsidian.vault").is_in_brain
 return {
   {
     "saghen/blink.compat",

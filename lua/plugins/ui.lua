@@ -1,6 +1,6 @@
 --  Nvim Tree Mappings
 local map = vim.keymap.set
-local is_brain = require("config.custom_func").is_in_brain
+local is_brain = require("config.obsidian.vault").is_in_brain
 
 map(
   "n",
