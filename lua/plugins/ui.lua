@@ -441,6 +441,10 @@ return {
       "franco-ruggeri/codecompanion-lualine.nvim",
     },
     event = "UIEnter",
+    config = function(_, opts)
+      require("config.obsidian.pomodoro").setup()
+      require("lualine").setup(opts)
+    end,
     opts = {
       options = {
         globalstatus = true,
@@ -448,6 +452,15 @@ return {
       sections = {
         lualine_x = {
           "codecompanion",
+          {
+            function()
+              return require("config.obsidian.pomodoro").statusline()
+            end,
+            cond = function()
+              return require("config.obsidian.pomodoro").cache.status
+                ~= "stopped"
+            end,
+          },
           {
             function()
               local buf_clients = vim.lsp.get_clients { bufnr = 0 }

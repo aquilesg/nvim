@@ -31,6 +31,16 @@ return {
       desc = "Find Files",
     },
     {
+      "<leader>fF",
+      function()
+        require("telescope.builtin").find_files {
+          hidden = true,
+          no_ignore_parent = true,
+        }
+      end,
+      desc = "Find within ALL Files",
+    },
+    {
       "<leader>fw",
       function()
         require("telescope").extensions.live_grep_args.live_grep_args()
