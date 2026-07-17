@@ -21,7 +21,7 @@ local directories = {
   WorkEvent = "Work/Events/",
   PersonalDocument = "Personal/Docs/",
   PersonalResearchDocument = "Personal/Research/",
-  Recipe = "Personal/Recipes/",
+  Recipes = "Personal/Recipes/",
   WorkOncallShift = "Work/OnCallShifts/",
 }
 
@@ -35,7 +35,7 @@ local template_names = {
   WorkOncallTask = "WorkOncallTask",
   PersonalDocument = "PersonalDocument",
   PersonalResearchDocument = "PersonalResearchDocument",
-  Recipe = "Recipes",
+  Recipes = "Recipes",
 }
 
 local note_status = {
@@ -199,7 +199,7 @@ return {
         "<leader>onr",
         function()
           require("obsidian.note_creation").create_for_type(
-            template_names.Recipe
+            template_names.Recipes
           )
         end,
         desc = "Create New Recipe Document",
