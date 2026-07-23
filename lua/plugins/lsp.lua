@@ -25,6 +25,9 @@ local ensure_installed_local = {
   "ruff",
   "shellcheck",
   "shfmt",
+  "sqlfluff",
+  "taplo",
+  "xmlformatter",
   "terraform-ls",
   "tflint",
   "stylua",
@@ -83,6 +86,12 @@ local terraform_group =
 local ansible_group =
   vim.api.nvim_create_augroup("AnsibleDetect", { clear = true })
 
+-- Octo review buffers are named like `octo://.../file/path/main.tf`, which
+-- matches the `*.tf` patterns below. Skip them so terraform-ls doesn't attach.
+local function is_octo_buffer()
+  return vim.startswith(vim.api.nvim_buf_get_name(0), "octo://")
+end
+
 -- Terraform related files
 autocmd({ "BufRead", "BufNewFile" }, {
   pattern = {
@@ -92,6 +101,9 @@ autocmd({ "BufRead", "BufNewFile" }, {
   },
   group = terraform_group,
   callback = function()
+    if is_octo_buffer() then
+      return
+    end
     vim.bo.filetype = "terraform"
   end,
 })
@@ -104,6 +116,9 @@ autocmd({ "BufRead", "BufNewFile" }, {
   },
   group = terraform_group,
   callback = function()
+    if is_octo_buffer() then
+      return
+    end
     vim.bo.filetype = "hcl"
   end,
 })
@@ -116,6 +131,9 @@ autocmd({ "BufRead", "BufNewFile" }, {
   },
   group = terraform_group,
   callback = function()
+    if is_octo_buffer() then
+      return
+    end
     vim.bo.filetype = "json"
   end,
 })

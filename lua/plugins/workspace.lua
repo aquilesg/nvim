@@ -1,4 +1,16 @@
 -- Close Filetypes of a Buffer
+local is_in_brain = require("config.obsidian.vault").is_in_brain
+
+-- Effective filetype for the command: brain-vault markdown notes are grouped
+-- under a synthetic "brain" filetype so they can be listed/closed separately.
+local function effective_filetype(buf)
+  local ft = vim.bo[buf].filetype
+  if ft == "markdown" and is_in_brain(buf) then
+    return "brain"
+  end
+  return ft
+end
+
 vim.api.nvim_create_user_command("CloseFiletypeBuffers", function()
   local filetypes = {}
   for _, buf in ipairs(vim.fn.range(1, vim.fn.bufnr "$")) do
@@ -6,7 +18,7 @@ vim.api.nvim_create_user_command("CloseFiletypeBuffers", function()
     if vim.api.nvim_buf_is_valid(buf) and vim.fn.buflisted(buf) == 1 then
       local bufname = vim.fn.bufname(buf)
       if bufname ~= "" then
-        local ft = vim.bo[buf].filetype
+        local ft = effective_filetype(buf)
         if not vim.tbl_contains(filetypes, ft) then
           table.insert(filetypes, ft)
         end
@@ -37,7 +49,7 @@ vim.api.nvim_create_user_command("CloseFiletypeBuffers", function()
     if
       vim.api.nvim_buf_is_valid(buf)
       and vim.fn.buflisted(buf) == 1
-      and vim.bo[buf].filetype == selected_ft
+      and effective_filetype(buf) == selected_ft
     then
       vim.cmd("bdelete " .. buf)
     end
@@ -125,9 +137,17 @@ return {
         swift = { "swiftformat" },
         javascript = { "prettier" },
         json = { "jq" },
+        jsonc = { "prettier" },
         markdown = { "doctoc", "markdownlint" },
         typescript = { "ts-standard" },
         yaml = { "yamlfmt" },
+        html = { "prettier" },
+        css = { "prettier" },
+        scss = { "prettier" },
+        graphql = { "prettier" },
+        sql = { "sqlfluff" },
+        toml = { "taplo" },
+        xml = { "xmlformatter" },
         terraform = { "terraform_fmt" },
         hcl = { "terraform_fmt" },
         rust = { "rustfmt", lsp_format = "fallback" },
@@ -141,9 +161,94 @@ return {
     config = function(_, opts)
       require("conform").setup(opts)
 
+      -- Fenced code-block languages -> vim filetypes conform knows about.
+      local ft_aliases = {
+        js = "javascript",
+        ts = "typescript",
+        py = "python",
+        sh = "bash",
+        shell = "bash",
+        zsh = "bash",
+        yml = "yaml",
+        md = "markdown",
+        tf = "terraform",
+        gql = "graphql",
+        rs = "rust",
+        kt = "kotlin",
+        postgres = "sql",
+        psql = "sql",
+        mysql = "sql",
+      }
+
+      -- Language of the fenced code block enclosing `lnum`, or nil if not in one.
+      local function detect_fence_lang(bufnr, lnum)
+        for i = lnum, 1, -1 do
+          local line = vim.api.nvim_buf_get_lines(bufnr, i - 1, i, true)[1]
+          local lang = line:match "^%s*```([%w_%-%.]+)"
+          if lang then
+            return ft_aliases[lang] or lang
+          end
+          -- A bare ``` above us is a closing fence => we're not inside a block.
+          if line:match "^%s*```%s*$" then
+            return nil
+          end
+        end
+        return nil
+      end
+
+      -- Format lines [line1, line2] of the current buffer as `filetype`,
+      -- reusing the conform formatters configured for that filetype. Runs in a
+      -- scratch buffer so range-unaware formatters (jq, etc.) see only the
+      -- selection. Strips surrounding ``` fences if they were included.
+      local function format_range_as(filetype, line1, line2)
+        local start_idx, end_idx = line1 - 1, line2
+        local lines = vim.api.nvim_buf_get_lines(0, start_idx, end_idx, false)
+        if
+          #lines >= 2
+          and lines[1]:match "^%s*```"
+          and lines[#lines]:match "^%s*```"
+        then
+          start_idx = start_idx + 1
+          end_idx = end_idx - 1
+          lines = vim.api.nvim_buf_get_lines(0, start_idx, end_idx, false)
+        end
+
+        local scratch = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_buf_set_lines(scratch, 0, -1, false, lines)
+        vim.bo[scratch].filetype = filetype
+        local ok = require("conform").format {
+          bufnr = scratch,
+          async = false,
+          quiet = true,
+          lsp_format = "never",
+          timeout_ms = 3000,
+        }
+        if ok then
+          local formatted = vim.api.nvim_buf_get_lines(scratch, 0, -1, false)
+          vim.api.nvim_buf_set_lines(0, start_idx, end_idx, false, formatted)
+        else
+          vim.notify(
+            "Format: no formatter for '" .. filetype .. "'",
+            vim.log.levels.WARN
+          )
+        end
+        vim.api.nvim_buf_delete(scratch, { force = true })
+      end
+
       vim.api.nvim_create_user_command("Format", function(args)
+        local has_range = args.count ~= -1
+
+        -- In markdown, format a selection inside a code fence as its language.
+        if has_range and vim.bo.filetype == "markdown" then
+          local lang = detect_fence_lang(0, args.line1)
+          if lang then
+            format_range_as(lang, args.line1, args.line2)
+            return
+          end
+        end
+
         local range = nil
-        if args.count ~= -1 then
+        if has_range then
           local end_line =
             vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
           range = {
@@ -158,6 +263,22 @@ return {
           range = range,
         }
       end, { range = true })
+
+      -- Explicitly format a selection as a given filetype, e.g. :'<,'>FormatAs json
+      vim.api.nvim_create_user_command("FormatAs", function(args)
+        local filetype = ft_aliases[args.args] or args.args
+        format_range_as(filetype, args.line1, args.line2)
+      end, {
+        range = true,
+        nargs = 1,
+        complete = function(arglead)
+          local fts = vim.tbl_keys(opts.formatters_by_ft)
+          table.sort(fts)
+          return vim.tbl_filter(function(ft)
+            return ft:find(arglead, 1, true) == 1
+          end, fts)
+        end,
+      })
 
       vim.api.nvim_create_user_command("FormatDisable", function()
         vim.b.disable_autoformat = true
