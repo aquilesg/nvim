@@ -166,7 +166,6 @@ return {
         on_attach = on_attach,
       }
 
-      require("mason").setup()
       require("mason-lspconfig").setup()
       vim.lsp.config("*", opts)
       vim.lsp.config("yamlls", {

@@ -49,8 +49,9 @@ local note_status = {
   blocked = "blocked",
 }
 
-local update_note_properties =
-  require("obsidian.note_properties").update_note_properties
+local function update_note_properties(props)
+  require("obsidian.note_properties").update_note_properties(props)
+end
 
 local function open_obsidian_find_file_picker()
   require("obsidian.search").open_find_file_picker()
@@ -405,4 +406,5 @@ return {
       note_properties = note_properties,
     },
   },
+  lazy = true,
 }
