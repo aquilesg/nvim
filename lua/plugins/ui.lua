@@ -457,19 +457,11 @@ return {
           "location",
           {
             function()
-              return require("config.wifi").statusline()
+              local wifi = require("config.wifi").statusline()
+              local batt = require("battery").get_status_line()
+              local clock = os.date "%H:%M"
+              return string.format("%s  %s   %s", wifi, batt, clock)
             end,
-          },
-          {
-            function()
-              return require("battery").get_status_line()
-            end,
-          },
-          {
-            function()
-              return os.date "%H:%M"
-            end,
-            icon = "",
           },
         },
         lualine_x = {
