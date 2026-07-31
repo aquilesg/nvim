@@ -439,10 +439,13 @@ return {
       "nvim-tree/nvim-web-devicons",
       "folke/noice.nvim",
       "franco-ruggeri/codecompanion-lualine.nvim",
+      "justinhj/battery.nvim",
     },
     event = "UIEnter",
     config = function(_, opts)
       require("config.obsidian.pomodoro").setup()
+      require("battery").setup { update_rate_seconds = 30 }
+      require("config.wifi").setup { update_rate_seconds = 30 }
       require("lualine").setup(opts)
     end,
     opts = {
@@ -450,6 +453,25 @@ return {
         globalstatus = true,
       },
       sections = {
+        lualine_z = {
+          "location",
+          {
+            function()
+              return require("config.wifi").statusline()
+            end,
+          },
+          {
+            function()
+              return require("battery").get_status_line()
+            end,
+          },
+          {
+            function()
+              return os.date "%H:%M"
+            end,
+            icon = "",
+          },
+        },
         lualine_x = {
           "codecompanion",
           {
