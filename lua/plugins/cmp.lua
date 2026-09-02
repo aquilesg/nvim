@@ -1,4 +1,16 @@
 local is_brain = require("config.obsidian.vault").is_in_brain
+
+-- register the Kitty kind once, so the enum doesn't grow on every completion
+local kitty_kind_idx
+local function kitty_kind()
+  if not kitty_kind_idx then
+    local CompletionItemKind = require("blink.cmp.types").CompletionItemKind
+    kitty_kind_idx = #CompletionItemKind + 1
+    CompletionItemKind[kitty_kind_idx] = "Kitty"
+  end
+  return kitty_kind_idx
+end
+
 return {
   {
     "saghen/blink.compat",
@@ -12,6 +24,7 @@ return {
       "mikavilpas/blink-ripgrep.nvim",
       "Kaiser-Yang/blink-cmp-git",
       "aquilesg/obsidian",
+      "garyhurtz/blink_cmp_kitty",
     },
     event = "LspAttach",
     version = "*",
@@ -22,6 +35,7 @@ return {
         kind_icons = {
           RipGrep = "󱉶 ",
           Git = "󰊢 ",
+          Kitty = "󰄛 ",
         },
       },
       keymap = {
@@ -48,6 +62,7 @@ return {
               "buffer",
               "git",
               "ripgrep",
+              "kitty",
             }
           elseif is_brain(0) then
             -- Check if we're in a code block
@@ -75,13 +90,14 @@ return {
             vim.tbl_contains({ "gitcommit", "octo" }, vim.bo.filetype)
             and vim.fn.mode() ~= "c"
           then
-            return { "buffer", "git", "path", "ripgrep" }
+            return { "buffer", "git", "path", "ripgrep", "kitty" }
           else
             return {
               "lsp",
               "snippets",
               "buffer",
               "path",
+              "kitty",
             }
           end
         end,
@@ -127,6 +143,38 @@ return {
               CompletionItemKind[kind_idx] = "Git"
               for _, item in ipairs(items) do
                 item.kind = kind_idx
+              end
+              return items
+            end,
+          },
+          kitty = {
+            module = "blink_cmp_kitty",
+            name = "Kitty",
+            score_offset = -12,
+            opts = {
+              -- period is multiplied by 1000 internally, so this is ~10s
+              min_update_restart_period = 0.01,
+              completion_item_lifetime = 60,
+              -- skip other nvim windows: get-text returns rendered UI, not text
+              include_window = function(ctx)
+                if ctx.is_self then
+                  return false
+                end
+                for _, proc in ipairs(ctx.foreground_processes or {}) do
+                  for _, arg in ipairs(proc.cmdline or {}) do
+                    if arg:match("n?vim$") then
+                      return false
+                    end
+                  end
+                end
+                return true
+              end,
+            },
+            transform_items = function(_, items)
+              local kind = kitty_kind()
+              for _, item in ipairs(items) do
+                item.kind = kind
+                item.labelDetails = { description = "Kitty" }
               end
               return items
             end,

@@ -66,18 +66,26 @@ local reload_ui = function(_)
   vim.cmd "bufdo e"
 end
 
+-- The primary themes live in local checkouts under ~/Repos; fall back to a
+-- bundled scheme on machines that do not have them.
+local function apply_colorscheme(name, fallback)
+  if not pcall(vim.cmd.colorscheme, name) then
+    vim.cmd.colorscheme(fallback)
+  end
+end
+
 return {
   {
     "f-person/auto-dark-mode.nvim",
     event = "VeryLazy",
     opts = {
       set_dark_mode = function()
-        vim.cmd.colorscheme "ciapre"
+        apply_colorscheme("ciapre", "tokyonight-night")
         vim.api.nvim_set_option_value("background", "dark", {})
         reload_ui()
       end,
       set_light_mode = function()
-        vim.cmd.colorscheme "lighty"
+        apply_colorscheme("lighty", "tokyonight-day")
         vim.api.nvim_set_option_value("background", "light", {})
         reload_ui()
       end,
@@ -104,6 +112,7 @@ return {
     "catppuccin/nvim",
     name = "catppuccin",
   },
+  { "rose-pine/neovim", name = "rose-pine", lazy = true },
   {
     lazy = false,
     "rktjmp/lush.nvim",
@@ -329,6 +338,74 @@ return {
     dependencies = "nvim-tree/nvim-web-devicons",
     config = function()
       local bufferline = require "bufferline"
+
+      -- Build a bufferline group matching any of `exts`. The icon is taken
+      -- from `icon` when given, otherwise auto-derived from nvim-web-devicons
+      -- so a new language automatically gets its icon.
+      local function ext_group(label, exts, icon)
+        local set = {}
+        for _, e in ipairs(exts) do
+          set[e] = true
+        end
+        if not icon then
+          local devicons = require "nvim-web-devicons"
+          icon = devicons.get_icon("file." .. exts[1], exts[1], {
+            default = true,
+          })
+        end
+        return {
+          name = icon and (icon .. " " .. label) or label,
+          matcher = function(buf)
+            local ext = vim.api.nvim_buf_get_name(buf.id):match "%.([^./]+)$"
+            return ext ~= nil and set[ext] == true
+          end,
+        }
+      end
+
+      -- Add a language: one line here. Third element pins an icon; omit it to
+      -- auto-derive one from nvim-web-devicons.
+      local ext_groups = {
+        { "Infra", { "tf" } },
+        { "Configs", { "yaml", "yml" } },
+        { "Go", { "go" } },
+        { "Python", { "py" } },
+        { "Bash", { "sh" } },
+        { "Lua", { "lua" } },
+      }
+
+      -- Groups that key off something other than a file extension stay
+      -- hand-written; the extension-based ones are generated below.
+      local group_items = {
+        {
+          name = " PRs",
+          matcher = function(buf)
+            return vim.api.nvim_get_option_value("filetype", {
+              buf = buf.id,
+            }) == "octo"
+          end,
+        },
+        {
+          name = " Brain",
+          matcher = function(buf)
+            return vim.api.nvim_buf_get_name(buf.id):match "%.md$"
+              and is_brain(buf.id)
+          end,
+        },
+        {
+          name = "󰈙 Docs",
+          matcher = function(buf)
+            local get_buf = vim.api.nvim_buf_get_name
+            return (
+              get_buf(buf.id):match "%.md$"
+              or get_buf(buf.id):match "%.txt$"
+            ) and not is_brain(buf.id)
+          end,
+        },
+      }
+      for _, g in ipairs(ext_groups) do
+        table.insert(group_items, ext_group(g[1], g[2], g[3]))
+      end
+
       bufferline.setup {
         options = {
           name_formatter = function(buf)
@@ -359,75 +436,7 @@ return {
           separator_style = "slope",
           color_icons = false,
           groups = {
-            items = {
-              {
-                name = " PRs",
-                matcher = function(buf)
-                  return vim.api.nvim_get_option_value("filetype", {
-                    buf = buf.id,
-                  }) == "octo"
-                end,
-              },
-              {
-                name = "󱥊 Infra",
-                matcher = function(buf)
-                  return vim.api.nvim_buf_get_name(buf.id):match "%.tf$"
-                end,
-              },
-              {
-                name = " Configs",
-                matcher = function(buf)
-                  local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.yaml$"
-                    or get_buf(buf.id):match "%.yml$"
-                end,
-              },
-              {
-                name = " Brain",
-                matcher = function(buf)
-                  local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.md$" and is_brain(buf.id)
-                end,
-              },
-              {
-                name = "󰈙 Docs",
-                matcher = function(buf)
-                  local get_buf = vim.api.nvim_buf_get_name
-                  return (
-                    get_buf(buf.id):match "%.md$"
-                    or get_buf(buf.id):match "%.txt$"
-                  ) and not is_brain(buf.id)
-                end,
-              },
-              {
-                name = " Go",
-                matcher = function(buf)
-                  local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.go$"
-                end,
-              },
-              {
-                name = " Python",
-                matcher = function(buf)
-                  local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.py$"
-                end,
-              },
-              {
-                name = " Bash",
-                matcher = function(buf)
-                  local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.sh$"
-                end,
-              },
-              {
-                name = "󰢱 Lua",
-                matcher = function(buf)
-                  local get_buf = vim.api.nvim_buf_get_name
-                  return get_buf(buf.id):match "%.lua$"
-                end,
-              },
-            },
+            items = group_items,
           },
         },
       }
@@ -457,10 +466,19 @@ return {
           "location",
           {
             function()
-              local wifi = require("config.wifi").statusline()
-              local batt = require("battery").get_status_line()
-              local clock = os.date "%H:%M"
-              return string.format("%s  %s   %s", wifi, batt, clock)
+              local segments = {
+                require("config.wifi").statusline() or "",
+                require("battery").get_status_line() or "",
+                os.date "%H:%M",
+              }
+              local parts = {}
+              for _, seg in ipairs(segments) do
+                seg = vim.trim(seg)
+                if seg ~= "" then
+                  parts[#parts + 1] = seg
+                end
+              end
+              return table.concat(parts, "   ")
             end,
           },
         },

@@ -10,8 +10,15 @@ return {
       },
     },
   },
+  config = function(_, opts)
+    local telescope = require "telescope"
+    telescope.setup(opts)
+    -- Native build can fail (no compiler); telescope still works without it.
+    pcall(telescope.load_extension, "fzf")
+  end,
   dependencies = {
     "nvim-telescope/telescope-live-grep-args.nvim",
+    { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   },
   keys = {
     {
