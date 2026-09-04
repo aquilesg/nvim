@@ -1,7 +1,22 @@
 local map = vim.keymap.set
 function _G.set_terminal_keymaps()
+  -- <esc> stays unmapped so it reaches the program running in the terminal.
+  -- kitty sends ctrl+[ as CSI 91;5u, which nvim reads as a key distinct from
+  -- <esc>, so it can still exit terminal mode.
   map("t", "<C-[>", [[<C-\><C-n>]], { buffer = 0, desc = "Exit Terminal mode" })
-  map("t", "<esc>", [[<C-\><C-n>]], { buffer = 0, desc = "Exit Terminal mode" })
+  map(
+    "t",
+    "<S-Up>",
+    [[<C-\><C-n><C-y>]],
+    { buffer = 0, desc = "Scroll terminal scrollback up" }
+  )
+  map("n", "<S-Up>", "<C-y>", { buffer = 0, desc = "Scroll scrollback up" })
+  map("n", "<S-Down>", function()
+    vim.api.nvim_feedkeys(vim.keycode "<C-e>", "nx", false)
+    if vim.fn.line "w$" == vim.fn.line "$" then
+      vim.cmd "startinsert"
+    end
+  end, { buffer = 0, desc = "Scroll scrollback down, resume terminal at bottom" })
   map(
     "t",
     "<C-h>",
