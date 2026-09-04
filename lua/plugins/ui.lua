@@ -1,6 +1,7 @@
 --  Nvim Tree Mappings
 local map = vim.keymap.set
 local is_brain = require("config.obsidian.vault").is_in_brain
+local is_mac = require("config.platform").is_mac
 
 map(
   "n",
@@ -452,9 +453,13 @@ return {
     },
     event = "UIEnter",
     config = function(_, opts)
-      require("config.obsidian.pomodoro").setup()
+      -- Both shell out to macOS-only binaries (`obsidian` from Homebrew,
+      -- `ipconfig getsummary`), so skip their polling timers elsewhere.
+      if is_mac then
+        require("config.obsidian.pomodoro").setup()
+        require("config.wifi").setup { update_rate_seconds = 30 }
+      end
       require("battery").setup { update_rate_seconds = 30 }
-      require("config.wifi").setup { update_rate_seconds = 30 }
       require("lualine").setup(opts)
     end,
     opts = {
@@ -466,11 +471,14 @@ return {
           "location",
           {
             function()
-              local segments = {
-                require("config.wifi").statusline() or "",
-                require("battery").get_status_line() or "",
-                os.date "%H:%M",
-              }
+              local segments = {}
+              if is_mac then
+                segments[#segments + 1] = require("config.wifi").statusline()
+                  or ""
+              end
+              segments[#segments + 1] = require("battery").get_status_line()
+                or ""
+              segments[#segments + 1] = os.date "%H:%M"
               local parts = {}
               for _, seg in ipairs(segments) do
                 seg = vim.trim(seg)
@@ -489,8 +497,9 @@ return {
               return require("config.obsidian.pomodoro").statusline()
             end,
             cond = function()
-              return require("config.obsidian.pomodoro").cache.status
-                ~= "stopped"
+              return is_mac
+                and require("config.obsidian.pomodoro").cache.status
+                  ~= "stopped"
             end,
           },
           {

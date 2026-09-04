@@ -1,3 +1,5 @@
+local is_mac = require("config.platform").is_mac
+
 local ensure_installed_local = {
   "bash-language-server",
   "buf",
@@ -189,10 +191,14 @@ return {
           on_attach()
         end,
       })
-      vim.lsp.config("sourcekit", {
-        cmd = { vim.trim(vim.fn.system({ "xcrun", "-f", "sourcekit-lsp" })) },
-      })
-      vim.lsp.enable "sourcekit"
+      -- `xcrun` is macOS-only and runs synchronously here, so keep it off the
+      -- startup path elsewhere.
+      if is_mac then
+        vim.lsp.config("sourcekit", {
+          cmd = { vim.trim(vim.fn.system { "xcrun", "-f", "sourcekit-lsp" }) },
+        })
+        vim.lsp.enable "sourcekit"
+      end
     end,
   },
   {
