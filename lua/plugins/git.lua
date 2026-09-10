@@ -176,6 +176,41 @@ return {
       "DiffviewRefresh",
       "DiffviewFileHistory",
     },
+    keys = {
+      {
+        "<leader>gd",
+        function()
+          local base
+          local head = vim.fn.systemlist {
+            "git",
+            "symbolic-ref",
+            "--short",
+            "refs/remotes/origin/HEAD",
+          }
+          if vim.v.shell_error == 0 and head[1] and head[1] ~= "" then
+            base = head[1]
+          else
+            for _, ref in ipairs { "origin/main", "origin/master" } do
+              vim.fn.system { "git", "rev-parse", "--verify", "--quiet", ref }
+              if vim.v.shell_error == 0 then
+                base = ref
+                break
+              end
+            end
+          end
+          if not base then
+            vim.notify(
+              "No origin/HEAD, origin/main, or origin/master found",
+              vim.log.levels.WARN
+            )
+            return
+          end
+          -- three-dot: merge-base, so only this branch's changes show up
+          vim.cmd("DiffviewOpen " .. base .. "...HEAD")
+        end,
+        desc = "Diffview against default branch",
+      },
+    },
     opts = {
       view = {
         merge_tool = {

@@ -94,6 +94,27 @@ local function is_octo_buffer()
   return vim.startswith(vim.api.nvim_buf_get_name(0), "octo://")
 end
 
+-- Diffview's index buffers are writable, so they have an empty `buftype` and
+-- slip past Neovim's own guard against attaching LSP to non-file buffers.
+-- Nothing under `diffview://` is a real file on disk.
+local function is_diffview_buffer(bufnr)
+  return vim.startswith(vim.api.nvim_buf_get_name(bufnr), "diffview://")
+end
+
+autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("DiffviewNoLsp", { clear = true }),
+  callback = function(args)
+    if not is_diffview_buffer(args.buf) then
+      return
+    end
+    vim.schedule(function()
+      if vim.api.nvim_buf_is_valid(args.buf) then
+        vim.lsp.buf_detach_client(args.buf, args.data.client_id)
+      end
+    end)
+  end,
+})
+
 -- Terraform related files
 autocmd({ "BufRead", "BufNewFile" }, {
   pattern = {

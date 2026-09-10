@@ -44,7 +44,9 @@
       "Bash(luajit -bl lua/config/obsidian/pomodoro.lua)",
       "Bash(luac -p lua/config/obsidian/pomodoro.lua)",
       "Bash(luac -p /Users/aquiles.gomez/.config/nvim/lua/config/obsidian/pomodoro.lua)",
-      "Bash(luajit -bl /Users/aquiles.gomez/.config/nvim/lua/config/obsidian/pomodoro.lua)"
+      "Bash(luajit -bl /Users/aquiles.gomez/.config/nvim/lua/config/obsidian/pomodoro.lua)",
+      "Bash(echo \"--- exit $? ---\")",
+      "Bash(sort -t'>' -k2)"
     ]
   }
 }
