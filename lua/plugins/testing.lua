@@ -9,7 +9,22 @@ return {
   {
     "miroshQa/debugmaster.nvim",
     dependencies = {
-      "mfussenegger/nvim-dap",
+      {
+        "mfussenegger/nvim-dap",
+        config = function()
+          -- neotest-jest emits a `pwa-node` strategy config for its dap run.
+          require("dap").adapters["pwa-node"] = {
+            type = "server",
+            host = "127.0.0.1",
+            port = "${port}",
+            executable = {
+              -- js-debug-adapter binds to `::1` unless given a host.
+              command = "js-debug-adapter",
+              args = { "${port}", "127.0.0.1" },
+            },
+          }
+        end,
+      },
       "nvim-neotest/nvim-nio",
       {
         "leoluz/nvim-dap-go",
@@ -103,6 +118,16 @@ return {
       {
         "nvim-neotest/neotest-python",
       },
+      {
+        "nvim-neotest/neotest-jest",
+      },
+      {
+        "marilari88/neotest-vitest",
+      },
+      {
+        "thenbe/neotest-playwright",
+        dependencies = { "nvim-telescope/telescope.nvim" },
+      },
     },
     opts = function(_, opts)
       opts.adapters = opts.adapters or {}
@@ -128,6 +153,80 @@ return {
           return python_path
         end,
       }
+      opts.adapters["neotest-jest"] = {
+        -- Jest sharding across workers loses breakpoints, so debug in-process.
+        strategy_config = function(config)
+          if config.type == "pwa-node" then
+            table.insert(config.args, "--runInBand")
+            config.skipFiles = { "<node_internals>/**", "**/node_modules/**" }
+          end
+          return config
+        end,
+      }
+
+      local function dap_strategy(command, cwd)
+        return {
+          name = "Debug Test",
+          type = "pwa-node",
+          request = "launch",
+          runtimeExecutable = command[1],
+          args = { unpack(command, 2) },
+          cwd = cwd or "${workspaceFolder}",
+          console = "integratedTerminal",
+          internalConsoleOptions = "neverOpen",
+          skipFiles = { "<node_internals>/**", "**/node_modules/**" },
+        }
+      end
+
+      -- Runners that fork workers lose breakpoints, so dap runs get forced
+      -- single-process and the strategy is rebuilt from the final command.
+      local function debuggable(adapter, dap_args)
+        local build_spec = adapter.build_spec
+        adapter.build_spec = function(args)
+          local spec = build_spec(args)
+          if spec and args.strategy == "dap" then
+            vim.list_extend(spec.command, dap_args)
+            spec.strategy = dap_strategy(spec.command, spec.cwd)
+          end
+          return spec
+        end
+        return adapter
+      end
+
+      -- Both JS adapters match `.spec.*` by default and would claim the same
+      -- files, so playwright takes `.spec.*` and vitest keeps the rest.
+      local function is_spec_file(file)
+        return file:match "%.spec%.[jt]sx?$" ~= nil
+      end
+
+      local vitest = require "neotest-vitest"
+      opts.adapters[#opts.adapters + 1] = debuggable(
+        vitest {
+          is_test_file = function(file)
+            if file:match "__tests__" or file:match "%.test%.[jt]sx?$" then
+              return true
+            end
+            local playwright_config = vim.fs.root(
+              file,
+              { "playwright.config.ts", "playwright.config.js" }
+            )
+            return is_spec_file(file) and playwright_config == nil
+          end,
+        },
+        { "--no-file-parallelism" }
+      )
+
+      local playwright = require "neotest-playwright"
+      opts.adapters[#opts.adapters + 1] = debuggable(
+        playwright.adapter {
+          options = {
+            is_test_file = is_spec_file,
+            persist_project_selection = true,
+            enable_dynamic_test_discovery = true,
+          },
+        },
+        { "--workers=1", "--timeout=0" }
+      )
     end,
     config = function(_, opts)
       if opts.adapters then

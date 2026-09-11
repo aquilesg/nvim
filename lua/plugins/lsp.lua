@@ -18,6 +18,7 @@ local ensure_installed_local = {
   "kotlin-language-server",
   "ktlint",
   "jq",
+  "js-debug-adapter",
   "json-lsp",
   "lua-language-server",
   "markdownlint",

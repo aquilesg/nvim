@@ -68,6 +68,8 @@ vim.api.nvim_create_autocmd("FileType", {
     "hcl",
     "rust",
     "javascript",
+    "typescript",
+    "typescriptreact",
   },
   callback = function()
     vim.treesitter.start()

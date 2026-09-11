@@ -578,6 +578,8 @@ return {
           "hcl",
           "rust",
           "javascript",
+          "typescript",
+          "tsx",
         })
         :wait(300000)
     end,
