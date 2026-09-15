@@ -398,7 +398,6 @@ return {
     opts = {
       obsidian_vault_dir = obsidian_vault,
       template_dir = template_dir_name,
-      obsidian_cli = "/opt/homebrew/bin/obsidian",
       -- Normal mode [[wiki]] follow (see `obsidian.wiki_follow` in the plugin)
       wiki_follow = true,
       directories = directories,
