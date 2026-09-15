@@ -93,7 +93,7 @@ return {
         reload_ui()
       end,
       set_light_mode = function()
-        apply_colorscheme("lighty", "tokyonight-day")
+        apply_colorscheme("rose-pine-dawn", "tokyonight-day")
         vim.api.nvim_set_option_value("background", "light", {})
         reload_ui()
       end,
