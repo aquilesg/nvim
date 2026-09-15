@@ -3,6 +3,13 @@ local map = vim.keymap.set
 local is_brain = require("config.obsidian.vault").is_in_brain
 local is_mac = require("config.platform").is_mac
 
+-- Optional modules: lualine re-raises render errors, so an unguarded require in
+-- a component breaks the whole statusline instead of just its own segment.
+local function optional(module)
+  local ok, mod = pcall(require, module)
+  return ok and mod or nil
+end
+
 map(
   "n",
   "<leader>jj",
@@ -456,8 +463,14 @@ return {
       -- Both shell out to macOS-only binaries (`obsidian` from Homebrew,
       -- `ipconfig getsummary`), so skip their polling timers elsewhere.
       if is_mac then
-        require("config.obsidian.pomodoro").setup()
-        require("config.wifi").setup { update_rate_seconds = 30 }
+        local pomodoro = optional "obsidian.pomodoro"
+        if pomodoro then
+          pomodoro.setup()
+        end
+        local wifi = optional "config.wifi"
+        if wifi then
+          wifi.setup { update_rate_seconds = 30 }
+        end
       end
       require("battery").setup { update_rate_seconds = 30 }
       require("lualine").setup(opts)
@@ -494,12 +507,15 @@ return {
           "codecompanion",
           {
             function()
-              return require("config.obsidian.pomodoro").statusline()
+              local pomodoro = optional "obsidian.pomodoro"
+              return pomodoro and pomodoro.statusline() or ""
             end,
             cond = function()
-              return is_mac
-                and require("config.obsidian.pomodoro").cache.status
-                  ~= "stopped"
+              if not is_mac then
+                return false
+              end
+              local pomodoro = optional "obsidian.pomodoro"
+              return pomodoro ~= nil and pomodoro.cache.status ~= "stopped"
             end,
           },
           {
