@@ -23,7 +23,6 @@ return {
       "rafamadriz/friendly-snippets",
       "mikavilpas/blink-ripgrep.nvim",
       "Kaiser-Yang/blink-cmp-git",
-      "aquilesg/obsidian",
       "garyhurtz/blink_cmp_kitty",
     },
     event = "LspAttach",
@@ -81,9 +80,6 @@ return {
                 "buffer",
                 "path",
                 "ripgrep",
-                "obsidian_wiki_links",
-                "obsidian_tags_body",
-                "obsidian_tags_frontmatter",
               }
             end
           elseif
@@ -178,22 +174,6 @@ return {
               end
               return items
             end,
-          },
-          obsidian_tags_body = {
-            name = "Obsidian (body)",
-            module = "obsidian.cmp.tags_body",
-            opts = {},
-          },
-          obsidian_tags_frontmatter = {
-            name = "Obsidian (FM)",
-            module = "obsidian.cmp.tags_frontmatter",
-            opts = {},
-          },
-          obsidian_wiki_links = {
-            name = "Obsidian (wiki)",
-            module = "obsidian.cmp.wiki_links",
-            score_offset = 4,
-            opts = {},
           },
         },
       },

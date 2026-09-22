@@ -463,7 +463,7 @@ return {
       -- Both shell out to macOS-only binaries (`obsidian` from Homebrew,
       -- `ipconfig getsummary`), so skip their polling timers elsewhere.
       if is_mac then
-        local pomodoro = optional "obsidian.pomodoro"
+        local pomodoro = optional "config.obsidian.pomodoro"
         if pomodoro then
           pomodoro.setup()
         end
@@ -507,14 +507,14 @@ return {
           "codecompanion",
           {
             function()
-              local pomodoro = optional "obsidian.pomodoro"
+              local pomodoro = optional "config.obsidian.pomodoro"
               return pomodoro and pomodoro.statusline() or ""
             end,
             cond = function()
               if not is_mac then
                 return false
               end
-              local pomodoro = optional "obsidian.pomodoro"
+              local pomodoro = optional "config.obsidian.pomodoro"
               return pomodoro ~= nil and pomodoro.cache.status ~= "stopped"
             end,
           },

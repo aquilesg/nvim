@@ -1,61 +1,193 @@
-local obsidian_vault = "~/Repos/brain"
-local template_dir_name = "Templates"
+local vault = require "config.obsidian"
 
-local note_properties = {
-  pr_link = "pr_link",
-  projects = "projects",
-  contexts = "contexts",
-  status = "status",
-  tags = "tags",
-  document_type = "document_type",
-  id = "id",
-  blocked_reason = "blockedBy",
-}
+local props = vault.properties
+local status = vault.status
 
-local directories = {
-  WorkTask = "Work/Tasks/",
-  WorkOncallTask = "Work/Tasks/",
-  WorkDocument = "Work/Docs/",
-  WorkResearch = "Work/Research/",
-  WorkProject = "Work/Projects/",
-  WorkEvent = "Work/Events/",
-  PersonalDocument = "Personal/Docs/",
-  PersonalResearchDocument = "Personal/Research/",
-  Recipes = "Personal/Recipes/",
-  WorkOncallShift = "Work/OnCallShifts/",
-}
-
-local template_names = {
-  WorkTask = "WorkTask",
-  WorkDocument = "WorkDocument",
-  WorkResearch = "WorkResearch",
-  WorkEvent = "WorkEvent",
-  WorkProject = "WorkProject",
-  WorkOncallShift = "WorkOncallShift",
-  WorkOncallTask = "WorkOncallTask",
-  PersonalDocument = "PersonalDocument",
-  PersonalResearchDocument = "PersonalResearchDocument",
-  Recipes = "Recipes",
-}
-
-local note_status = {
-  active_tag = "active",
-  in_progress = "In Progress",
-  in_review = "In Review",
-  review_complete = "Review Complete",
-  abandoned = "abandoned",
-  draft = "draft",
-  complete = "completed",
-  blocked = "blocked",
-}
-
-local function update_note_properties(props)
-  require("obsidian.note_properties").update_note_properties(props)
+local function notes()
+  return require "config.obsidian.notes"
 end
 
-local function open_obsidian_find_file_picker()
-  require("obsidian.search").open_find_file_picker()
+local function properties()
+  return require "config.obsidian.properties"
 end
+
+--- Keymap that creates a note of one template type.
+---@param lhs string
+---@param type_key string
+---@param desc string
+local function new_note_key(lhs, type_key, desc)
+  return {
+    lhs,
+    function()
+      notes().create_for_type(type_key)
+    end,
+    desc = desc,
+  }
+end
+
+local keys = {
+  {
+    "<leader>osv",
+    function()
+      require("grug-far").open { prefills = { paths = vault.vault } }
+    end,
+    desc = "Search in obsidian vault",
+  },
+  { "<leader>ost", "<cmd> Obsidian tags <CR>", desc = "Search for tags" },
+  {
+    "<leader>osf",
+    "<cmd> Obsidian quick_switch <CR>",
+    desc = "Find Obsidian note by name",
+  },
+  {
+    "<leader>oo",
+    "<cmd> Obsidian open <CR>",
+    desc = "Open current file in Obsidian",
+  },
+  {
+    "<leader>ol",
+    "<cmd> Obsidian links <CR>",
+    desc = "Open links of current note",
+  },
+  {
+    "<leader>ob",
+    "<cmd> Obsidian backlinks <CR>",
+    desc = "Open backlinks of current note",
+  },
+  new_note_key("<leader>ot", "WorkOncallTask", "Create new OnCall Work Task"),
+  new_note_key("<leader>onws", "WorkOncallShift", "Create new OnCall Work Shift"),
+  new_note_key("<leader>onwt", "WorkTask", "Create new Work Task"),
+  new_note_key("<leader>onwd", "WorkDocument", "Create new Work Document"),
+  new_note_key("<leader>onwr", "WorkResearch", "Create new Work Research Document"),
+  new_note_key("<leader>onwp", "WorkProject", "Create new Work Project"),
+  new_note_key("<leader>onwe", "WorkEvent", "Create new Work Event"),
+  new_note_key("<leader>onpd", "PersonalDocument", "Create New Personal Document"),
+  new_note_key(
+    "<leader>onpr",
+    "PersonalResearchDocument",
+    "Create New Personal ResearchDocument"
+  ),
+  new_note_key("<leader>onr", "Recipes", "Create New Recipe Document"),
+  -- Maintenance commands
+  {
+    "<leader>ocn",
+    function()
+      require("config.obsidian.active_notes").open_picker {
+        tag = status.active_tag,
+        property_keys = {
+          status = props.status,
+          document_type = props.document_type,
+          id = props.id,
+        },
+      }
+    end,
+    desc = "Open currently active tasks",
+  },
+  {
+    "<leader>oct",
+    function()
+      require("config.obsidian.tasks").pick()
+    end,
+    desc = "Open current note tasks",
+  },
+  -- Status change
+  {
+    "<leader>omc",
+    function()
+      local p = properties()
+      p.update(p.for_mark_complete(vault.current_note_path(), {
+        tags_key = props.tags,
+        status_key = props.status,
+        status_complete = status.complete,
+        exclude_tag = status.active_tag,
+      }))
+    end,
+    desc = "Mark complete",
+  },
+  {
+    "<leader>omi",
+    function()
+      local p = properties()
+      p.update(p.for_mark_in_progress(vault.current_note_path(), {
+        tags_key = props.tags,
+        status_key = props.status,
+        status_in_progress = status.in_progress,
+        active_tag = status.active_tag,
+      }))
+    end,
+    desc = "Mark document in progress",
+  },
+  {
+    "<leader>oma",
+    function()
+      local p = properties()
+      p.update(p.for_mark_complete(vault.current_note_path(), {
+        tags_key = props.tags,
+        status_key = props.status,
+        status_complete = status.abandoned,
+        exclude_tag = status.active_tag,
+      }))
+    end,
+    desc = "Mark document abandoned",
+  },
+  {
+    "<leader>omb",
+    function()
+      vim.ui.input({
+        prompt = "Why is this blocked? (Link ticket if available)",
+      }, function(response)
+        local p = properties()
+        p.update(p.for_mark_blocked(vault.current_note_path(), response, {
+          blocked_property = props.blocked_reason,
+          status_property = props.status,
+          status_value = status.blocked,
+        }))
+      end)
+    end,
+    desc = "Mark document blocked",
+  },
+  {
+    "<leader>omr",
+    function()
+      vim.ui.input(
+        { prompt = "What is the PR Link (if available)" },
+        function(response)
+          local p = properties()
+          local rows = {
+            { name = props.status, value = status.in_review, type = "text" },
+          }
+          if response and response ~= "" then
+            local rel = vault.current_note_path()
+            local pr_links =
+              vim.list_extend({}, p.get_string_list(rel, props.pr_link))
+            table.insert(pr_links, response)
+            rows[#rows + 1] =
+              { name = props.pr_link, value = pr_links, type = "list" }
+          end
+          p.update(rows)
+        end
+      )
+    end,
+    desc = "Mark document as in-review",
+  },
+  {
+    "<leader>omR",
+    function()
+      properties().update {
+        { name = props.status, value = status.review_complete, type = "text" },
+      }
+    end,
+    desc = "Mark review complete",
+  },
+  {
+    "<leader>oid",
+    function()
+      notes().create { insert_link = true, prompt_for_type = true }
+    end,
+    mode = { "n" },
+    desc = "Insert Link to Document",
+  },
+}
 
 return {
   {
@@ -70,340 +202,39 @@ return {
     opts = {},
   },
   {
-    "aquilesg/obsidian",
-    dependencies = { "MagicDuck/grug-far.nvim" },
-    keys = {
-      {
-        "<leader>osv",
-        function()
-          require("grug-far").open {
-            prefills = { paths = obsidian_vault },
-          }
-        end,
-        desc = "Search in obsidian vault",
-      },
-      {
-        "<leader>ost",
-        function()
-          require("obsidian.search").findWithinTags()
-        end,
-        desc = "Search for tags",
-      },
-      {
-        "<leader>osf",
-        open_obsidian_find_file_picker,
-        desc = "Find Obsidian note by name (Telescope)",
-      },
-      {
-        "<leader>oo",
-        function()
-          require("obsidian.note").setActiveFile()
-        end,
-        desc = "Open current file in Obsidian",
-      },
-      {
-        "<leader>ol",
-        function()
-          require("obsidian.search").FindLinks()
-        end,
-        desc = "Open links of current note",
-      },
-      {
-        "<leader>ob",
-        function()
-          require("obsidian.search").FindBacklinks()
-        end,
-        desc = "Open backlinks of current note",
-      },
-      {
-        "<leader>ot",
-        function()
-          require("obsidian.note_creation").create_for_type(
-            template_names.WorkOncallTask
-          )
-        end,
-        desc = "Create new OnCall Work Task",
-      },
-      {
-        "<leader>onws",
-        function()
-          require("obsidian.note_creation").create_for_type(
-            template_names.WorkOncallShift
-          )
-        end,
-        desc = "Create new OnCall Work Shift",
-      },
-      {
-        "<leader>onwt",
-        function()
-          require("obsidian.note_creation").create_for_type(
-            template_names.WorkTask
-          )
-        end,
-        desc = "Create new Work Task",
-      },
-      {
-        "<leader>onwd",
-        function()
-          require("obsidian.note_creation").create_for_type(
-            template_names.WorkDocument
-          )
-        end,
-        desc = "Create new Work Document",
-      },
-      {
-        "<leader>onwr",
-        function()
-          require("obsidian.note_creation").create_for_type(
-            template_names.WorkResearch
-          )
-        end,
-        desc = "Create new Work Research Document",
-      },
-      {
-        "<leader>onwp",
-        function()
-          require("obsidian.note_creation").create_for_type(
-            template_names.WorkProject
-          )
-        end,
-        desc = "Create new Work Project",
-      },
-      {
-        "<leader>onwe",
-        function()
-          require("obsidian.note_creation").create_for_type(
-            template_names.WorkEvent
-          )
-        end,
-        desc = "Create new Work Event",
-      },
-      {
-        "<leader>onpd",
-        function()
-          require("obsidian.note_creation").create_for_type(
-            template_names.PersonalDocument
-          )
-        end,
-        desc = "Create New Personal Document",
-      },
-      {
-        "<leader>onpr",
-        function()
-          require("obsidian.note_creation").create_for_type(
-            template_names.PersonalResearchDocument
-          )
-        end,
-        desc = "Create New Personal ResearchDocument",
-      },
-      {
-        "<leader>onr",
-        function()
-          require("obsidian.note_creation").create_for_type(
-            template_names.Recipes
-          )
-        end,
-        desc = "Create New Recipe Document",
-      },
-      -- Maintenance commands
-      {
-        "<leader>ocn",
-        function()
-          require("obsidian.active_notes").open_picker {
-            vault = obsidian_vault,
-            template_dir_name = template_dir_name,
-            tag = "active",
-            property_keys = {
-              status = note_properties.status,
-              document_type = note_properties.document_type,
-              id = note_properties.id,
-            },
-          }
-        end,
-        desc = "Open currently active tasks",
-      },
-      {
-        "<leader>oct",
-        function()
-          require("obsidian.note").UpdateNoteTask()
-        end,
-        desc = "Open current note tasks",
-      },
-      -- Status change
-      {
-        "<leader>omc",
-        function()
-          local rel = require("obsidian.util").get_relative_path(
-            vim.api.nvim_buf_get_name(0),
-            obsidian_vault
-          )
-          local props =
-            require("obsidian.note_properties").properties_for_mark_complete(
-              rel,
-              {
-                tags_key = note_properties.tags,
-                status_key = note_properties.status,
-                status_complete = note_status.complete,
-                exclude_tag = note_status.active_tag,
-              }
-            )
-          update_note_properties(props)
-        end,
-        desc = "Mark complete",
-      },
-      {
-        "<leader>omi",
-        function()
-          local rel = require("obsidian.util").get_relative_path(
-            vim.api.nvim_buf_get_name(0),
-            obsidian_vault
-          )
-          local props =
-            require("obsidian.note_properties").properties_for_mark_in_progress(
-              rel,
-              {
-                tags_key = note_properties.tags,
-                status_key = note_properties.status,
-                status_in_progress = note_status.in_progress,
-                active_tag = note_status.active_tag,
-              }
-            )
-          update_note_properties(props)
-        end,
-        desc = "Mark document in progress",
-      },
-      {
-        "<leader>oma",
-        function()
-          local rel = require("obsidian.util").get_relative_path(
-            vim.api.nvim_buf_get_name(0),
-            obsidian_vault
-          )
-
-          local props =
-            require("obsidian.note_properties").properties_for_mark_complete(
-              rel,
-              {
-                tags_key = note_properties.tags,
-                status_key = note_properties.status,
-                status_complete = note_status.abandoned,
-                exclude_tag = note_status.active_tag,
-              }
-            )
-          update_note_properties(props)
-        end,
-        desc = "Mark document abandoned",
-      },
-      {
-        "<leader>omb",
-        function()
-          vim.ui.input({
-            prompt = "Why is this blocked? (Link ticket if available)",
-          }, function(response)
-            local rel = require("obsidian.util").get_relative_path(
-              vim.api.nvim_buf_get_name(0),
-              obsidian_vault
-            )
-            local props =
-              require("obsidian.note_properties").properties_for_mark_blocked(
-                rel,
-                response,
-                {
-                  blocked_property = note_properties.blocked_reason,
-                  status_property = note_properties.status,
-                  status_value = note_status.blocked,
-                }
-              )
-            if props then
-              update_note_properties(props)
-            end
-          end)
-        end,
-        desc = "Mark document blocked",
-      },
-      {
-        "<leader>omr",
-        function()
-          vim.ui.input({
-            prompt = "What is the PR Link (if available)",
-          }, function(response)
-            if not response or response == "" then
-              local props = {
-                {
-                  name = note_properties.status,
-                  value = note_status.in_review,
-                  type = "text",
-                },
-              }
-              update_note_properties(props)
-              return
-            end
-
-            local rel = require("obsidian.util").get_relative_path(
-              vim.api.nvim_buf_get_name(0),
-              obsidian_vault
-            )
-            local pr_links = vim.list_extend(
-              {},
-              require("obsidian.note_properties").get_string_list_property(
-                rel,
-                note_properties.pr_link
-              )
-            )
-            table.insert(pr_links, response)
-
-            local props = {
-              {
-                name = note_properties.status,
-                value = note_status.in_review,
-                type = "text",
-              },
-              {
-                name = note_properties.pr_link,
-                value = pr_links,
-                type = "list",
-              },
-            }
-            update_note_properties(props)
-          end)
-        end,
-        desc = "Mark document as in-review",
-      },
-      {
-        "<leader>omR",
-        function()
-          local props = {
-            {
-              name = note_properties.status,
-              value = note_status.review_complete,
-              type = "text",
-            },
-          }
-          update_note_properties(props)
-        end,
-        desc = "Mark review complete",
-      },
-      {
-        "<leader>oid",
-        function()
-          require("obsidian.note_creation").create_with_options {
-            insert_link = true,
-            prompt_for_type = true,
-          }
-        end,
-        mode = { "n" },
-        desc = "Insert Link to Document",
-      },
+    "obsidian-nvim/obsidian.nvim",
+    version = "*",
+    dependencies = {
+      "MagicDuck/grug-far.nvim",
+      "nvim-telescope/telescope.nvim",
     },
+    event = {
+      "BufReadPre " .. vim.fn.expand(vault.vault) .. "/**.md",
+      "BufNewFile " .. vim.fn.expand(vault.vault) .. "/**.md",
+    },
+    keys = keys,
+    ---@module 'obsidian'
+    ---@type obsidian.config
     opts = {
-      obsidian_vault_dir = obsidian_vault,
-      template_dir = template_dir_name,
-      -- Normal mode [[wiki]] follow (see `obsidian.wiki_follow` in the plugin)
-      wiki_follow = true,
-      directories = directories,
-      template_names = template_names,
-      note_properties = note_properties,
+      legacy_commands = false,
+      workspaces = {
+        { name = "brain", path = vault.vault },
+      },
+      templates = {
+        folder = vault.template_dir,
+        date_format = "YYYY-MM-DD",
+      },
+      -- Frontmatter in this vault is hand-rolled (document_type, status,
+      -- contexts, ...); let the templates and the Obsidian CLI own it rather
+      -- than having obsidian.nvim rewrite id/aliases/tags on every write.
+      frontmatter = { enabled = false },
+      -- markdown.nvim already renders notes, and lualine owns the statusline.
+      ui = { enable = false },
+      footer = { enabled = false },
+      statusline = { enabled = false },
+      picker = { name = "telescope.nvim" },
+      note_id_func = vault.camel_case_title,
+      completion = { create_new = false },
     },
   },
-  lazy = true,
 }
