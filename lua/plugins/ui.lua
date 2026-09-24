@@ -340,6 +340,32 @@ return {
         "<cmd> BufferLineCyclePrev <cr>",
         desc = "Cycle Bufferline Next",
       },
+      {
+        "<leader>Tn",
+        function()
+          vim.ui.input({ prompt = "Tab name: " }, function(name)
+            vim.cmd.tabnew()
+            if name and name ~= "" then
+              require("bufferline.tabpages").rename_tab(0, name)
+            end
+          end)
+        end,
+        desc = "New named tab",
+      },
+      {
+        "<leader>Tr",
+        function()
+          vim.ui.input(
+            { prompt = "Rename tab: ", default = vim.t.name },
+            function(name)
+              if name then
+                require("bufferline.tabpages").rename_tab(0, name)
+              end
+            end
+          )
+        end,
+        desc = "Rename current tab",
+      },
     },
     version = "*",
     event = "UIEnter",
@@ -480,6 +506,7 @@ return {
         globalstatus = true,
       },
       sections = {
+        lualine_b = { "branch", "diagnostics" },
         lualine_z = {
           "location",
           {

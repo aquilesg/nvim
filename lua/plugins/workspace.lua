@@ -454,9 +454,18 @@ return {
     },
   },
   {
+    -- Scopes the buffer list per tabpage, so bufferline only shows the
+    -- buffers opened in the current tab.
+    "tiagovla/scope.nvim",
+    lazy = false,
+    opts = {},
+  },
+  {
     event = "VeryLazy",
     "stevearc/resession.nvim",
-    opts = {},
+    opts = {
+      extensions = { scope = {} },
+    },
     keys = {
       {
         "<leader>ss",
