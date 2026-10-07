@@ -3,8 +3,6 @@ local map = vim.keymap.set
 local is_brain = require("config.obsidian.vault").is_in_brain
 local is_mac = require("config.platform").is_mac
 
--- Optional modules: lualine re-raises render errors, so an unguarded require in
--- a component breaks the whole statusline instead of just its own segment.
 local function optional(module)
   local ok, mod = pcall(require, module)
   return ok and mod or nil
@@ -151,6 +149,7 @@ return {
   },
   {
     "nvim-tree/nvim-tree.lua",
+    event = "VeryLazy",
     keys = {
       {
         "<c-n>",
@@ -235,12 +234,12 @@ return {
   },
   {
     "winston0410/range-highlight.nvim",
-    event = "BufEnter",
+    event = "VeryLazy",
     dependencies = { "winston0410/cmd-parser.nvim" },
   },
   {
     "brenoprata10/nvim-highlight-colors",
-    event = "BufEnter",
+    event = "VeryLazy",
     opts = {
       render = "foreground",
     },
