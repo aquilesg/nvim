@@ -131,6 +131,9 @@ return {
             name = "Git",
             opts = {
               use_items_pre_cache = false,
+              should_reload_cache = function()
+                return false
+              end,
             },
             transform_items = function(_, items)
               local CompletionItemKind =
