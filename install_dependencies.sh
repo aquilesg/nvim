@@ -18,7 +18,7 @@ dependencies=(neovim
   coursier/formulas/coursier
 
   # Toggleterm floats
-  btop jayadamsmorgan/yatoro/yatoro gleanwork/tap/glean-cli)
+  btop)
 
 # claude-code: <leader>a float. obsidian: <leader>op* pomodoro keymaps, which
 # call obsidian-cli from inside the app bundle. The nerd font supplies the
@@ -47,12 +47,6 @@ npm install -g @mermaid-js/mermaid-cli
 if [ -n "$AWS_ENVIRONMENT" ]; then
   asdf reshim nodejs
 fi
-
-# Setup coursier
-cs setup
-
-# cursor
-curl https://cursor.com/install -fsS | bash
 if ! grep -q ".local/bin" ~/.zshrc; then
   # shellcheck disable=SC2016 # written literally so .zshrc expands it at shell start
   echo 'export PATH="$HOME/.local/bin:$PATH"' >>~/.zshrc

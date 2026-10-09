@@ -78,7 +78,8 @@ local function notes_with_tag(tag)
   local search = require "obsidian.search"
   local want = tag:gsub("^#", "")
   local seen, out = {}, {}
-  for _, loc in ipairs(search.find_tags(want)) do
+  -- Default 1s timeout is shorter than a full vault scan and yields an empty list.
+  for _, loc in ipairs(search.find_tags(want, { timeout = 10000 })) do
     local key = tostring(loc.path)
     if not seen[key] and loc.tag:gsub("^#", "") == want then
       seen[key] = true
