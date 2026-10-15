@@ -451,6 +451,51 @@ return {
         "<cmd> Jira Cloud <CR>",
         desc = "Open Jira Tickets",
       },
+      {
+        "<leader>ju",
+        function()
+          local lines = vim.api.nvim_buf_get_lines(0, 0, 60, false)
+          local tickets = {}
+          if lines[1] == "---" then
+            local in_list = false
+            for i = 2, #lines do
+              local line = lines[i]
+              if line == "---" then
+                break
+              end
+              local inline = line:match "^ticket_number:%s*(%S.*)$"
+              if inline then
+                for item in inline:gsub("[%[%]\"']", ""):gmatch "[^,%s]+" do
+                  table.insert(tickets, item)
+                end
+                in_list = false
+              elseif line:match "^ticket_number:%s*$" then
+                in_list = true
+              elseif in_list then
+                local item = line:match "^%s*-%s*(.-)%s*$"
+                if item and item ~= "" then
+                  table.insert(tickets, (item:gsub("[\"']", "")))
+                else
+                  in_list = false
+                end
+              end
+            end
+          end
+
+          if #tickets == 0 then
+            vim.notify("No ticket_number in frontmatter", vim.log.levels.WARN)
+          elseif #tickets == 1 then
+            vim.cmd("Jira info " .. tickets[1])
+          else
+            vim.ui.select(tickets, { prompt = "Jira ticket" }, function(choice)
+              if choice then
+                vim.cmd("Jira info " .. choice)
+              end
+            end)
+          end
+        end,
+        desc = "Open Jira ticket from note properties",
+      },
     },
   },
   {
