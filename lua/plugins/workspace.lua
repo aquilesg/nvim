@@ -80,6 +80,85 @@ local function autoformat_disabled(bufnr)
   return vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat
 end
 
+-- Calls fn(ticket) with the ticket_number from the note's frontmatter,
+-- prompting when there are several.
+local function with_note_ticket(fn)
+  local lines = vim.api.nvim_buf_get_lines(0, 0, 60, false)
+  local tickets = {}
+  if lines[1] == "---" then
+    local in_list = false
+    for i = 2, #lines do
+      local line = lines[i]
+      if line == "---" then
+        break
+      end
+      local inline = line:match "^ticket_number:%s*(%S.*)$"
+      if inline then
+        for item in inline:gsub("[%[%]\"']", ""):gmatch "[^,%s]+" do
+          table.insert(tickets, item)
+        end
+        in_list = false
+      elseif line:match "^ticket_number:%s*$" then
+        in_list = true
+      elseif in_list then
+        local item = line:match "^%s*-%s*(.-)%s*$"
+        if item and item ~= "" then
+          table.insert(tickets, (item:gsub("[\"']", "")))
+        else
+          in_list = false
+        end
+      end
+    end
+  end
+
+  if #tickets == 0 then
+    vim.notify("No ticket_number in frontmatter", vim.log.levels.WARN)
+  elseif #tickets == 1 then
+    fn(tickets[1])
+  else
+    vim.ui.select(tickets, { prompt = "Jira ticket" }, function(choice)
+      if choice then
+        fn(choice)
+      end
+    end)
+  end
+end
+
+local function update_jira_status(key)
+  local api = require "jira.jira-api.api"
+  api.get_transitions(key, function(transitions, err)
+    vim.schedule(function()
+      if err then
+        vim.notify("Error fetching transitions: " .. err, vim.log.levels.ERROR)
+        return
+      end
+      if #transitions == 0 then
+        vim.notify("No available transitions for " .. key, vim.log.levels.WARN)
+        return
+      end
+      vim.ui.select(transitions, {
+        prompt = "Status for " .. key,
+        format_item = function(t)
+          return t.name
+        end,
+      }, function(choice)
+        if not choice then
+          return
+        end
+        api.transition_issue(key, choice.id, function(_, t_err)
+          vim.schedule(function()
+            if t_err then
+              vim.notify("Error updating status: " .. t_err, vim.log.levels.ERROR)
+            else
+              vim.notify(key .. " -> " .. choice.name)
+            end
+          end)
+        end)
+      end)
+    end)
+  end)
+end
+
 return {
   {
     "stevearc/conform.nvim",
@@ -425,19 +504,10 @@ return {
           AND "eng pod[labels]" IN (cloud-observability, cloud-platform-infrastructure-risk-pod, cloud-data, cloud-resiliency, cloud-containerization, cloud-platform-operational-risk-pod) ORDER BY created DESC
         ]],
         queries = {
-          ["On Call Tickets"] = [[ 
-            labels IN (cloud-platform-triage-need-sort, cloud-platform-triage-documentation, cloud-platform-triage-ongoing-issue, cloud-platform-triage-bug, cloud-platform-triage-feature-request, cloud-platform-triage-other)
-            AND project = CLOUD 
-            AND created >= -1w ORDER BY created DESC 
-          ]],
-          ["Created By Me Within Last Week"] = [[
-            reporter = currentUser() 
-            AND created >= -1w ORDER BY created DESC 
-          ]],
-          ["Created By Me Unresolved"] = [[
-            reporter = currentUser() 
-            AND resolution = Unresolved ORDER BY created DESC 
-            ]],
+          ["My Tasks"] = "assignee = currentUser() AND resolution = Unresolved ORDER BY updated DESC",
+          ["On Call Tickets"] = "labels IN (cloud-platform-triage-need-sort, cloud-platform-triage-documentation, cloud-platform-triage-ongoing-issue, cloud-platform-triage-bug, cloud-platform-triage-feature-request, cloud-platform-triage-other) AND project = CLOUD AND created >= -1w ORDER BY created DESC",
+          ["Created By Me Within Last Week"] = "reporter = currentUser() AND created >= -1w ORDER BY created DESC",
+          ["Created By Me Unresolved"] = "reporter = currentUser() AND resolution = Unresolved ORDER BY created DESC",
         },
 
         projects = {
@@ -449,52 +519,31 @@ return {
       {
         "<leader>jt",
         "<cmd> Jira Cloud <CR>",
-        desc = "Open Jira Tickets",
+        desc = "Jira sprint board",
+      },
+      {
+        "<leader>jm",
+        function()
+          require("jira.board.state").project_key = "CLOUD"
+          require("jira.board").switch_query "My Tasks"
+        end,
+        desc = "Jira my tasks",
+      },
+      {
+        "<leader>jI",
+        function()
+          with_note_ticket(function(key)
+            vim.cmd("Jira info " .. key)
+          end)
+        end,
+        desc = "Open Jira ticket from note properties",
       },
       {
         "<leader>ju",
         function()
-          local lines = vim.api.nvim_buf_get_lines(0, 0, 60, false)
-          local tickets = {}
-          if lines[1] == "---" then
-            local in_list = false
-            for i = 2, #lines do
-              local line = lines[i]
-              if line == "---" then
-                break
-              end
-              local inline = line:match "^ticket_number:%s*(%S.*)$"
-              if inline then
-                for item in inline:gsub("[%[%]\"']", ""):gmatch "[^,%s]+" do
-                  table.insert(tickets, item)
-                end
-                in_list = false
-              elseif line:match "^ticket_number:%s*$" then
-                in_list = true
-              elseif in_list then
-                local item = line:match "^%s*-%s*(.-)%s*$"
-                if item and item ~= "" then
-                  table.insert(tickets, (item:gsub("[\"']", "")))
-                else
-                  in_list = false
-                end
-              end
-            end
-          end
-
-          if #tickets == 0 then
-            vim.notify("No ticket_number in frontmatter", vim.log.levels.WARN)
-          elseif #tickets == 1 then
-            vim.cmd("Jira info " .. tickets[1])
-          else
-            vim.ui.select(tickets, { prompt = "Jira ticket" }, function(choice)
-              if choice then
-                vim.cmd("Jira info " .. choice)
-              end
-            end)
-          end
+          with_note_ticket(update_jira_status)
         end,
-        desc = "Open Jira ticket from note properties",
+        desc = "Update Jira ticket status",
       },
     },
   },

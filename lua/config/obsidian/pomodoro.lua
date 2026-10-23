@@ -24,6 +24,7 @@ M.actions = vim.list_extend(vim.deepcopy(CLI_ACTIONS), { "goto" })
 --- @field poll_ms? integer # background resync interval, default 15000
 --- @field keymaps? boolean # register the `<prefix>{s,e,p,r,i,g}` mappings
 --- @field keymap_prefix? string # default `<leader>op`
+--- @field auto? boolean # start/resume on entering a brain note, stop on closing the last one
 
 -- POLL_MS only needs to catch session transitions started outside Neovim; we
 -- count down locally between polls.
@@ -32,6 +33,7 @@ local DEFAULTS = {
   poll_ms = 15000,
   keymaps = true,
   keymap_prefix = "<leader>op",
+  auto = true,
 }
 
 local options = vim.deepcopy(DEFAULTS)
@@ -49,6 +51,10 @@ M.cache = {
   note_path = nil,
   alerted = false,
 }
+
+-- Set when the autocmds started the session, so auto-stop never ends one
+-- started by hand or from Obsidian.
+local auto_started = false
 
 --- CLI `vault=` name: the configured value, else the vault's basename.
 --- @return string
@@ -183,6 +189,7 @@ local function update_cache(state)
     M.cache.status = "paused"
   else
     M.cache.status = "stopped"
+    auto_started = false
   end
   M.cache.remaining = math.floor(tonumber(val(state.timeRemaining, 0)) or 0)
   M.cache.synced_at = os.time()
@@ -280,6 +287,17 @@ local function run_action(action, title, reload_buf)
   end)
 end
 
+-- Persist pending edits first so the session starts from what's on screen;
+-- run_action reloads the buffer afterward.
+local function start_session(buf)
+  if vim.bo[buf].modified then
+    vim.api.nvim_buf_call(buf, function()
+      vim.cmd "silent write"
+    end)
+  end
+  run_action("start", buf_title(buf), buf)
+end
+
 --- @return string|nil
 local function tracked_note_file()
   local rel = M.cache.note_path or (M.cache.note_id and M.cache.note_id .. ".md")
@@ -337,15 +355,70 @@ function M.pomodoro(action)
       )
       return
     end
-    -- Persist pending edits first so the session starts from what's on screen;
-    -- run_action reloads the buffer afterward.
-    if vim.bo[buf].modified then
-      vim.api.nvim_buf_call(buf, function()
-        vim.cmd "silent write"
-      end)
-    end
-    run_action(action, buf_title(buf), buf)
+    start_session(buf)
   end)
+end
+
+local auto_busy = false
+
+-- Start (or resume) a session for the brain note just entered. The cache can be
+-- stale, so resync first; a running session is left alone.
+local function auto_start(buf)
+  if auto_busy or M.cache.status == "running" then
+    return
+  end
+  auto_busy = true
+  cli.run_json_async(pomodoro_args "status", function(state)
+    auto_busy = false
+    if not state then
+      return
+    end
+    update_cache(state)
+    if M.cache.status == "paused" then
+      run_action "resume"
+    elseif M.cache.status == "stopped" and vim.api.nvim_buf_is_loaded(buf) then
+      auto_started = true
+      start_session(buf)
+    end
+  end, true)
+end
+
+local function auto_stop()
+  if auto_started and #note_buffers() == 0 then
+    auto_started = false
+    run_action "stop"
+  end
+end
+
+local function setup_auto()
+  local group = vim.api.nvim_create_augroup("PomodoroAuto", { clear = true })
+  vim.api.nvim_create_autocmd("BufEnter", {
+    group = group,
+    pattern = "*.md",
+    callback = function(ev)
+      if vim.bo[ev.buf].buflisted and is_in_brain(ev.buf) then
+        auto_start(ev.buf)
+      end
+    end,
+  })
+  vim.api.nvim_create_autocmd({ "BufDelete", "BufWipeout" }, {
+    group = group,
+    callback = function()
+      if auto_started then
+        vim.schedule(auto_stop)
+      end
+    end,
+  })
+  vim.api.nvim_create_autocmd("VimLeavePre", {
+    group = group,
+    callback = function()
+      if auto_started then
+        vim.system(
+          vim.list_extend({ cli.executable() }, pomodoro_args "stop")
+        ):wait(5000)
+      end
+    end,
+  })
 end
 
 local poll_timer
@@ -382,6 +455,10 @@ function M.setup(opts)
         M.pomodoro(action)
       end, { desc = desc })
     end
+  end
+
+  if options.auto then
+    setup_auto()
   end
 
   -- We count down locally between polls, so a coarse interval is enough.
