@@ -9,6 +9,7 @@ if vim.env.PROF then
 end
 
 require "config.lazy"
+require("gtui").setup()
 
 -- Editor options (grouped for clarity)
 vim.opt.wrap = false
