@@ -210,6 +210,7 @@ function M.render(series, opts)
   hl(H + off + 1, 0, #axis, DIM)
 
   local shown = math.min(#series, opts.legend_max or #series, #PALETTE)
+  local legend_row = #lines
   for i = 1, shown do
     local lo, hi, last = math.huge, -math.huge, nil
     for _, p in ipairs(series[i].points) do
@@ -233,7 +234,7 @@ function M.render(series, opts)
     lines[#lines + 1] = string.rep(" ", GUTTER + 1) .. ("... %d more series"):format(#series - shown)
     hl(#lines - 1, 0, #lines[#lines], DIM)
   end
-  return { lines = lines, hls = hls, t0 = t0, t1 = t1, width = W }
+  return { lines = lines, hls = hls, t0 = t0, t1 = t1, width = W, legend_row = legend_row, legend_n = shown }
 end
 
 return M

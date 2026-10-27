@@ -25,7 +25,7 @@ return {
       "Kaiser-Yang/blink-cmp-git",
       "garyhurtz/blink_cmp_kitty",
     },
-    event = "LspAttach",
+    event = { "LspAttach", "InsertEnter" },
     version = "*",
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
@@ -48,6 +48,8 @@ return {
           local success, node = pcall(vim.treesitter.get_node)
           if vim.bo.filetype == "lua" then
             return { "lsp", "path", "lazydev" }
+          elseif vim.bo.filetype == "gtui" then
+            return { "gtui" }
           elseif
             success
             and node
@@ -98,6 +100,11 @@ return {
           end
         end,
         providers = {
+          gtui = {
+            module = "gtui.complete",
+            name = "Grafana",
+            async = true,
+          },
           lazydev = {
             name = "LazyDev",
             module = "lazydev.integrations.blink",

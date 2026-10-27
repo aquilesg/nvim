@@ -9,9 +9,9 @@ local NS = vim.api.nvim_create_namespace "gtui_logs"
 local PLACEHOLDER = [[LogQL, e.g. {app="x", tng_environment="$environment"} |= "error"  (Enter to run)]]
 local KEYS = {
   "<CR> / i  run (prompt) / full line (results) / focus prompt (results)",
-  "<space>t  jump to trace    <space>f  live tail",
-  "<space>r  refresh    <space>e  env    <space>[ <space>]  range preset",
-  "<space>y <space>p  yank / paste range    <space>u <space>0  undo / reset range",
+  ",t  jump to trace    ,f  live tail",
+  ",r  refresh    ,e  env    ,[ ,]  range preset",
+  ",y ,p  yank / paste range    ,u ,0  undo / reset range",
   "q  close    /  search (plain vim)",
 }
 
@@ -195,7 +195,7 @@ function M.open()
   if S.res_buf and vim.api.nvim_buf_is_valid(S.res_buf) then
     return vim.api.nvim_set_current_win(S.res_win)
   end
-  local t = ui.query_tab { title = "logs", placeholder = PLACEHOLDER, run = M.run }
+  local t = ui.query_tab { title = "logs", lang = "promql", ds = "loki", placeholder = PLACEHOLDER, run = M.run }
   S.res_win, S.res_buf, S.query, S.set_query = t.res_win, t.res_buf, t.query, t.set_query
   S.rows, S.tailing = {}, false
 
@@ -205,8 +205,8 @@ function M.open()
   end
   map("<CR>", detail, "full line")
   map("i", t.focus_prompt, "focus prompt")
-  map("<space>t", jump_trace, "jump to trace")
-  map("<space>f", toggle_tail, "live tail")
+  map("<localleader>t", jump_trace, "jump to trace")
+  map("<localleader>f", toggle_tail, "live tail")
   map("?", function() vim.notify(table.concat(KEYS, "\n")) end, "keys")
 
   local timer = vim.uv.new_timer()

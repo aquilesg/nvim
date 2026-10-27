@@ -100,17 +100,17 @@ function M.common_maps(buf, refresh)
       refresh()
     end
   end
-  map("<space>r", refresh, "refresh")
-  map("<space>e", act(state.cycle_env), "cycle environment")
-  map("<space>]", act(function() state.cycle_preset(1) end), "next range preset")
-  map("<space>[", act(function() state.cycle_preset(-1) end), "previous range preset")
-  map("<space>u", act(state.undo_range), "undo range")
-  map("<space>0", act(state.reset_range), "reset range")
-  map("<space>y", function()
+  map("<localleader>r", refresh, "refresh")
+  map("<localleader>e", act(state.cycle_env), "cycle environment")
+  map("<localleader>]", act(function() state.cycle_preset(1) end), "next range preset")
+  map("<localleader>[", act(function() state.cycle_preset(-1) end), "previous range preset")
+  map("<localleader>u", act(state.undo_range), "undo range")
+  map("<localleader>0", act(state.reset_range), "reset range")
+  map("<localleader>y", function()
     vim.fn.setreg("+", state.range:to_json())
     vim.notify("yanked " .. state.range:to_json())
   end, "yank range")
-  map("<space>p", function()
+  map("<localleader>p", function()
     local r, err = timerange.parse(vim.fn.getreg "+")
     if not r then
       return vim.notify(err, vim.log.levels.ERROR)
@@ -149,6 +149,11 @@ function M.query_tab(opts)
   M.use_bar(t.res_win)
   M.set_lines(t.res_buf, { "" })
   vim.bo[t.prompt_buf].modifiable = true
+  if opts.lang then pcall(vim.treesitter.start, t.prompt_buf, opts.lang) end
+  if opts.ds then
+    vim.b[t.prompt_buf].gtui_ds = opts.ds
+    require("gtui.complete").prefetch(opts.ds)
+  end
 
   local ns = vim.api.nvim_create_namespace "gtui_prompt"
   function t.query()

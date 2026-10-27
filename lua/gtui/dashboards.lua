@@ -84,6 +84,22 @@ local function default_value(v)
   return ".*"
 end
 
+local function var_choices(v)
+  local out = {}
+  for _, o in ipairs(v.options or {}) do
+    out[#out + 1] = { label = tostring(o.text or o.value), value = var_value(o.value) }
+  end
+  if #out == 0 and v.type == "custom" and type(v.query) == "string" then
+    for item in v.query:gmatch "[^,]+" do
+      item = vim.trim(item)
+      if item ~= "" then
+        out[#out + 1] = { label = item, value = item }
+      end
+    end
+  end
+  return out
+end
+
 local function ds_kind(ds)
   local t = (type(ds) == "table" and ds.type or tostring(ds or "")):lower()
   if t:find "loki" then
@@ -113,9 +129,13 @@ function M.load_grafana(ref, cb)
       return cb(err)
     end
     local js = d.dashboard
-    local vars = {}
+    local vars, var_options = {}, {}
     for _, v in ipairs((js.templating or {}).list or {}) do
       vars[v.name] = default_value(v)
+      local choices = var_choices(v)
+      if #choices > 0 then
+        var_options[v.name] = choices
+      end
     end
     vars = vim.tbl_extend("force", vars, overrides)
     local panels = {}
@@ -132,7 +152,7 @@ function M.load_grafana(ref, cb)
         span = ((p.gridPos or {}).w or 12) >= 16 and 2 or 1,
       }
     end
-    cb(nil, { title = js.title or uid, vars = vars, panels = panels })
+    cb(nil, { title = js.title or uid, vars = vars, var_options = var_options, panels = panels })
   end)
 end
 
@@ -383,7 +403,14 @@ local function draw()
   ui.set_lines(D.buf, lines)
   vim.api.nvim_buf_clear_namespace(D.buf, NS, 0, -1)
   ui.apply_hls(D.buf, NS, hls)
-  ui.set_info(D.buf, ("%d panels"):format(#D.panels))
+  local shown = {}
+  for k, v in pairs(D.vars) do
+    if not vim.tbl_contains(config.env_vars, k) then
+      shown[#shown + 1] = k .. "=" .. v
+    end
+  end
+  table.sort(shown)
+  ui.set_info(D.buf, ("%d panels%s"):format(#D.panels, #shown > 0 and ("  " .. table.concat(shown, " ")) or ""))
 end
 
 local function refresh()
@@ -448,6 +475,54 @@ local function zoom()
   vim.keymap.set("n", "gd", function() explore(p) end, { buffer = buf, desc = "gtui: explore panel" })
 end
 
+-- environment variables follow the global env (,e), so only the rest are offered
+local function set_var()
+  local dash = D
+  local items = {}
+  for name, value in pairs(dash.vars) do
+    if not vim.tbl_contains(config.env_vars, name) then
+      items[#items + 1] = { name = name, label = ("%s = %s"):format(name, value) }
+    end
+  end
+  table.sort(items, function(a, b) return a.name < b.name end)
+  if #items == 0 then
+    return vim.notify "this dashboard has no variables besides the environment (,e)"
+  end
+  local function apply(name, value)
+    if D == dash then
+      dash.vars[name] = value
+      refresh()
+    end
+  end
+  pick.select(items, { prompt = "dashboard variable", format = function(i) return i.label end }, function(item)
+    if not item then
+      return
+    end
+    local function ask()
+      vim.ui.input({ prompt = item.name .. ": ", default = dash.vars[item.name] }, function(v)
+        if v and v ~= "" then
+          apply(item.name, v)
+        end
+      end)
+    end
+    local choices = dash.var_options and dash.var_options[item.name]
+    if not choices then
+      return ask()
+    end
+    local list = vim.list_extend(vim.deepcopy(choices), { { label = "(type a value...)", input = true } })
+    pick.select(list, { prompt = item.name, format = function(c) return c.label end }, function(c)
+      if not c then
+        return
+      end
+      if c.input then
+        ask()
+      else
+        apply(item.name, c.value)
+      end
+    end)
+  end)
+end
+
 local function jump(delta)
   local _, idx = panel_at_cursor()
   local p = D.panels[math.max(1, math.min(#D.panels, (idx or 1) + delta))]
@@ -470,6 +545,7 @@ function M.show(dash)
     vim.keymap.set("n", lhs, fn, { buffer = buf, nowait = true, desc = "gtui: " .. desc })
   end
   map("<CR>", zoom, "zoom panel")
+  map("<localleader>v", set_var, "set dashboard variable")
   map("gd", function() explore((panel_at_cursor())) end, "explore panel in Metrics/Logs")
   map("]]", function() jump(1) end, "next panel")
   map("[[", function() jump(-1) end, "previous panel")

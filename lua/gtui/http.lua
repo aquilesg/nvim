@@ -105,7 +105,7 @@ function M.series(ds, expr, start, stop, cb)
       for _, v in ipairs(r.values) do
         pts[#pts + 1] = { tonumber(v[1]), tonumber(v[2]) }
       end
-      out[#out + 1] = { name = series_name(r.metric), points = pts }
+      out[#out + 1] = { name = series_name(r.metric), metric = r.metric, points = pts }
     end
     cb(nil, out)
   end)

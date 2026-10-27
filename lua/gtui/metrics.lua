@@ -76,7 +76,7 @@ local function mark()
   end
   if not S.sel.a or S.sel.b then
     S.sel = { a = f }
-    vim.notify("anchor set: move, <space>v again for the other edge, <CR> to zoom")
+    vim.notify("anchor set: move, ,v again for the other edge, <CR> to zoom")
   else
     S.sel.b = f
     vim.notify("<CR> to zoom, <Esc> to cancel")
@@ -84,9 +84,50 @@ local function mark()
   redraw()
 end
 
+local function show_series()
+  local i = vim.api.nvim_win_get_cursor(S.res_win)[1] - S.out.legend_row
+  local s = i >= 1 and i <= S.out.legend_n and S.series[i]
+  if not s then
+    return false
+  end
+  local lines = { s.metric.__name__ or "" }
+  local keys = vim.tbl_keys(s.metric)
+  table.sort(keys)
+  for _, k in ipairs(keys) do
+    if k ~= "__name__" then
+      lines[#lines + 1] = "  " .. k .. "=" .. s.metric[k]
+    end
+  end
+  local buf = ui.scratch("series", "gtui")
+  ui.set_lines(buf, lines)
+  local hls = { { row = 0, col = 0, end_col = #lines[1], group = "Function" } }
+  for r = 2, #lines do
+    local k_end = lines[r]:find("=", 1, true)
+    hls[#hls + 1] = { row = r - 1, col = 2, end_col = k_end - 1, group = "Identifier" }
+    hls[#hls + 1] = { row = r - 1, col = k_end - 1, end_col = k_end, group = "Operator" }
+    hls[#hls + 1] = { row = r - 1, col = k_end, end_col = #lines[r], group = "String" }
+  end
+  ui.apply_hls(buf, NS, hls)
+  local w = math.min(vim.o.columns - 4, math.max(40, unpack(vim.tbl_map(vim.fn.strdisplaywidth, lines))) + 2)
+  local h = math.min(#lines, vim.o.lines - 6)
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor", width = w, height = h,
+    row = math.floor((vim.o.lines - h) / 2), col = math.floor((vim.o.columns - w) / 2),
+    border = "rounded",
+  })
+  vim.wo[win].wrap = false
+  for _, k in ipairs { "q", "<Esc>", "<CR>" } do
+    vim.keymap.set("n", k, "<cmd>close<cr>", { buffer = buf, nowait = true })
+  end
+  return true
+end
+
 local function zoom()
   if not (S.sel.a and S.sel.b) then
-    return vim.notify("set two edges with <space>v first", vim.log.levels.WARN)
+    if S.out and S.out.legend_row and show_series() then
+      return
+    end
+    return vim.notify("set two edges with ,v first", vim.log.levels.WARN)
   end
   local lo, hi = math.min(S.sel.a, S.sel.b), math.max(S.sel.a, S.sel.b)
   if hi - lo < 0.005 then
@@ -112,7 +153,7 @@ function M.open()
   if valid() then
     return vim.api.nvim_set_current_win(S.res_win)
   end
-  local t = ui.query_tab { title = "metrics", placeholder = PLACEHOLDER, run = M.run }
+  local t = ui.query_tab { title = "metrics", lang = "promql", ds = "mimir", placeholder = PLACEHOLDER, run = M.run }
   S.res_win, S.res_buf, S.query, S.set_query = t.res_win, t.res_buf, t.query, t.set_query
   S.series, S.sel, S.out = {}, {}, nil
   vim.wo[S.res_win].wrap = false
@@ -122,13 +163,13 @@ function M.open()
     vim.keymap.set("n", lhs, fn, { buffer = S.res_buf, nowait = true, desc = "gtui: " .. desc })
   end
   map("i", t.focus_prompt, "focus prompt")
-  map("<space>v", mark, "select range edge")
-  map("<CR>", zoom, "zoom to selection")
+  map("<localleader>v", mark, "select range edge")
+  map("<CR>", zoom, "zoom to selection / series labels")
   map("<Esc>", function()
     S.sel = {}
     redraw()
   end, "cancel selection")
-  map("<space>l", function()
+  map("<localleader>l", function()
     S.legend = not S.legend
     redraw()
   end, "toggle legend")
