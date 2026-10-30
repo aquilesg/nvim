@@ -24,7 +24,7 @@ M.actions = vim.list_extend(vim.deepcopy(CLI_ACTIONS), { "goto" })
 --- @field poll_ms? integer # background resync interval, default 15000
 --- @field keymaps? boolean # register the `<prefix>{s,e,p,r,i,g}` mappings
 --- @field keymap_prefix? string # default `<leader>op`
---- @field auto? boolean # start/resume on entering a brain note, stop on closing the last one
+--- @field auto? boolean # start/resume on entering a Work/Tasks note, stop on closing the last one
 
 -- POLL_MS only needs to catch session transitions started outside Neovim; we
 -- count down locally between polls.
@@ -82,13 +82,22 @@ local function buf_title(buf)
   return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":t:r")
 end
 
--- Loaded, listed buffers backed by a markdown note inside the vault.
+-- Only notes under the vault's Work/Tasks/ directory get a session.
+local function is_task_note(buf)
+  if not is_in_brain(buf) then
+    return false
+  end
+  local rel = vault.relative_path(vim.api.nvim_buf_get_name(buf))
+  return vim.startswith(rel, vault.directories.WorkTask)
+end
+
+-- Loaded, listed buffers backed by a markdown note under Work/Tasks/.
 local function note_buffers()
   local bufs = {}
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buflisted then
       local name = vim.api.nvim_buf_get_name(buf)
-      if name ~= "" and name:match "%.md$" and is_in_brain(buf) then
+      if name ~= "" and name:match "%.md$" and is_task_note(buf) then
         table.insert(bufs, buf)
       end
     end
@@ -396,7 +405,7 @@ local function setup_auto()
     group = group,
     pattern = "*.md",
     callback = function(ev)
-      if vim.bo[ev.buf].buflisted and is_in_brain(ev.buf) then
+      if vim.bo[ev.buf].buflisted and is_task_note(ev.buf) then
         auto_start(ev.buf)
       end
     end,
