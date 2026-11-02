@@ -45,14 +45,16 @@ M.template_names = {
 }
 
 M.status = {
-  active_tag = "active",
+  not_started = "Not Started",
+  active_tag = "Active",
   in_progress = "In Progress",
   in_review = "In Review",
   review_complete = "Review Complete",
-  abandoned = "abandoned",
-  draft = "draft",
-  complete = "completed",
-  blocked = "blocked",
+  abandoned = "Abandoned",
+  paused = "Paused",
+  draft = "Draft",
+  complete = "Completed",
+  blocked = "Blocked",
 }
 
 -- Checkbox middle characters offered by the task picker (`key` -> CLI status=).

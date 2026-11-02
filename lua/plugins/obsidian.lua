@@ -55,13 +55,25 @@ local keys = {
     desc = "Open backlinks of current note",
   },
   new_note_key("<leader>ot", "WorkOncallTask", "Create new OnCall Work Task"),
-  new_note_key("<leader>onws", "WorkOncallShift", "Create new OnCall Work Shift"),
+  new_note_key(
+    "<leader>onws",
+    "WorkOncallShift",
+    "Create new OnCall Work Shift"
+  ),
   new_note_key("<leader>onwt", "WorkTask", "Create new Work Task"),
   new_note_key("<leader>onwd", "WorkDocument", "Create new Work Document"),
-  new_note_key("<leader>onwr", "WorkResearch", "Create new Work Research Document"),
+  new_note_key(
+    "<leader>onwr",
+    "WorkResearch",
+    "Create new Work Research Document"
+  ),
   new_note_key("<leader>onwp", "WorkProject", "Create new Work Project"),
   new_note_key("<leader>onwe", "WorkEvent", "Create new Work Event"),
-  new_note_key("<leader>onpd", "PersonalDocument", "Create New Personal Document"),
+  new_note_key(
+    "<leader>onpd",
+    "PersonalDocument",
+    "Create New Personal Document"
+  ),
   new_note_key(
     "<leader>onpr",
     "PersonalResearchDocument",
@@ -131,6 +143,16 @@ local keys = {
     desc = "Mark document abandoned",
   },
   {
+    "<leader>omp",
+    function()
+      local p = properties()
+      p.update({
+        { name = props.status, value = status.paused, type = "text" },
+      })
+    end,
+    desc = "Mark document paused",
+  },
+  {
     "<leader>omb",
     function()
       vim.ui.input({
@@ -169,15 +191,6 @@ local keys = {
       )
     end,
     desc = "Mark document as in-review",
-  },
-  {
-    "<leader>omR",
-    function()
-      properties().update {
-        { name = props.status, value = status.review_complete, type = "text" },
-      }
-    end,
-    desc = "Mark review complete",
   },
   {
     "<leader>oid",
