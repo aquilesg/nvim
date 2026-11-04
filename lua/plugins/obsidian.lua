@@ -67,7 +67,12 @@ local keys = {
     "WorkResearch",
     "Create new Work Research Document"
   ),
-  new_note_key("<leader>onwp", "WorkProject", "Create new Work Project"),
+  new_note_key("<leader>onwpe", "WorkEpic", "Create new Work Epic"),
+  new_note_key(
+    "<leader>onwpi",
+    "WorkInitiative",
+    "Create new Work Initiative"
+  ),
   new_note_key("<leader>onwe", "WorkEvent", "Create new Work Event"),
   new_note_key(
     "<leader>onpd",

@@ -1,169 +1,91 @@
-command_timeout = 1000
-
 "$schema" = 'https://starship.rs/config-schema.json'
 
+command_timeout = 1000
+add_newline = false
+
 format = """
-[](#9A348E)\
-$os\
-$username\
-[](bg:#DA627D fg:#9A348E)\
+${custom.rule}
+${custom.prefix}\
+$time\
 $directory\
-[](fg:#DA627D bg:#FCA17D)\
 $git_branch\
 $git_status\
-[](fg:#FCA17D bg:#86BBD8)\
 $env_var\
 $python\
-$c\
-$elixir\
-$elm\
-$golang\
-$gradle\
-$haskell\
-$java\
-$julia\
 $nodejs\
-$nim\
+$golang\
 $rust\
-$scala\
-[](fg:#86BBD8 bg:#06969A)\
-$docker_context\
-[](fg:#06969A bg:#33658A)\
-$time\
-[](fg:#33658A)
-$character
-"""
-
-[username]
-show_always = true
-style_user = "bg:#9A348E"
-style_root = "bg:#9A348E"
-format = '[$user ]($style)'
-disabled = false
-
-[os]
-style = "bg:#9A348E"
-disabled = true
+$java
+$character"""
 
 [directory]
-style = "bg:#DA627D"
-format = "[ $path ]($style)"
+style = "bold blue"
+format = "[$path]($style) "
 truncation_length = 3
 truncation_symbol = "…/"
 
-[directory.substitutions]
-"Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = " "
-"Pictures" = " "
+[git_branch]
+symbol = ""
+style = "purple"
+format = "[$symbol$branch]($style) "
 
-[aws]
-symbol = "󰸏"
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($profile)(\($region\))]($style)'
+[git_status]
+style = "yellow"
+format = "[$all_status$ahead_behind]($style) "
 
 [env_var.AWS_ENVIRONMENT]
 variable = "AWS_ENVIRONMENT"
-symbol = "󰸏 "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = "[ $symbol $env_value ]($style)"
+style = "cyan"
+format = "[$env_value]($style) "
 
 [env_var.AWS_ENVIRONMENT_ROLE_NAME]
 variable = "AWS_ROLE_NAME"
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = "[ $symbol $env_value ]($style)"
-
-[c]
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[cpp]
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[docker_context]
-symbol = " "
-style = "fg:#ffffff bg:#06969A"
-format = '[ $symbol $context ]($style)'
-
-[elixir]
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[elm]
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[git_branch]
-symbol = ""
-style = "fg:#1a1a2e bg:#FCA17D"
-format = '[ $symbol $branch ]($style)'
-
-[git_status]
-style = "fg:#1a1a2e bg:#FCA17D"
-format = '[$all_status$ahead_behind ]($style)'
-
-[golang]
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[gradle]
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[haskell]
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[java]
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[julia]
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[nodejs]
-symbol = ""
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[nim]
-symbol = "󰆥 "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[php]
-symbol = ""
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+style = "cyan"
+format = "[$env_value]($style) "
 
 [python]
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) venv: ($virtualenv) ]($style)'
+symbol = ""
+style = "green"
+format = "[$symbol$version(\\($virtualenv\\))]($style) "
+
+[nodejs]
+symbol = ""
+style = "green"
+format = "[$symbol$version]($style) "
+
+[golang]
+symbol = ""
+style = "green"
+format = "[$symbol$version]($style) "
 
 [rust]
-symbol = ""
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+symbol = ""
+style = "green"
+format = "[$symbol$version]($style) "
 
-[scala]
-symbol = " "
-style = "fg:#1a1a2e bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+[java]
+symbol = ""
+style = "green"
+format = "[$symbol$version]($style) "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
 
 [time]
 disabled = false
-time_format = "%R"
-style = "fg:#ffffff bg:#33658A"
-format = '[  $time ]($style)'
+time_format = "%T"
+style = "bright-black"
+format = "[$time]($style) "
+
+[custom.rule]
+command = "printf '╭'; printf '%*s' \"$(( $(stty size </dev/tty | cut -d' ' -f2) - 1 ))\" '' | tr ' ' '─'"
+when = true
+style = "bright-black"
+format = "[$output]($style)"
+
+[custom.prefix]
+command = "printf '├──'"
+when = true
+style = "bright-black"
+format = "[$output ]($style)"

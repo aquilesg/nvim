@@ -148,7 +148,10 @@ local function update_jira_status(key)
         api.transition_issue(key, choice.id, function(_, t_err)
           vim.schedule(function()
             if t_err then
-              vim.notify("Error updating status: " .. t_err, vim.log.levels.ERROR)
+              vim.notify(
+                "Error updating status: " .. t_err,
+                vim.log.levels.ERROR
+              )
             else
               vim.notify(key .. " -> " .. choice.name)
             end
@@ -530,7 +533,15 @@ return {
         desc = "Jira my tasks",
       },
       {
-        "<leader>jI",
+        "<leader>jb",
+        function()
+          require("jira.board.state").project_key = "CLOUD"
+          require("jira.board").switch_query "Backlog"
+        end,
+        desc = "Jira backlog",
+      },
+      {
+        "<leader>ji",
         function()
           with_note_ticket(function(key)
             vim.cmd("Jira info " .. key)
@@ -539,7 +550,7 @@ return {
         desc = "Open Jira ticket from note properties",
       },
       {
-        "<leader>ju",
+        "<leader>js",
         function()
           with_note_ticket(update_jira_status)
         end,

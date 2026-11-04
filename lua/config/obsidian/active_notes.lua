@@ -161,23 +161,60 @@ local function build_columns(notes)
   return out
 end
 
+local PROJECT_TYPES = { project_planning = true, initiative = true, epic = true }
+
+--- Split notes into Tasks and Projects groups, dropping empty ones.
+---@param notes table[]
+---@return table[]
+local function group_notes(notes)
+  local tasks, projects = {}, {}
+  for _, n in ipairs(notes) do
+    local list = PROJECT_TYPES[n.doc_type] and projects or tasks
+    list[#list + 1] = n
+  end
+  local groups = {}
+  for _, g in ipairs { { name = "Tasks", notes = tasks }, { name = "Projects", notes = projects } } do
+    g.cols = build_columns(g.notes)
+    if #g.cols > 0 then
+      groups[#groups + 1] = g
+    end
+  end
+  return groups
+end
+
 ---@param title string
 ---@param notes table[]
 local function open_board(title, notes)
-  local cols = build_columns(notes)
-  if #cols == 0 then
+  local groups = group_notes(notes)
+  if #groups == 0 then
     vim.notify("No notes to show (all completed or abandoned)", vim.log.levels.INFO)
     return
   end
 
   local width = math.floor(vim.o.columns * 0.9)
-  local colw = math.floor((width - (#cols - 1) * vim.fn.strdisplaywidth(SEP)) / #cols)
-  local maxcards = 0
-  for _, col in ipairs(cols) do
-    maxcards = math.max(maxcards, #col.cards)
+  local gi = 1
+  local cols, colw, nlines, height
+
+  local function layout()
+    cols = groups[gi].cols
+    colw = math.floor((width - (#cols - 1) * vim.fn.strdisplaywidth(SEP)) / #cols)
+    local maxcards = 0
+    for _, col in ipairs(cols) do
+      maxcards = math.max(maxcards, #col.cards)
+    end
+    nlines = 2 + maxcards * CARD_H
+    height = math.min(nlines, math.floor(vim.o.lines * 0.8))
   end
-  local nlines = 2 + maxcards * CARD_H
-  local height = math.min(nlines, math.floor(vim.o.lines * 0.8))
+
+  local function win_title()
+    local names = {}
+    for i, g in ipairs(groups) do
+      names[i] = i == gi and "[" .. g.name .. "]" or g.name
+    end
+    return " " .. title .. ": " .. table.concat(names, " ") .. " "
+  end
+
+  layout()
 
   local buf = vim.api.nvim_create_buf(false, true)
   vim.bo[buf].bufhidden = "wipe"
@@ -189,8 +226,8 @@ local function open_board(title, notes)
     col = math.floor((vim.o.columns - width) / 2),
     style = "minimal",
     border = "rounded",
-    title = " " .. title .. " ",
-    footer = " h/l column   j/k card   <CR> open   q close ",
+    title = win_title(),
+    footer = " h/l column   j/k card   <Tab> tasks/projects   <CR> open   q close ",
     footer_pos = "center",
   })
 
@@ -259,6 +296,24 @@ local function open_board(title, notes)
     render()
   end
 
+  local function switch()
+    if #groups < 2 then
+      return
+    end
+    gi = gi % #groups + 1
+    sel.col, sel.row = 1, 1
+    layout()
+    vim.api.nvim_win_set_config(win, {
+      relative = "editor",
+      width = width,
+      height = height,
+      row = math.floor((vim.o.lines - height) / 2) - 1,
+      col = math.floor((vim.o.columns - width) / 2),
+      title = win_title(),
+    })
+    render()
+  end
+
   local function close()
     if vim.api.nvim_win_is_valid(win) then
       vim.api.nvim_win_close(win, true)
@@ -272,6 +327,7 @@ local function open_board(title, notes)
   map("l", function() move(1, 0) end)
   map("j", function() move(0, 1) end)
   map("k", function() move(0, -1) end)
+  map("<Tab>", switch)
   map("q", close)
   map("<Esc>", close)
   map("<CR>", function()
