@@ -161,19 +161,25 @@ local function build_columns(notes)
   return out
 end
 
+local PERSONAL_PREFIX = "Personal/"
 local PROJECT_TYPES = { project_planning = true, initiative = true, epic = true }
 
---- Split notes into Tasks and Projects groups, dropping empty ones.
+--- Split notes into Personal, Tasks and Projects groups, dropping empty ones.
 ---@param notes table[]
 ---@return table[]
 local function group_notes(notes)
-  local tasks, projects = {}, {}
+  local tasks, projects, personal = {}, {}, {}
   for _, n in ipairs(notes) do
-    local list = PROJECT_TYPES[n.doc_type] and projects or tasks
+    local list = vim.startswith(n.rel, PERSONAL_PREFIX) and personal or PROJECT_TYPES[n.doc_type] and projects or tasks
     list[#list + 1] = n
   end
   local groups = {}
-  for _, g in ipairs { { name = "Tasks", notes = tasks }, { name = "Projects", notes = projects } } do
+  local defs = {
+    { name = "Tasks", notes = tasks },
+    { name = "Projects", notes = projects },
+    { name = "Personal", notes = personal },
+  }
+  for _, g in ipairs(defs) do
     g.cols = build_columns(g.notes)
     if #g.cols > 0 then
       groups[#groups + 1] = g
@@ -206,15 +212,13 @@ local function open_board(title, notes)
     height = math.min(nlines, math.floor(vim.o.lines * 0.8))
   end
 
-  local function win_title()
-    local names = {}
-    for i, g in ipairs(groups) do
-      names[i] = i == gi and "[" .. g.name .. "]" or g.name
-    end
-    return " " .. title .. ": " .. table.concat(names, " ") .. " "
-  end
-
   layout()
+
+  local ns = vim.api.nvim_create_namespace "active_notes_board"
+  local TABS_H = 3 -- one line plus border
+  local function board_row()
+    return math.floor((vim.o.lines - height - TABS_H) / 2) + TABS_H - 1
+  end
 
   local buf = vim.api.nvim_create_buf(false, true)
   vim.bo[buf].bufhidden = "wipe"
@@ -222,16 +226,46 @@ local function open_board(title, notes)
     relative = "editor",
     width = width,
     height = height,
-    row = math.floor((vim.o.lines - height) / 2) - 1,
+    row = board_row(),
     col = math.floor((vim.o.columns - width) / 2),
     style = "minimal",
     border = "rounded",
-    title = win_title(),
-    footer = " h/l column   j/k card   <Tab> tasks/projects   <CR> open   q close ",
+    title = " " .. title .. " ",
+    footer = " h/l column   j/k card   <Tab>/<S-Tab> tab   <CR> open   q close ",
     footer_pos = "center",
   })
 
-  local ns = vim.api.nvim_create_namespace "active_notes_board"
+  local tabs_buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[tabs_buf].bufhidden = "wipe"
+  local tabs_win = vim.api.nvim_open_win(tabs_buf, false, {
+    relative = "editor",
+    width = width,
+    height = 1,
+    row = board_row() - TABS_H,
+    col = math.floor((vim.o.columns - width) / 2),
+    style = "minimal",
+    border = "rounded",
+    focusable = false,
+  })
+
+  local function render_tabs()
+    local labels, marks, bytes = {}, {}, 0
+    for i, g in ipairs(groups) do
+      local label = string.format("  %s (%d)  ", g.name, #g.notes)
+      marks[#marks + 1] = { bytes, bytes + #label, i == gi and "PmenuSel" or "Comment" }
+      labels[i] = label
+      bytes = bytes + #label + #SEP
+    end
+    local line = table.concat(labels, SEP)
+    local pad = math.max(0, math.floor((width - vim.fn.strdisplaywidth(line)) / 2))
+    line = string.rep(" ", pad) .. line
+    vim.api.nvim_buf_set_lines(tabs_buf, 0, -1, false, { line })
+    vim.api.nvim_buf_clear_namespace(tabs_buf, ns, 0, -1)
+    for _, m in ipairs(marks) do
+      vim.api.nvim_buf_set_extmark(tabs_buf, ns, 0, m[1] + pad, { end_col = m[2] + pad, hl_group = m[3] })
+    end
+  end
+
   local sel = { col = 1, row = 1 }
 
   local function render()
@@ -296,21 +330,17 @@ local function open_board(title, notes)
     render()
   end
 
-  local function switch()
+  local function switch(dir)
     if #groups < 2 then
       return
     end
-    gi = gi % #groups + 1
+    gi = (gi - 1 + dir) % #groups + 1
     sel.col, sel.row = 1, 1
     layout()
-    vim.api.nvim_win_set_config(win, {
-      relative = "editor",
-      width = width,
-      height = height,
-      row = math.floor((vim.o.lines - height) / 2) - 1,
-      col = math.floor((vim.o.columns - width) / 2),
-      title = win_title(),
-    })
+    local col = math.floor((vim.o.columns - width) / 2)
+    vim.api.nvim_win_set_config(win, { relative = "editor", width = width, height = height, row = board_row(), col = col })
+    vim.api.nvim_win_set_config(tabs_win, { relative = "editor", width = width, height = 1, row = board_row() - TABS_H, col = col })
+    render_tabs()
     render()
   end
 
@@ -320,6 +350,16 @@ local function open_board(title, notes)
     end
   end
 
+  vim.api.nvim_create_autocmd("WinClosed", {
+    pattern = tostring(win),
+    once = true,
+    callback = function()
+      if vim.api.nvim_win_is_valid(tabs_win) then
+        vim.api.nvim_win_close(tabs_win, true)
+      end
+    end,
+  })
+
   local function map(lhs, fn)
     vim.keymap.set("n", lhs, fn, { buffer = buf, nowait = true })
   end
@@ -327,7 +367,8 @@ local function open_board(title, notes)
   map("l", function() move(1, 0) end)
   map("j", function() move(0, 1) end)
   map("k", function() move(0, -1) end)
-  map("<Tab>", switch)
+  map("<Tab>", function() switch(1) end)
+  map("<S-Tab>", function() switch(-1) end)
   map("q", close)
   map("<Esc>", close)
   map("<CR>", function()
@@ -336,6 +377,7 @@ local function open_board(title, notes)
     vim.cmd("edit " .. vim.fn.fnameescape(card.path))
   end)
 
+  render_tabs()
   render()
 end
 
@@ -382,6 +424,7 @@ function M.open_picker(opts)
         id = id,
         doc_type = doc_type,
         status = status,
+        rel = match.rel,
         path = vim.fs.joinpath(root, match.rel),
       }
     end
