@@ -1,5 +1,5 @@
 -- Close Filetypes of a Buffer
-local is_in_brain = require("config.obsidian.vault").is_in_brain
+local is_in_brain = require("config.obsidian").is_in_brain
 
 -- Effective filetype for the command: brain-vault markdown notes are grouped
 -- under a synthetic "brain" filetype so they can be listed/closed separately.

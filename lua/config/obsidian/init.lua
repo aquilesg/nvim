@@ -32,20 +32,6 @@ M.directories = {
   WorkOncallShift = "Work/OnCallShifts/",
 }
 
-M.template_names = {
-  WorkTask = "WorkTask",
-  WorkDocument = "WorkDocument",
-  WorkResearch = "WorkResearch",
-  WorkEvent = "WorkEvent",
-  WorkEpic = "WorkEpic",
-  WorkInitiative = "WorkInitiative",
-  WorkOncallShift = "WorkOncallShift",
-  WorkOncallTask = "WorkOncallTask",
-  PersonalDocument = "PersonalDocument",
-  PersonalResearchDocument = "PersonalResearchDocument",
-  Recipes = "Recipes",
-}
-
 M.status = {
   not_started = "Not Started",
   active_tag = "active",
@@ -57,6 +43,17 @@ M.status = {
   draft = "Draft",
   complete = "Completed",
   blocked = "Blocked",
+}
+
+-- Kanban column order.
+M.board_statuses = {
+  M.status.not_started,
+  M.status.draft,
+  M.status.in_progress,
+  M.status.in_review,
+  M.status.review_complete,
+  M.status.blocked,
+  M.status.paused,
 }
 
 -- Checkbox middle characters offered by the task picker (`key` -> CLI status=).
@@ -89,6 +86,14 @@ function M.relative_path(absolute_path)
     return abs:sub(#vault + 2)
   end
   return abs
+end
+
+--- True when buffer `buf_id` is a file inside the vault.
+---@param buf_id integer
+---@return boolean
+function M.is_in_brain(buf_id)
+  local abs = vim.fs.normalize(vim.api.nvim_buf_get_name(buf_id))
+  return vim.startswith(abs, M.vault_dir():gsub("/$", "") .. "/")
 end
 
 --- Vault-relative path of the current buffer, or nil when it has no file.

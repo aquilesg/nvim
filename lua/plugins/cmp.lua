@@ -1,4 +1,4 @@
-local is_brain = require("config.obsidian.vault").is_in_brain
+local is_brain = require("config.obsidian").is_in_brain
 
 -- register the Kitty kind once, so the enum doesn't grow on every completion
 local kitty_kind_idx

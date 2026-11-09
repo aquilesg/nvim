@@ -12,7 +12,7 @@ local M = {}
 
 local cli = require "config.obsidian.cli"
 local vault = require "config.obsidian"
-local is_in_brain = require("config.obsidian.vault").is_in_brain
+local is_in_brain = require("config.obsidian").is_in_brain
 
 -- Actions the CLI understands; `goto` is handled locally from the cache.
 local CLI_ACTIONS = { "start", "stop", "pause", "resume", "status" }

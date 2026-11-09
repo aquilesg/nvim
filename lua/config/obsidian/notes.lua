@@ -7,7 +7,7 @@ local vault = require "config.obsidian"
 
 ---@class config.obsidian.CreateOpts
 ---@field prompt_for_type boolean|nil # pick the type with `vim.ui.select`
----@field template_type string|nil # key into directories / template_names
+---@field template_type string|nil # key into directories, also the template name
 ---@field insert_link boolean|nil # insert `[[id|title]]` at the cursor first
 
 --- Create a note for a template type key (e.g. `"WorkOncallTask"`).
@@ -33,7 +33,7 @@ end
 function M.create(opts)
   opts = opts or {}
 
-  local template_keys = vim.tbl_keys(vault.template_names)
+  local template_keys = vim.tbl_keys(vault.directories)
   table.sort(template_keys)
 
   local function create_for_choice(choice)
@@ -48,10 +48,9 @@ function M.create(opts)
     local id = vault.camel_case_title(title)
 
     local dir = vault.directories[choice]
-    local template = vault.template_names[choice]
-    if not dir or not template then
+    if not dir then
       vim.notify(
-        "No directory or template for " .. tostring(choice),
+        "No directory for " .. tostring(choice),
         vim.log.levels.ERROR
       )
       return
@@ -66,7 +65,7 @@ function M.create(opts)
       id = id,
       title = title,
       dir = dir,
-      template = template,
+      template = choice,
       verbatim = true,
     })
     if not ok then

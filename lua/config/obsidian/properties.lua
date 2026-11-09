@@ -204,56 +204,59 @@ end
 --- entries. With an empty `response` only the status is set.
 ---@param note_rel string
 ---@param response string|nil
----@param opts { blocked_property: string, status_property: string, status_value: string }
 ---@return table[]
-function M.for_mark_blocked(note_rel, response, opts)
+function M.for_mark_blocked(note_rel, response)
+  local props = vault.properties
+  local status_row =
+    { name = props.status, value = vault.status.blocked, type = "text" }
   if not response or response == "" then
-    return {
-      { name = opts.status_property, value = opts.status_value, type = "text" },
-    }
+    return { status_row }
   end
 
-  local existing = M.get(note_rel, { opts.blocked_property })
-  local reasons = M.normalize_blocked_by(existing[opts.blocked_property])
+  local existing = M.get(note_rel, { props.blocked_reason })
+  local reasons = M.normalize_blocked_by(existing[props.blocked_reason])
   table.insert(reasons, { uid = M.wiki_link_if_vault_note(response) })
   return {
-    { name = opts.status_property, value = opts.status_value, type = "text" },
-    { name = opts.blocked_property, value = reasons, type = "list" },
+    status_row,
+    { name = props.blocked_reason, value = reasons, type = "list" },
   }
 end
 
---- Tags with `exclude_tag` removed, plus completed date and status.
+--- Active tag removed, plus completed date and `status` (default Completed).
 ---@param note_rel string
----@param opts { tags_key: string, status_key: string, status_complete: string, exclude_tag?: string, completed_date_property?: string }
+---@param status? string
 ---@return table[]
-function M.for_mark_complete(note_rel, opts)
-  local exclude_tag = opts.exclude_tag or "active"
-  local completed_key = opts.completed_date_property or "completedDate"
+function M.for_mark_complete(note_rel, status)
+  local props = vault.properties
 
-  local note_tags = M.get(note_rel, { opts.tags_key })
+  local note_tags = M.get(note_rel, { props.tags })
   local filtered = {}
-  for _, t in ipairs(parse_tags(note_tags[opts.tags_key])) do
-    if not tags_equivalent(t, exclude_tag) then
+  for _, t in ipairs(parse_tags(note_tags[props.tags])) do
+    if not tags_equivalent(t, vault.status.active_tag) then
       filtered[#filtered + 1] = t
     end
   end
 
   return {
-    { name = completed_key, value = os.date "%Y-%m-%d", type = "date" },
-    { name = opts.status_key, value = opts.status_complete, type = "text" },
-    { name = opts.tags_key, value = filtered, type = "list" },
+    { name = "completedDate", value = os.date "%Y-%m-%d", type = "date" },
+    {
+      name = props.status,
+      value = status or vault.status.complete,
+      type = "text",
+    },
+    { name = props.tags, value = filtered, type = "list" },
   }
 end
 
---- Add `active_tag` to tags if missing; set status to in-progress.
+--- Add the active tag to tags if missing; set status to in-progress.
 ---@param note_rel string
----@param opts { tags_key: string, status_key: string, status_in_progress: string, active_tag?: string }
 ---@return table[]
-function M.for_mark_in_progress(note_rel, opts)
-  local active_tag = opts.active_tag or "active"
+function M.for_mark_in_progress(note_rel)
+  local props = vault.properties
+  local active_tag = vault.status.active_tag
 
-  local note_tags = M.get(note_rel, { opts.tags_key })
-  local tags = parse_tags(note_tags[opts.tags_key])
+  local note_tags = M.get(note_rel, { props.tags })
+  local tags = parse_tags(note_tags[props.tags])
   local has_active = false
   for _, t in ipairs(tags) do
     if tags_equivalent(t, active_tag) then
@@ -265,8 +268,12 @@ function M.for_mark_in_progress(note_rel, opts)
     table.insert(tags, active_tag)
   end
   return {
-    { name = opts.status_key, value = opts.status_in_progress, type = "text" },
-    { name = opts.tags_key, value = tags, type = "list" },
+    {
+      name = props.status,
+      value = vault.status.in_progress,
+      type = "text",
+    },
+    { name = props.tags, value = tags, type = "list" },
   }
 end
 

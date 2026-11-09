@@ -132,10 +132,9 @@ end
 ---@return table[]
 local function build_columns(notes)
   local st = vault.status
-  local defs = { st.draft, st.in_progress, st.in_review, st.review_complete, st.blocked, st.paused }
   local hidden = { [st.complete:lower()] = true, [st.abandoned:lower()] = true }
   local cols, by_status = {}, {}
-  for _, name in ipairs(defs) do
+  for _, name in ipairs(vault.board_statuses) do
     local col = { name = name, cards = {} }
     cols[#cols + 1] = col
     by_status[name:lower()] = col
@@ -382,21 +381,16 @@ local function open_board(title, notes)
 end
 
 ---@class config.obsidian.ActiveNotesOpts
----@field template_dir_name? string # skip notes under this directory
 ---@field tag? string # default "active"
 ---@field active_property? { key: string, value: string|number } # overrides tag
----@field property_keys? { status?: string, document_type?: string, id?: string }
 
 --- Open the picker.
 ---@param opts config.obsidian.ActiveNotesOpts|nil
 function M.open_picker(opts)
   opts = opts or {}
   local root = vault.vault_dir()
-  local template_dir = opts.template_dir_name or vault.template_dir
-  local pk = opts.property_keys or {}
-  local status_k = pk.status or "status"
-  local doc_k = pk.document_type or "document_type"
-  local id_k = pk.id or "id"
+  local template_dir = vault.template_dir
+  local props = vault.properties
 
   local matches, filter_label
   local ap = opts.active_property
@@ -417,9 +411,9 @@ function M.open_picker(opts)
   local display_notes = {}
   for _, match in ipairs(matches) do
     if not string.find(match.rel, template_dir, 1, true) then
-      local id = to_str(note_field(match.note, id_k))
-      local doc_type = to_str(note_field(match.note, doc_k))
-      local status = to_str(note_field(match.note, status_k))
+      local id = to_str(note_field(match.note, props.id))
+      local doc_type = to_str(note_field(match.note, props.document_type))
+      local status = to_str(note_field(match.note, props.status))
       display_notes[#display_notes + 1] = {
         id = id,
         doc_type = doc_type,

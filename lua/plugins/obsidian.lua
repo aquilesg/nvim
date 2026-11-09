@@ -91,11 +91,6 @@ local keys = {
     function()
       require("config.obsidian.active_notes").open_picker {
         tag = status.active_tag,
-        property_keys = {
-          status = props.status,
-          document_type = props.document_type,
-          id = props.id,
-        },
       }
     end,
     desc = "Open currently active tasks",
@@ -112,12 +107,7 @@ local keys = {
     "<leader>omc",
     function()
       local p = properties()
-      p.update(p.for_mark_complete(vault.current_note_path(), {
-        tags_key = props.tags,
-        status_key = props.status,
-        status_complete = status.complete,
-        exclude_tag = status.active_tag,
-      }))
+      p.update(p.for_mark_complete(vault.current_note_path()))
     end,
     desc = "Mark complete",
   },
@@ -125,12 +115,7 @@ local keys = {
     "<leader>omi",
     function()
       local p = properties()
-      p.update(p.for_mark_in_progress(vault.current_note_path(), {
-        tags_key = props.tags,
-        status_key = props.status,
-        status_in_progress = status.in_progress,
-        active_tag = status.active_tag,
-      }))
+      p.update(p.for_mark_in_progress(vault.current_note_path()))
     end,
     desc = "Mark document in progress",
   },
@@ -138,12 +123,9 @@ local keys = {
     "<leader>oma",
     function()
       local p = properties()
-      p.update(p.for_mark_complete(vault.current_note_path(), {
-        tags_key = props.tags,
-        status_key = props.status,
-        status_complete = status.abandoned,
-        exclude_tag = status.active_tag,
-      }))
+      p.update(
+        p.for_mark_complete(vault.current_note_path(), status.abandoned)
+      )
     end,
     desc = "Mark document abandoned",
   },
@@ -164,11 +146,7 @@ local keys = {
         prompt = "Why is this blocked? (Link ticket if available)",
       }, function(response)
         local p = properties()
-        p.update(p.for_mark_blocked(vault.current_note_path(), response, {
-          blocked_property = props.blocked_reason,
-          status_property = props.status,
-          status_value = status.blocked,
-        }))
+        p.update(p.for_mark_blocked(vault.current_note_path(), response))
       end)
     end,
     desc = "Mark document blocked",
