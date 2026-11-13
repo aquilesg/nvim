@@ -11,7 +11,7 @@ local KEYS = {
   "<CR> / i  run (prompt) / full line (results) / focus prompt (results)",
   ",t  jump to trace    ,f  live tail",
   ",r  refresh    ,e  env    ,[ ,]  range preset",
-  ",y ,p  yank / paste range    ,u ,0  undo / reset range",
+  ",s  set range    ,y ,p  yank / paste range    ,u ,0  undo / reset range",
   "q  close    /  search (plain vim)",
 }
 

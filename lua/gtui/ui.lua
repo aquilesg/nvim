@@ -110,6 +110,19 @@ function M.common_maps(buf, refresh)
     vim.fn.setreg("+", state.range:to_json())
     vim.notify("yanked " .. state.range:to_json())
   end, "yank range")
+  map("<localleader>s", function()
+    vim.ui.input({ prompt = "range (now-2h | from, to): " }, function(text)
+      if not text or vim.trim(text) == "" then
+        return
+      end
+      local r, err = timerange.parse(text)
+      if not r then
+        return vim.notify(err, vim.log.levels.ERROR)
+      end
+      state.set_range(r)
+      refresh()
+    end)
+  end, "set range")
   map("<localleader>p", function()
     local r, err = timerange.parse(vim.fn.getreg "+")
     if not r then

@@ -28,12 +28,12 @@ local function redraw()
   if S.sel.b then
     marks[#marks + 1] = { S.sel.b, "DiagnosticError" }
   end
-  local out = canvas.render(S.series, { width = width, height = height, marks = marks, legend_max = S.legend and 8 or 0 })
+  local out = canvas.render(S.series, { width = width, height = height, marks = marks, legend_max = S.legend and 8 or 0, focus = S.focus })
   S.out = out
   ui.set_lines(S.res_buf, out.lines)
   vim.api.nvim_buf_clear_namespace(S.res_buf, NS, 0, -1)
   ui.apply_hls(S.res_buf, NS, out.hls)
-  ui.set_info(S.res_buf, ("%d series"):format(#S.series))
+  ui.set_info(S.res_buf, ("%d series"):format(#S.series) .. (S.focus and ", focus: " .. S.names[S.focus] or ""))
 end
 
 function M.run()
@@ -51,7 +51,7 @@ function M.run()
     if err then
       return vim.notify(err, vim.log.levels.ERROR)
     end
-    S.series, S.sel = series, {}
+    S.series, S.sel, S.focus = series, {}, nil
     redraw()
     vim.notify(#series .. " series")
     if valid() then
@@ -122,6 +122,46 @@ local function show_series()
   return true
 end
 
+local function list_all()
+  if #S.series == 0 then
+    return
+  end
+  local lines, hls, names = {}, {}, {}
+  S.names = names
+  for i, s in ipairs(S.series) do
+    local keys = vim.tbl_keys(s.metric)
+    table.sort(keys)
+    local parts = {}
+    for _, k in ipairs(keys) do
+      if k ~= "__name__" then
+        parts[#parts + 1] = k .. "=" .. s.metric[k]
+      end
+    end
+    lines[i] = "■ " .. (s.metric.__name__ or "") .. "{" .. table.concat(parts, ", ") .. "}"
+    names[i] = lines[i]:sub(#"■ " + 1)
+    hls[i] = { row = i - 1, col = 0, end_col = #"■", group = canvas.group(i) }
+  end
+  local buf = ui.scratch("series", "gtui")
+  ui.set_lines(buf, lines)
+  ui.apply_hls(buf, NS, hls)
+  local w = math.min(vim.o.columns - 4, math.max(40, unpack(vim.tbl_map(vim.fn.strdisplaywidth, lines))) + 2)
+  local h = math.min(#lines, vim.o.lines - 6)
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor", width = w, height = h,
+    row = math.floor((vim.o.lines - h) / 2), col = math.floor((vim.o.columns - w) / 2),
+    border = "rounded", title = (" %d series "):format(#lines),
+  })
+  vim.wo[win].wrap = false
+  for _, k in ipairs { "q", "<Esc>" } do
+    vim.keymap.set("n", k, "<cmd>close<cr>", { buffer = buf, nowait = true })
+  end
+  vim.keymap.set("n", "<CR>", function()
+    S.focus = vim.api.nvim_win_get_cursor(win)[1]
+    vim.cmd.close()
+    redraw()
+  end, { buffer = buf, nowait = true })
+end
+
 local function zoom()
   if not (S.sel.a and S.sel.b) then
     if S.out and S.out.legend_row and show_series() then
@@ -155,7 +195,7 @@ function M.open()
   end
   local t = ui.query_tab { title = "metrics", lang = "promql", ds = "mimir", placeholder = PLACEHOLDER, run = M.run }
   S.res_win, S.res_buf, S.query, S.set_query = t.res_win, t.res_buf, t.query, t.set_query
-  S.series, S.sel, S.out = {}, {}, nil
+  S.series, S.sel, S.out, S.focus = {}, {}, nil, nil
   vim.wo[S.res_win].wrap = false
 
   ui.common_maps(S.res_buf, M.run)
@@ -166,9 +206,10 @@ function M.open()
   map("<localleader>v", mark, "select range edge")
   map("<CR>", zoom, "zoom to selection / series labels")
   map("<Esc>", function()
-    S.sel = {}
+    S.sel, S.focus = {}, nil
     redraw()
   end, "cancel selection")
+  map("<localleader>a", list_all, "list all series")
   map("<localleader>l", function()
     S.legend = not S.legend
     redraw()

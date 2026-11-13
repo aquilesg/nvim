@@ -97,6 +97,15 @@ function M.parse(text)
     from, to = q:match "from=([^&]+)", q:match "to=([^&]+)"
     if from and to then
       from, to = vim.uri_decode(from), vim.uri_decode(to)
+    else
+      -- typed form: "now-2h", "from, to" or "from -> to"
+      from, to = text:match "^(.-)%s*,%s*(.+)$"
+      if not from then
+        from, to = text:match "^(.-)%s*%->%s*(.+)$"
+      end
+      if not from then
+        from, to = text, "now"
+      end
     end
   end
   local bad = ("not a time range: %q"):format(text:sub(1, 60))

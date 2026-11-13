@@ -12,6 +12,7 @@ local function setup_hl()
   for i, c in ipairs(PALETTE) do
     vim.api.nvim_set_hl(0, "GtuiSeries" .. i, { fg = c, default = true })
   end
+  vim.api.nvim_set_hl(0, "GtuiDim", { fg = "#4b5263", default = true })
 end
 setup_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = setup_hl })
@@ -64,7 +65,7 @@ local function bresenham(plot, x0, y0, x1, y1)
 end
 
 -- series: { { name, points = { {t, v}, ... } } }
--- opts: width, height (cells of the plot area), marks = { { frac, group } }, legend_max
+-- opts: width, height (cells of the plot area), marks = { { frac, group } }, legend_max, focus (series index kept bright)
 -- framed (default) adds 3 lines (top, bottom, x labels) and a border column on each side of the plot;
 -- opts.frame = false drops the box and keeps only the y axis and the bottom axis (2 lines)
 -- returns { lines, hls = { {row, col, end_col, group} }, t0, t1, width }
@@ -100,7 +101,17 @@ function M.render(series, opts)
       bits[r][c] = 0
     end
   end
-  for si, s in ipairs(series) do
+  local order = {}
+  for si = 1, #series do
+    if si ~= opts.focus then
+      order[#order + 1] = si
+    end
+  end
+  if opts.focus and series[opts.focus] then
+    order[#order + 1] = opts.focus
+  end
+  for _, si in ipairs(order) do
+    local s = series[si]
     local function plot(x, y)
       if x < 0 or y < 0 or x >= DW or y >= DH then
         return
@@ -158,6 +169,9 @@ function M.render(series, opts)
       local ch, group
       if bits[r][c] ~= 0 then
         ch, group = braille(bits[r][c]), M.group(owner[r][c])
+        if opts.focus and owner[r][c] ~= opts.focus then
+          group = "GtuiDim"
+        end
       elseif mark_cols[c] then
         ch, group = "│", mark_cols[c]
       elseif r == 1 or r == mid then
