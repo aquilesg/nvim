@@ -395,6 +395,7 @@ return {
   },
   {
     "mrjones2014/smart-splits.nvim",
+    tag = "v2.1.1-final",
     build = "./kitty/install-kittens.bash",
     event = "VeryLazy",
     keys = {
