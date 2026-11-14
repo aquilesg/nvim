@@ -52,8 +52,38 @@ return {
     quickfile = { enabled = true },
     dashboard = {
       enabled = true,
+      preset = {
+        header = [[
+      _           _
+     (o)---------(o)
+    /    .-----.    \
+   (    (  ___  )    )
+    \    '-----'    /
+  .--'-------------'--.
+  | > nvim .          |
+  | const frog = code; |
+  '--------------------'
+ /______________________\]],
+      },
       sections = {
-        { section = "header" },
+        function()
+          if vim.fn.executable "chafa" == 0 then
+            return { section = "header" }
+          end
+          local imgs = vim.fn.glob(vim.fn.stdpath "config" .. "/assets/*.{png,jpg,jpeg,gif,webp}", false, true)
+          if #imgs == 0 then
+            return { section = "header" }
+          end
+          math.randomseed(vim.uv.hrtime())
+          local img = imgs[math.random(#imgs)]
+          return {
+            section = "terminal",
+            cmd = ("chafa %s --format symbols --symbols vhalf --size 30x15 --stretch; sleep .1"):format(vim.fn.shellescape(img)),
+            height = 15,
+            width = 30,
+            padding = 1,
+          }
+        end,
         { section = "keys", gap = 1, padding = 1 },
         {
           pane = 2,

@@ -11,6 +11,9 @@ dependencies=(neovim
   # snacks.image rendering
   imagemagick mermaid-cli
 
+  # Dashboard header image
+  chafa
+
   # markdown-preview.nvim build step
   yarn
 
