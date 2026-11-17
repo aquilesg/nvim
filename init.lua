@@ -10,6 +10,7 @@ end
 
 require "config.lazy"
 require("gtui").setup()
+require("mermaid_pop").setup()
 
 -- Editor options (grouped for clarity)
 vim.opt.wrap = false
