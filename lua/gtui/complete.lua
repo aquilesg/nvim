@@ -68,6 +68,10 @@ function M.prefetch(ds)
   end
 end
 
+function M.metric_names(cb)
+  fetch("mimir", "/label/__name__/values", nil, cb)
+end
+
 local function items_of(names, kind, detail)
   local out = {}
   for _, n in ipairs(names) do

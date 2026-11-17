@@ -7,13 +7,6 @@ local M = {}
 local LEVELS = { { "error", "DiagnosticError" }, { "warn", "DiagnosticWarn" } }
 local NS = vim.api.nvim_create_namespace "gtui_logs"
 local PLACEHOLDER = [[LogQL, e.g. {app="x", tng_environment="$environment"} |= "error"  (Enter to run)]]
-local KEYS = {
-  "<CR> / i  run (prompt) / full line (results) / focus prompt (results)",
-  ",t  jump to trace    ,f  live tail",
-  ",r  refresh    ,e  env    ,[ ,]  range preset",
-  ",s  set range    ,y ,p  yank / paste range    ,u ,0  undo / reset range",
-  "q  close    /  search (plain vim)",
-}
 
 local S = { rows = {}, seq = 0, tailing = false, inflight = false }
 
@@ -207,7 +200,6 @@ function M.open()
   map("i", t.focus_prompt, "focus prompt")
   map("<localleader>t", jump_trace, "jump to trace")
   map("<localleader>f", toggle_tail, "live tail")
-  map("?", function() vim.notify(table.concat(KEYS, "\n")) end, "keys")
 
   local timer = vim.uv.new_timer()
   timer:start(2000, 2000, vim.schedule_wrap(tail_tick))

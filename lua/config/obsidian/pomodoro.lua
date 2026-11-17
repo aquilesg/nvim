@@ -412,8 +412,8 @@ local function setup_auto()
   })
   vim.api.nvim_create_autocmd({ "BufDelete", "BufWipeout" }, {
     group = group,
-    callback = function()
-      if auto_started then
+    callback = function(ev)
+      if auto_started and is_task_note(ev.buf) then
         vim.schedule(auto_stop)
       end
     end,

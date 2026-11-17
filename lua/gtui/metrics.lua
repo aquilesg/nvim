@@ -182,6 +182,19 @@ local function zoom()
   M.run()
 end
 
+function M.find()
+  require("gtui.complete").metric_names(function(names)
+    if #names == 0 then
+      return vim.notify("no metrics found", vim.log.levels.WARN)
+    end
+    require("gtui.pick").select(names, { prompt = "metric", format = function(n) return n end }, function(name)
+      M.open()
+      S.set_query(name)
+      M.run()
+    end)
+  end)
+end
+
 function M.explore(q)
   M.open()
   vim.cmd.stopinsert()
@@ -210,6 +223,7 @@ function M.open()
     redraw()
   end, "cancel selection")
   map("<localleader>a", list_all, "list all series")
+  map("<localleader>/", M.find, "search metrics")
   map("<localleader>l", function()
     S.legend = not S.legend
     redraw()

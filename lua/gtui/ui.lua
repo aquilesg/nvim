@@ -89,6 +89,40 @@ function M.use_bar(win)
   update_bars()
 end
 
+local function show_help(buf)
+  local rows = {}
+  for _, m in ipairs(vim.api.nvim_buf_get_keymap(buf, "n")) do
+    local desc = m.desc and m.desc:match "^gtui: (.*)"
+    if desc then
+      rows[#rows + 1] = { m.lhs:gsub(" ", "<Space>"), desc }
+    end
+  end
+  table.sort(rows, function(a, b) return a[1] < b[1] end)
+  local width = 0
+  for _, r in ipairs(rows) do
+    width = math.max(width, vim.fn.strdisplaywidth(r[1]))
+  end
+  local lines, hls = {}, {}
+  for i, r in ipairs(rows) do
+    lines[i] = r[1] .. string.rep(" ", width - vim.fn.strdisplaywidth(r[1]) + 2) .. r[2]
+    hls[i] = { row = i - 1, col = 0, end_col = #r[1], group = "Special" }
+  end
+  local hbuf = M.scratch("keys", "gtui")
+  M.set_lines(hbuf, lines)
+  M.apply_hls(hbuf, vim.api.nvim_create_namespace "gtui_help", hls)
+  local w = math.min(vim.o.columns - 4, math.max(30, unpack(vim.tbl_map(vim.fn.strdisplaywidth, lines))) + 2)
+  local h = math.min(#lines, vim.o.lines - 6)
+  local win = vim.api.nvim_open_win(hbuf, true, {
+    relative = "editor", width = w, height = h,
+    row = math.floor((vim.o.lines - h) / 2), col = math.floor((vim.o.columns - w) / 2),
+    border = "rounded", title = " keymaps ", title_pos = "center",
+  })
+  vim.wo[win].wrap = false
+  for _, k in ipairs { "q", "<Esc>", "?" } do
+    vim.keymap.set("n", k, "<cmd>close<cr>", { buffer = hbuf, nowait = true })
+  end
+end
+
 -- range, env and refresh keys shared by every gtui results buffer
 function M.common_maps(buf, refresh)
   local function map(lhs, fn, desc)
@@ -131,11 +165,8 @@ function M.common_maps(buf, refresh)
     state.set_range(r)
     refresh()
   end, "paste range")
-  map("q", function()
-    if #vim.api.nvim_list_tabpages() > 1 then
-      vim.cmd.tabclose()
-    end
-  end, "close tab")
+  map("q", vim.cmd.tabclose, "close tab")
+  map("?", function() show_help(buf) end, "show keymaps")
 end
 
 function M.ts_str(ns)

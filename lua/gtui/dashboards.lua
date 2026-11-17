@@ -468,11 +468,32 @@ local function zoom()
   vim.api.nvim_win_set_buf(win, buf)
   ui.use_bar(win)
   vim.wo[win].wrap = false
-  local lines, hls = card(p, idx, vim.api.nvim_win_get_width(win), vim.api.nvim_win_get_height(win) - 3)
-  ui.set_lines(buf, lines)
-  ui.apply_hls(buf, NS, hls)
-  vim.keymap.set("n", "q", vim.cmd.tabclose, { buffer = buf, nowait = true, desc = "gtui: close tab" })
-  vim.keymap.set("n", "gd", function() explore(p) end, { buffer = buf, desc = "gtui: explore panel" })
+  local gen = 0
+  local function render()
+    if not vim.api.nvim_buf_is_valid(buf) then
+      return
+    end
+    local lines, hls = card(p, idx, vim.api.nvim_win_get_width(win), vim.api.nvim_win_get_height(win) - 3)
+    ui.set_lines(buf, lines)
+    vim.api.nvim_buf_clear_namespace(buf, NS, 0, -1)
+    ui.apply_hls(buf, NS, hls)
+  end
+  local function refresh_card()
+    gen = gen + 1
+    local g = gen
+    p.data, p.err = nil, nil
+    fetch(p, function(err, data)
+      if g ~= gen then
+        return
+      end
+      p.err, p.data = err, data
+      render()
+    end)
+    render()
+  end
+  render()
+  ui.common_maps(buf, refresh_card)
+  vim.keymap.set("n", "gd", function() explore(p) end, { buffer = buf, nowait = true, desc = "gtui: explore panel" })
 end
 
 -- environment variables follow the global env (,e), so only the rest are offered
