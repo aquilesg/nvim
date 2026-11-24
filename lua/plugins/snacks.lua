@@ -70,7 +70,7 @@ return {
           if vim.fn.executable "chafa" == 0 then
             return { section = "header" }
           end
-          local imgs = vim.fn.glob(vim.fn.stdpath "config" .. "/assets/*.{png,jpg,jpeg,gif,webp}", false, true)
+          local imgs = vim.fn.glob(vim.fn.stdpath "config" .. "/bufo/all-the-bufo/*.{png,jpg,jpeg,gif,webp}", false, true)
           if #imgs == 0 then
             return { section = "header" }
           end
